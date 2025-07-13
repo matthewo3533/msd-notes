@@ -96,9 +96,6 @@ const ClothingQuestions: React.FC<ClothingQuestionsProps> = ({ formData, onFormD
 
   return (
     <div className="form-sections-container">
-      <button className="copy-btn" onClick={onBack} style={{ marginBottom: '1.5rem' }}>
-        ← Back to Services
-      </button>
 
       {/* General Questions */}
       <div className="form-section-card section-visible">
