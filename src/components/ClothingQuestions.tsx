@@ -36,7 +36,6 @@ interface ClothingQuestionsProps {
 
 const ClothingQuestions: React.FC<ClothingQuestionsProps> = ({ formData, onFormDataChange, onBack }) => {
   const [visibleSections, setVisibleSections] = useState<Set<string>>(new Set(['general']));
-  const sectionRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
 
   useEffect(() => {
     const observer = new window.IntersectionObserver(
