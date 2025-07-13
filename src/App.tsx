@@ -185,12 +185,17 @@ function App() {
     }
   }, [darkMode]);
 
-  // Get time-based greeting and current date
+  // Get service name for greeting
   const getGreeting = () => {
-    const hour = new Date().getHours();
-    if (hour < 12) return 'Good morning';
-    if (hour < 17) return 'Good afternoon';
-    return 'Good evening';
+    // Return service name if a service is selected
+    if (selectedService) {
+      const service = services.find(s => s.id === selectedService);
+      if (service) {
+        return service.title;
+      }
+    }
+    
+    return 'MSD Notes App';
   };
 
   const getCurrentDate = () => {

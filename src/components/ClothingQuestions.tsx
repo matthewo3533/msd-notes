@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import IncomeSection from './IncomeSection';
 import PaymentSection from './PaymentSection';
 import DecisionSection from './DecisionSection';
@@ -35,6 +35,38 @@ interface ClothingQuestionsProps {
 }
 
 const ClothingQuestions: React.FC<ClothingQuestionsProps> = ({ formData, onFormDataChange, onBack }) => {
+  const [visibleSections, setVisibleSections] = useState<Set<string>>(new Set(['general']));
+  const sectionRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
+
+  useEffect(() => {
+    const observer = new window.IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const sectionId = entry.target.getAttribute('data-section');
+            if (sectionId) {
+              setVisibleSections((prev) => new Set(prev).add(sectionId));
+            }
+          }
+        });
+      },
+      {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px',
+      }
+    );
+    const timeoutId = setTimeout(() => {
+      const sections = document.querySelectorAll('[data-section]');
+      sections.forEach((section) => {
+        observer.observe(section);
+      });
+    }, 100);
+    return () => {
+      clearTimeout(timeoutId);
+      observer.disconnect();
+    };
+  }, []);
+
   const handleInputChange = (field: keyof ClothingFormData, value: any) => {
     onFormDataChange({ [field]: value });
   };
@@ -140,6 +172,18 @@ const ClothingQuestions: React.FC<ClothingQuestionsProps> = ({ formData, onFormD
         </div>
       </div>
 
+      {/* Income Section */}
+      <IncomeSection
+        income={formData.income}
+        costs={formData.costs}
+        onIncomeChange={handleIncomeChange}
+        onCostChange={handleCostChange}
+        onAddCost={addCost}
+        onRemoveCost={removeCost}
+        sectionNumber={2}
+        isVisible={visibleSections.has('income')}
+      />
+
       {/* Payment Section */}
       <PaymentSection
         supplierName={formData.supplierName}
@@ -154,18 +198,8 @@ const ClothingQuestions: React.FC<ClothingQuestionsProps> = ({ formData, onFormD
         onRecoveryRateChange={(rate) => handleInputChange('recoveryRate', rate)}
         onDirectCreditChange={(credit) => handleInputChange('directCredit', credit)}
         onPaymentReferenceChange={(reference) => handleInputChange('paymentReference', reference)}
-        sectionNumber={2}
-      />
-
-      {/* Income Section */}
-      <IncomeSection
-        income={formData.income}
-        costs={formData.costs}
-        onIncomeChange={handleIncomeChange}
-        onCostChange={handleCostChange}
-        onAddCost={addCost}
-        onRemoveCost={removeCost}
         sectionNumber={3}
+        isVisible={visibleSections.has('payment')}
       />
 
       {/* Decision Section */}
@@ -175,6 +209,7 @@ const ClothingQuestions: React.FC<ClothingQuestionsProps> = ({ formData, onFormD
         onDecisionChange={(decision) => handleInputChange('decision', decision)}
         onDecisionReasonChange={(reason) => handleInputChange('decisionReason', reason)}
         sectionNumber={4}
+        isVisible={visibleSections.has('decision')}
       />
     </div>
   );
