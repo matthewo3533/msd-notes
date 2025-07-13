@@ -31,10 +31,9 @@ interface ClothingFormData {
 interface ClothingQuestionsProps {
   formData: ClothingFormData;
   onFormDataChange: (data: Partial<ClothingFormData>) => void;
-  onBack: () => void;
 }
 
-const ClothingQuestions: React.FC<ClothingQuestionsProps> = ({ formData, onFormDataChange, onBack }) => {
+const ClothingQuestions: React.FC<ClothingQuestionsProps> = ({ formData, onFormDataChange }) => {
   const [visibleSections, setVisibleSections] = useState<Set<string>>(new Set(['general']));
 
   useEffect(() => {

@@ -93,7 +93,6 @@ const FoodPage: React.FC<FoodPageProps> = ({ darkMode, onToggleDarkMode }) => {
         <FoodQuestions 
           formData={formData} 
           onFormDataChange={handleFormDataChange}
-          onBack={handleBack}
         />
         <div className="note-section">
           <NoteOutput formData={formData} onReset={resetForm} />

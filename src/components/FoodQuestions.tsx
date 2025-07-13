@@ -6,10 +6,9 @@ import { FoodFormData } from '../App';
 interface FoodQuestionsProps {
   formData: FoodFormData;
   onFormDataChange: (data: Partial<FoodFormData>) => void;
-  onBack: () => void;
 }
 
-const FoodQuestions: React.FC<FoodQuestionsProps> = ({ formData, onFormDataChange, onBack }) => {
+const FoodQuestions: React.FC<FoodQuestionsProps> = ({ formData, onFormDataChange }) => {
   const [skippedQuestions, setSkippedQuestions] = useState<Set<string>>(new Set());
   const [visibleSections, setVisibleSections] = useState<Set<string>>(new Set());
   const [animatingQuestions, setAnimatingQuestions] = useState<Set<string>>(new Set());

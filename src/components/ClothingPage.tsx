@@ -97,7 +97,6 @@ const ClothingPage: React.FC<ClothingPageProps> = ({ darkMode, onToggleDarkMode 
         <ClothingQuestions
           formData={formData}
           onFormDataChange={handleFormDataChange}
-          onBack={handleBack}
         />
         <div className="note-section">
           <NoteOutput formData={formData} service="clothing" onReset={resetForm} />
