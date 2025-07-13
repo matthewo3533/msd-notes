@@ -27,9 +27,6 @@ const FoodQuestions: React.FC<FoodQuestionsProps> = ({ formData, onFormDataChang
             const sectionId = entry.target.getAttribute('data-section');
             if (sectionId) {
               setVisibleSections(prev => new Set(prev).add(sectionId));
-            } else {
-              // For reusable components without data-section, add the section-visible class directly
-              entry.target.classList.add('section-visible');
             }
           }
         });
@@ -363,6 +360,7 @@ const FoodQuestions: React.FC<FoodQuestionsProps> = ({ formData, onFormDataChang
         onAddCost={addCost}
         onRemoveCost={removeCost}
         sectionNumber={2}
+        isVisible={visibleSections.has('income')}
       />
 
       {/* Decision Section */}
@@ -372,6 +370,7 @@ const FoodQuestions: React.FC<FoodQuestionsProps> = ({ formData, onFormDataChang
         onDecisionChange={(decision) => handleInputChange('decision', decision)}
         onDecisionReasonChange={(reason) => handleInputChange('decisionReason', reason)}
         sectionNumber={3}
+        isVisible={visibleSections.has('decision')}
       />
     </div>
   );

@@ -21,6 +21,7 @@ interface IncomeSectionProps {
   onAddCost: () => void;
   onRemoveCost: (index: number) => void;
   sectionNumber?: number;
+  isVisible?: boolean;
 }
 
 const IncomeSection: React.FC<IncomeSectionProps> = ({
@@ -30,7 +31,8 @@ const IncomeSection: React.FC<IncomeSectionProps> = ({
   onCostChange,
   onAddCost,
   onRemoveCost,
-  sectionNumber = 2
+  sectionNumber = 2,
+  isVisible = false
 }) => {
   const totalIncome = Object.values(income).reduce((sum, value) => sum + (value || 0), 0);
   const totalCosts = costs.reduce((sum, cost) => sum + (cost.amount || 0), 0);
@@ -39,7 +41,7 @@ const IncomeSection: React.FC<IncomeSectionProps> = ({
   return (
     <div 
       data-section="income"
-      className="form-section-card"
+      className={`form-section-card ${isVisible ? 'section-visible' : ''}`}
     >
       <div className="section-header">
         <h3>Income</h3>

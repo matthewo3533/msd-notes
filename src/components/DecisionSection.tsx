@@ -6,6 +6,7 @@ interface DecisionSectionProps {
   onDecisionChange: (decision: string) => void;
   onDecisionReasonChange: (reason: string) => void;
   sectionNumber?: number;
+  isVisible?: boolean;
 }
 
 const DecisionSection: React.FC<DecisionSectionProps> = ({
@@ -13,12 +14,13 @@ const DecisionSection: React.FC<DecisionSectionProps> = ({
   decisionReason,
   onDecisionChange,
   onDecisionReasonChange,
-  sectionNumber = 3
+  sectionNumber = 3,
+  isVisible = false
 }) => {
   return (
     <div 
       data-section="decision"
-      className="form-section-card"
+      className={`form-section-card ${isVisible ? 'section-visible' : ''}`}
     >
       <div className="section-header">
         <h3>Decision</h3>
