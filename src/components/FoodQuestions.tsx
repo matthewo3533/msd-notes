@@ -27,6 +27,9 @@ const FoodQuestions: React.FC<FoodQuestionsProps> = ({ formData, onFormDataChang
             const sectionId = entry.target.getAttribute('data-section');
             if (sectionId) {
               setVisibleSections(prev => new Set(prev).add(sectionId));
+            } else {
+              // For reusable components without data-section, add the section-visible class directly
+              entry.target.classList.add('section-visible');
             }
           }
         });
@@ -39,8 +42,15 @@ const FoodQuestions: React.FC<FoodQuestionsProps> = ({ formData, onFormDataChang
 
     // Use setTimeout to ensure DOM is fully rendered
     const timeoutId = setTimeout(() => {
+      // Observe sections with data-section attributes
       const sections = document.querySelectorAll('[data-section]');
       sections.forEach((section) => {
+        observer.observe(section);
+      });
+      
+      // Also observe form-section-card elements (for reusable components)
+      const formSections = document.querySelectorAll('.form-section-card');
+      formSections.forEach((section) => {
         observer.observe(section);
       });
     }, 100);
