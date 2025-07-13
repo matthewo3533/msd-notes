@@ -17,6 +17,9 @@ const FoodQuestions: React.FC<FoodQuestionsProps> = ({ formData, onFormDataChang
 
   // Intersection Observer for scroll animations
   useEffect(() => {
+    // Make the first section visible immediately
+    setVisibleSections(new Set(['general']));
+    
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
