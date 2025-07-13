@@ -14,7 +14,6 @@ interface PaymentSectionProps {
   onDirectCreditChange: (credit: string) => void;
   onPaymentReferenceChange: (reference: string) => void;
   sectionNumber?: number;
-  isVisible?: boolean;
 }
 
 const PaymentSection: React.FC<PaymentSectionProps> = ({
@@ -30,11 +29,10 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
   onRecoveryRateChange,
   onDirectCreditChange,
   onPaymentReferenceChange,
-  sectionNumber = 3,
-  isVisible = false
+  sectionNumber = 3
 }) => {
   return (
-    <div className={`form-section-card ${isVisible ? 'section-visible' : ''}`}>
+    <div className="form-section-card">
       <div className="section-header">
         <h3>Payment</h3>
         <div className="section-number">{sectionNumber}</div>

@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import IncomeSection from './IncomeSection';
 import DecisionSection from './DecisionSection';
-import CostInput from './CostInput';
 import { FoodFormData } from '../App';
 
 interface FoodQuestionsProps {

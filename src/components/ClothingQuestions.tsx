@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import IncomeSection from './IncomeSection';
 import PaymentSection from './PaymentSection';
 import DecisionSection from './DecisionSection';
@@ -155,7 +155,6 @@ const ClothingQuestions: React.FC<ClothingQuestionsProps> = ({ formData, onFormD
         onDirectCreditChange={(credit) => handleInputChange('directCredit', credit)}
         onPaymentReferenceChange={(reference) => handleInputChange('paymentReference', reference)}
         sectionNumber={2}
-        isVisible={true}
       />
 
       {/* Income Section */}
@@ -167,7 +166,6 @@ const ClothingQuestions: React.FC<ClothingQuestionsProps> = ({ formData, onFormD
         onAddCost={addCost}
         onRemoveCost={removeCost}
         sectionNumber={3}
-        isVisible={true}
       />
 
       {/* Decision Section */}
@@ -177,7 +175,6 @@ const ClothingQuestions: React.FC<ClothingQuestionsProps> = ({ formData, onFormD
         onDecisionChange={(decision) => handleInputChange('decision', decision)}
         onDecisionReasonChange={(reason) => handleInputChange('decisionReason', reason)}
         sectionNumber={4}
-        isVisible={true}
       />
     </div>
   );

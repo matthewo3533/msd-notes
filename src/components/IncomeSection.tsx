@@ -36,8 +36,6 @@ const IncomeSection: React.FC<IncomeSectionProps> = ({
   const totalCosts = costs.reduce((sum, cost) => sum + (cost.amount || 0), 0);
   const remainingIncome = totalIncome - totalCosts;
 
-  const costTypes = ['Rent', 'Food', 'Petrol', 'Power bill', 'Hire Purchase', 'Loans'];
-
   return (
     <div 
       data-section="income"
