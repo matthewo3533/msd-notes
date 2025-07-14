@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import BeddingQuestions from './BeddingQuestions';
 import NoteOutput from './NoteOutput';
 import DarkModeToggle from './DarkModeToggle';
-import { ClothingFormData } from '../App';
+import { BeddingFormData } from './BeddingQuestions';
 
 interface BeddingPageProps {
   darkMode: boolean;
@@ -12,9 +12,9 @@ interface BeddingPageProps {
 
 const BeddingPage: React.FC<BeddingPageProps> = ({ darkMode, onToggleDarkMode }) => {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState<ClothingFormData>({
+  const [formData, setFormData] = useState<BeddingFormData>({
     clientId: null,
-    whyNeedClothing: '',
+    whyNeedBedding: '',
     canMeetNeedOtherWay: '',
     reasonableSteps: '',
     supplierName: '',
@@ -34,16 +34,18 @@ const BeddingPage: React.FC<BeddingPageProps> = ({ darkMode, onToggleDarkMode })
     costs: [],
     decision: '',
     decisionReason: '',
+    beddingSngEligible: '',
+    beddingSngReason: '',
   });
 
-  const handleFormDataChange = (data: Partial<ClothingFormData>) => {
+  const handleFormDataChange = (data: Partial<BeddingFormData>) => {
     setFormData(prev => ({ ...prev, ...data }));
   };
 
   const resetForm = () => {
     setFormData({
       clientId: null,
-      whyNeedClothing: '',
+      whyNeedBedding: '',
       canMeetNeedOtherWay: '',
       reasonableSteps: '',
       supplierName: '',
@@ -63,6 +65,8 @@ const BeddingPage: React.FC<BeddingPageProps> = ({ darkMode, onToggleDarkMode })
       costs: [],
       decision: '',
       decisionReason: '',
+      beddingSngEligible: '',
+      beddingSngReason: '',
     });
     navigate('/');
   };
