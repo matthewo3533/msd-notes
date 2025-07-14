@@ -165,7 +165,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
         if (cost.amount > 0) note += `-$${cost.amount.toFixed(2)} ${cost.cost}\n`;
       });
       if (b.costs && b.costs.length > 0) {
-        const totalIncome = Object.values(b.income as {[k:string]:number}).reduce((sum: number, value: number) => sum + (value || 0), 0);
+        const totalIncome = (Object.values(b.income) as number[]).reduce((sum: number, value: number) => sum + (value || 0), 0);
         const totalCosts = (b.costs as Array<{amount:number}>).reduce((sum: number, cost: {amount:number}) => sum + (cost.amount || 0), 0);
         const remainingIncome = totalIncome - totalCosts;
         note += '--------------\n';

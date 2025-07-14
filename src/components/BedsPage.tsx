@@ -41,7 +41,7 @@ const BedsPage: React.FC<BedsPageProps> = ({ darkMode, onToggleDarkMode }) => {
   };
 
   const resetForm = () => {
-    setFormData((prev: BedsFormData) => ({
+    setFormData({
       clientId: null,
       whyNeedBeds: '',
       canMeetNeedOtherWay: '',
@@ -63,7 +63,7 @@ const BedsPage: React.FC<BedsPageProps> = ({ darkMode, onToggleDarkMode }) => {
       costs: [],
       decision: '',
       decisionReason: '',
-    }));
+    });
     navigate('/');
   };
 

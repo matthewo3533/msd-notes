@@ -43,7 +43,7 @@ const BeddingPage: React.FC<BeddingPageProps> = ({ darkMode, onToggleDarkMode })
   };
 
   const resetForm = () => {
-    setFormData((prev: BeddingFormData) => ({
+    setFormData({
       clientId: null,
       whyNeedBedding: '',
       canMeetNeedOtherWay: '',
@@ -67,7 +67,7 @@ const BeddingPage: React.FC<BeddingPageProps> = ({ darkMode, onToggleDarkMode })
       decisionReason: '',
       beddingSngEligible: '',
       beddingSngReason: '',
-    }));
+    });
     navigate('/');
   };
 
