@@ -4,6 +4,10 @@ import Home from './components/Home';
 import FoodPage from './components/FoodPage';
 import ClothingPage from './components/ClothingPage';
 import NotFoundPage from './components/NotFoundPage';
+import ElectricityPage from './components/ElectricityPage';
+import DentalPage from './components/DentalPage';
+import BedsPage from './components/BedsPage';
+import BeddingPage from './components/BeddingPage';
 
 export interface Service {
   id: string;
@@ -23,7 +27,9 @@ export interface FoodFormData {
   income: {
     benefit: number;
     employment: number;
+    familyTaxCredit: number;
     childSupport: number;
+    childDisabilityAllowance: number;
     otherIncome: number;
   };
   costs: Array<{
@@ -48,7 +54,9 @@ export interface ClothingFormData {
   income: {
     benefit: number;
     employment: number;
+    familyTaxCredit: number;
     childSupport: number;
+    childDisabilityAllowance: number;
     otherIncome: number;
   };
   costs: Array<{
@@ -84,6 +92,22 @@ function App() {
       <Route 
         path="/clothing" 
         element={<ClothingPage darkMode={darkMode} onToggleDarkMode={setDarkMode} />} 
+      />
+      <Route 
+        path="/electricity" 
+        element={<ElectricityPage darkMode={darkMode} onToggleDarkMode={setDarkMode} />} 
+      />
+      <Route 
+        path="/dental" 
+        element={<DentalPage darkMode={darkMode} onToggleDarkMode={setDarkMode} />} 
+      />
+      <Route 
+        path="/beds" 
+        element={<BedsPage darkMode={darkMode} onToggleDarkMode={setDarkMode} />} 
+      />
+      <Route 
+        path="/bedding" 
+        element={<BeddingPage darkMode={darkMode} onToggleDarkMode={setDarkMode} />} 
       />
       <Route 
         path="/:serviceId" 

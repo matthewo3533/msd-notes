@@ -9,6 +9,18 @@ interface DecisionSectionProps {
   isVisible?: boolean;
 }
 
+function autoResizeTextarea(el: HTMLTextAreaElement | null) {
+  if (el) {
+    el.style.height = 'auto';
+    el.style.height = el.scrollHeight + 'px';
+    if (el.scrollHeight > 800) {
+      el.style.overflowY = 'auto';
+    } else {
+      el.style.overflowY = 'hidden';
+    }
+  }
+}
+
 const DecisionSection: React.FC<DecisionSectionProps> = ({
   decision,
   decisionReason,
@@ -53,6 +65,8 @@ const DecisionSection: React.FC<DecisionSectionProps> = ({
             value={decisionReason}
             onChange={(e) => onDecisionReasonChange(e.target.value)}
             placeholder="Please provide your reasoning..."
+            ref={el => autoResizeTextarea(el)}
+            onInput={e => autoResizeTextarea(e.currentTarget)}
           />
         </div>
       )}

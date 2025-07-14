@@ -1,26 +1,58 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import FoodQuestions from './FoodQuestions';
+import DentalQuestions from './DentalQuestions';
 import NoteOutput from './NoteOutput';
 import DarkModeToggle from './DarkModeToggle';
-import { FoodFormData } from '../App';
 
-interface FoodPageProps {
+interface DentalFormData {
+  clientId: boolean | null;
+  whyNeedDental: string;
+  canMeetNeedOtherWay: string;
+  reasonableSteps: string;
+  sngEligible: string;
+  sngBalance: number;
+  supplierName: string;
+  supplierId: string;
+  amount: number;
+  recoveryRate: number;
+  directCredit: string;
+  paymentReference: string;
+  income: {
+    benefit: number;
+    employment: number;
+    familyTaxCredit: number;
+    childSupport: number;
+    childDisabilityAllowance: number;
+    otherIncome: number;
+  };
+  costs: Array<{
+    amount: number;
+    cost: string;
+  }>;
+  decision: string;
+  decisionReason: string;
+}
+
+interface DentalPageProps {
   darkMode: boolean;
   onToggleDarkMode: (darkMode: boolean) => void;
 }
 
-const FoodPage: React.FC<FoodPageProps> = ({ darkMode, onToggleDarkMode }) => {
+const DentalPage: React.FC<DentalPageProps> = ({ darkMode, onToggleDarkMode }) => {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState<FoodFormData>({
+  const [formData, setFormData] = useState<DentalFormData>({
     clientId: null,
-    whyNeedFood: '',
+    whyNeedDental: '',
     canMeetNeedOtherWay: '',
-    currentFoodBalance: 0,
-    foodAmountRequested: 0,
-    hardshipUnforeseen: '',
-    unforeseenCircumstance: '',
     reasonableSteps: '',
+    sngEligible: '',
+    sngBalance: 1000,
+    supplierName: '',
+    supplierId: '',
+    amount: 0,
+    recoveryRate: 0,
+    directCredit: '',
+    paymentReference: '',
     income: {
       benefit: 0,
       employment: 0,
@@ -34,20 +66,20 @@ const FoodPage: React.FC<FoodPageProps> = ({ darkMode, onToggleDarkMode }) => {
     decisionReason: '',
   });
 
-  const handleFormDataChange = (data: Partial<FoodFormData>) => {
-    setFormData(prev => ({ ...prev, ...data }));
-  };
-
   const resetForm = () => {
     setFormData({
       clientId: null,
-      whyNeedFood: '',
+      whyNeedDental: '',
       canMeetNeedOtherWay: '',
-      currentFoodBalance: 0,
-      foodAmountRequested: 0,
-      hardshipUnforeseen: '',
-      unforeseenCircumstance: '',
       reasonableSteps: '',
+      sngEligible: '',
+      sngBalance: 1000,
+      supplierName: '',
+      supplierId: '',
+      amount: 0,
+      recoveryRate: 0,
+      directCredit: '',
+      paymentReference: '',
       income: {
         benefit: 0,
         employment: 0,
@@ -61,6 +93,10 @@ const FoodPage: React.FC<FoodPageProps> = ({ darkMode, onToggleDarkMode }) => {
       decisionReason: '',
     });
     navigate('/');
+  };
+
+  const handleFormDataChange = (data: Partial<DentalFormData>) => {
+    setFormData(prev => ({ ...prev, ...data, income: { ...prev.income, ...data.income } }));
   };
 
   const handleBack = () => {
@@ -77,34 +113,36 @@ const FoodPage: React.FC<FoodPageProps> = ({ darkMode, onToggleDarkMode }) => {
     return `${dayName} ${day}/${month}/${year}`;
   };
 
+  // Calculate advance for recovery rate
+  const advance = formData.sngEligible === 'yes' ? Math.max(0, formData.amount - (formData.sngBalance || 0)) : formData.amount;
+
   return (
     <div className="container">
       <div className="header">
         <div className="header-top">
           <div className="greeting-section">
-            <h1 className="greeting">Food</h1>
+            <h1 className="greeting">Dental</h1>
             <p className="date">{getCurrentDate()}</p>
           </div>
           <DarkModeToggle darkMode={darkMode} onToggle={onToggleDarkMode} />
         </div>
       </div>
-      
       <div style={{ marginBottom: '1.5rem' }}>
         <button className="copy-btn" onClick={handleBack}>
           ← Back to Services
         </button>
       </div>
       <div className="food-layout">
-        <FoodQuestions 
-          formData={formData} 
+        <DentalQuestions
+          formData={formData}
           onFormDataChange={handleFormDataChange}
         />
         <div className="note-section">
-          <NoteOutput formData={formData} onReset={resetForm} />
+          <NoteOutput formData={formData} service="dental" onReset={resetForm} />
         </div>
       </div>
     </div>
   );
 };
 
-export default FoodPage; 
+export default DentalPage; 

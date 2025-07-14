@@ -3,16 +3,16 @@ import IncomeSection from './IncomeSection';
 import PaymentSection from './PaymentSection';
 import DecisionSection from './DecisionSection';
 
-interface ClothingFormData {
+interface BeddingFormData {
   clientId: boolean | null;
-  whyNeedClothing: string;
+  whyNeedBedding: string;
   canMeetNeedOtherWay: string;
   reasonableSteps: string;
   supplierName: string;
   supplierId: string;
   amount: number;
   recoveryRate: number;
-  directCredit: string; // 'yes' | 'no' | ''
+  directCredit: string;
   paymentReference: string;
   income: {
     benefit: number;
@@ -28,11 +28,13 @@ interface ClothingFormData {
   }>;
   decision: string;
   decisionReason: string;
+  beddingSngEligible?: string; // 'yes' | 'no' | ''
+  beddingSngReason?: string; // 'Disability/Illness' | 'Child born/adopted' | ''
 }
 
-interface ClothingQuestionsProps {
-  formData: ClothingFormData;
-  onFormDataChange: (data: Partial<ClothingFormData>) => void;
+interface BeddingQuestionsProps {
+  formData: BeddingFormData;
+  onFormDataChange: (data: Partial<BeddingFormData>) => void;
 }
 
 function autoResizeTextarea(el: HTMLTextAreaElement | null) {
@@ -47,7 +49,7 @@ function autoResizeTextarea(el: HTMLTextAreaElement | null) {
   }
 }
 
-const ClothingQuestions: React.FC<ClothingQuestionsProps> = ({ formData, onFormDataChange }) => {
+const BeddingQuestions: React.FC<BeddingQuestionsProps> = ({ formData, onFormDataChange }) => {
   const [visibleSections, setVisibleSections] = useState<Set<string>>(new Set(['general']));
 
   useEffect(() => {
@@ -79,11 +81,11 @@ const ClothingQuestions: React.FC<ClothingQuestionsProps> = ({ formData, onFormD
     };
   }, []);
 
-  const handleInputChange = (field: keyof ClothingFormData, value: any) => {
+  const handleInputChange = (field: keyof BeddingFormData, value: any) => {
     onFormDataChange({ [field]: value });
   };
 
-  const handleIncomeChange = (field: keyof ClothingFormData['income'], value: number) => {
+  const handleIncomeChange = (field: keyof BeddingFormData['income'], value: number) => {
     onFormDataChange({
       income: {
         ...formData.income,
@@ -109,7 +111,6 @@ const ClothingQuestions: React.FC<ClothingQuestionsProps> = ({ formData, onFormD
 
   return (
     <div className="form-sections-container">
-
       {/* General Questions */}
       <div className="form-section-card section-visible">
         <div className="section-header">
@@ -139,11 +140,11 @@ const ClothingQuestions: React.FC<ClothingQuestionsProps> = ({ formData, onFormD
           </div>
         </div>
         <div className="form-group">
-          <label>1. Why is the client needing clothing?</label>
+          <label>1. Why is the client needing bedding?</label>
           <textarea
             className="form-control"
-            value={formData.whyNeedClothing}
-            onChange={e => handleInputChange('whyNeedClothing', e.target.value)}
+            value={formData.whyNeedBedding}
+            onChange={e => handleInputChange('whyNeedBedding', e.target.value)}
             placeholder="Please describe the client's situation..."
             ref={el => autoResizeTextarea(el)}
             onInput={e => autoResizeTextarea(e.currentTarget)}
@@ -183,8 +184,44 @@ const ClothingQuestions: React.FC<ClothingQuestionsProps> = ({ formData, onFormD
             onInput={e => autoResizeTextarea(e.currentTarget)}
           />
         </div>
+        <div className="form-group">
+          <label>Does client qualify for Bedding SNG?</label>
+          <div className="radio-group">
+            <label className={`radio-btn ${formData.beddingSngEligible === 'yes' ? 'selected' : ''}`}>Yes
+              <input
+                type="checkbox"
+                name="beddingSngEligibleYes"
+                checked={formData.beddingSngEligible === 'yes'}
+                onChange={() => handleInputChange('beddingSngEligible', formData.beddingSngEligible === 'yes' ? '' : 'yes')}
+                className="visually-hidden"
+              />
+            </label>
+            <label className={`radio-btn ${formData.beddingSngEligible === 'no' ? 'selected' : ''}`}>No
+              <input
+                type="checkbox"
+                name="beddingSngEligibleNo"
+                checked={formData.beddingSngEligible === 'no'}
+                onChange={() => handleInputChange('beddingSngEligible', formData.beddingSngEligible === 'no' ? '' : 'no')}
+                className="visually-hidden"
+              />
+            </label>
+          </div>
+        </div>
+        {formData.beddingSngEligible === 'yes' && (
+          <div className="form-group">
+            <label>How does client qualify?</label>
+            <select
+              className="form-control"
+              value={formData.beddingSngReason || ''}
+              onChange={e => handleInputChange('beddingSngReason', e.target.value)}
+            >
+              <option value="">Select reason...</option>
+              <option value="Disability/Illness">Disability/Illness</option>
+              <option value="Child born/adopted">Child born/adopted</option>
+            </select>
+          </div>
+        )}
       </div>
-
       {/* Income Section */}
       <IncomeSection
         income={formData.income}
@@ -196,7 +233,6 @@ const ClothingQuestions: React.FC<ClothingQuestionsProps> = ({ formData, onFormD
         sectionNumber={2}
         isVisible={visibleSections.has('income')}
       />
-
       {/* Payment Section */}
       <PaymentSection
         supplierName={formData.supplierName}
@@ -214,7 +250,6 @@ const ClothingQuestions: React.FC<ClothingQuestionsProps> = ({ formData, onFormD
         sectionNumber={3}
         isVisible={visibleSections.has('payment')}
       />
-
       {/* Decision Section */}
       <DecisionSection
         decision={formData.decision}
@@ -228,4 +263,4 @@ const ClothingQuestions: React.FC<ClothingQuestionsProps> = ({ formData, onFormD
   );
 };
 
-export default ClothingQuestions; 
+export default BeddingQuestions; 

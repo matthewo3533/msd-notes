@@ -3,16 +3,18 @@ import IncomeSection from './IncomeSection';
 import PaymentSection from './PaymentSection';
 import DecisionSection from './DecisionSection';
 
-interface ClothingFormData {
+interface DentalFormData {
   clientId: boolean | null;
-  whyNeedClothing: string;
+  whyNeedDental: string;
   canMeetNeedOtherWay: string;
   reasonableSteps: string;
+  sngEligible: string; // 'yes' | 'no' | ''
+  sngBalance: number;
   supplierName: string;
   supplierId: string;
   amount: number;
   recoveryRate: number;
-  directCredit: string; // 'yes' | 'no' | ''
+  directCredit: string;
   paymentReference: string;
   income: {
     benefit: number;
@@ -30,9 +32,9 @@ interface ClothingFormData {
   decisionReason: string;
 }
 
-interface ClothingQuestionsProps {
-  formData: ClothingFormData;
-  onFormDataChange: (data: Partial<ClothingFormData>) => void;
+interface DentalQuestionsProps {
+  formData: DentalFormData;
+  onFormDataChange: (data: Partial<DentalFormData>) => void;
 }
 
 function autoResizeTextarea(el: HTMLTextAreaElement | null) {
@@ -47,7 +49,7 @@ function autoResizeTextarea(el: HTMLTextAreaElement | null) {
   }
 }
 
-const ClothingQuestions: React.FC<ClothingQuestionsProps> = ({ formData, onFormDataChange }) => {
+const DentalQuestions: React.FC<DentalQuestionsProps> = ({ formData, onFormDataChange }) => {
   const [visibleSections, setVisibleSections] = useState<Set<string>>(new Set(['general']));
 
   useEffect(() => {
@@ -79,11 +81,11 @@ const ClothingQuestions: React.FC<ClothingQuestionsProps> = ({ formData, onFormD
     };
   }, []);
 
-  const handleInputChange = (field: keyof ClothingFormData, value: any) => {
+  const handleInputChange = (field: keyof DentalFormData, value: any) => {
     onFormDataChange({ [field]: value });
   };
 
-  const handleIncomeChange = (field: keyof ClothingFormData['income'], value: number) => {
+  const handleIncomeChange = (field: keyof DentalFormData['income'], value: number) => {
     onFormDataChange({
       income: {
         ...formData.income,
@@ -107,9 +109,11 @@ const ClothingQuestions: React.FC<ClothingQuestionsProps> = ({ formData, onFormD
     onFormDataChange({ costs: newCosts });
   };
 
+  // Calculate advance for recovery rate
+  const advance = formData.sngEligible === 'yes' ? Math.max(0, formData.amount - (formData.sngBalance || 0)) : formData.amount;
+
   return (
     <div className="form-sections-container">
-
       {/* General Questions */}
       <div className="form-section-card section-visible">
         <div className="section-header">
@@ -139,11 +143,11 @@ const ClothingQuestions: React.FC<ClothingQuestionsProps> = ({ formData, onFormD
           </div>
         </div>
         <div className="form-group">
-          <label>1. Why is the client needing clothing?</label>
+          <label>1. Why is the client needing dental assistance?</label>
           <textarea
             className="form-control"
-            value={formData.whyNeedClothing}
-            onChange={e => handleInputChange('whyNeedClothing', e.target.value)}
+            value={formData.whyNeedDental}
+            onChange={e => handleInputChange('whyNeedDental', e.target.value)}
             placeholder="Please describe the client's situation..."
             ref={el => autoResizeTextarea(el)}
             onInput={e => autoResizeTextarea(e.currentTarget)}
@@ -183,6 +187,45 @@ const ClothingQuestions: React.FC<ClothingQuestionsProps> = ({ formData, onFormD
             onInput={e => autoResizeTextarea(e.currentTarget)}
           />
         </div>
+        <div className="form-group">
+          <label>4. Does the client qualify for non-recoverable SNG?</label>
+          <div className="radio-group">
+            <label className={`radio-btn ${formData.sngEligible === 'yes' ? 'selected' : ''}`}>Yes
+              <input
+                type="checkbox"
+                name="sngEligibleYes"
+                checked={formData.sngEligible === 'yes'}
+                onChange={() => handleInputChange('sngEligible', formData.sngEligible === 'yes' ? '' : 'yes')}
+                className="visually-hidden"
+              />
+            </label>
+            <label className={`radio-btn ${formData.sngEligible === 'no' ? 'selected' : ''}`}>No
+              <input
+                type="checkbox"
+                name="sngEligibleNo"
+                checked={formData.sngEligible === 'no'}
+                onChange={() => handleInputChange('sngEligible', formData.sngEligible === 'no' ? '' : 'no')}
+                className="visually-hidden"
+              />
+            </label>
+          </div>
+        </div>
+        {formData.sngEligible === 'yes' && (
+          <div className="form-group">
+            <label>What is the client's SNG balance?</label>
+            <div className="dollar-input">
+              <input
+                type="number"
+                className="form-control"
+                value={formData.sngBalance || 1000}
+                onChange={e => handleInputChange('sngBalance', parseFloat(e.target.value) || 0)}
+                placeholder="1000.00"
+                step="0.01"
+                min="0"
+              />
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Income Section */}
@@ -201,16 +244,17 @@ const ClothingQuestions: React.FC<ClothingQuestionsProps> = ({ formData, onFormD
       <PaymentSection
         supplierName={formData.supplierName}
         supplierId={formData.supplierId}
-        amount={formData.amount}
+        amount={advance}
+        totalAmount={formData.amount}
         recoveryRate={formData.recoveryRate}
         directCredit={formData.directCredit}
         paymentReference={formData.paymentReference}
-        onSupplierNameChange={(name) => handleInputChange('supplierName', name)}
-        onSupplierIdChange={(id) => handleInputChange('supplierId', id)}
-        onAmountChange={(amount) => handleInputChange('amount', amount)}
-        onRecoveryRateChange={(rate) => handleInputChange('recoveryRate', rate)}
-        onDirectCreditChange={(credit) => handleInputChange('directCredit', credit)}
-        onPaymentReferenceChange={(reference) => handleInputChange('paymentReference', reference)}
+        onSupplierNameChange={name => handleInputChange('supplierName', name)}
+        onSupplierIdChange={id => handleInputChange('supplierId', id)}
+        onAmountChange={amount => handleInputChange('amount', amount)}
+        onRecoveryRateChange={rate => handleInputChange('recoveryRate', rate)}
+        onDirectCreditChange={credit => handleInputChange('directCredit', credit)}
+        onPaymentReferenceChange={reference => handleInputChange('paymentReference', reference)}
         sectionNumber={3}
         isVisible={visibleSections.has('payment')}
       />
@@ -219,8 +263,8 @@ const ClothingQuestions: React.FC<ClothingQuestionsProps> = ({ formData, onFormD
       <DecisionSection
         decision={formData.decision}
         decisionReason={formData.decisionReason}
-        onDecisionChange={(decision) => handleInputChange('decision', decision)}
-        onDecisionReasonChange={(reason) => handleInputChange('decisionReason', reason)}
+        onDecisionChange={decision => handleInputChange('decision', decision)}
+        onDecisionReasonChange={reason => handleInputChange('decisionReason', reason)}
         sectionNumber={4}
         isVisible={visibleSections.has('decision')}
       />
@@ -228,4 +272,4 @@ const ClothingQuestions: React.FC<ClothingQuestionsProps> = ({ formData, onFormD
   );
 };
 
-export default ClothingQuestions; 
+export default DentalQuestions; 

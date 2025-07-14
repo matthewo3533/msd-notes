@@ -26,7 +26,9 @@ const ClothingPage: React.FC<ClothingPageProps> = ({ darkMode, onToggleDarkMode 
     income: {
       benefit: 0,
       employment: 0,
+      familyTaxCredit: 0,
       childSupport: 0,
+      childDisabilityAllowance: 0,
       otherIncome: 0,
     },
     costs: [],
@@ -53,13 +55,16 @@ const ClothingPage: React.FC<ClothingPageProps> = ({ darkMode, onToggleDarkMode 
       income: {
         benefit: 0,
         employment: 0,
+        familyTaxCredit: 0,
         childSupport: 0,
+        childDisabilityAllowance: 0,
         otherIncome: 0,
       },
       costs: [],
       decision: '',
       decisionReason: '',
     });
+    navigate('/');
   };
 
   const handleBack = () => {

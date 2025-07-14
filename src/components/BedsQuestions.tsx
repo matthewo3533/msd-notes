@@ -3,16 +3,16 @@ import IncomeSection from './IncomeSection';
 import PaymentSection from './PaymentSection';
 import DecisionSection from './DecisionSection';
 
-interface ClothingFormData {
+interface BedsFormData {
   clientId: boolean | null;
-  whyNeedClothing: string;
+  whyNeedBeds: string;
   canMeetNeedOtherWay: string;
   reasonableSteps: string;
   supplierName: string;
   supplierId: string;
   amount: number;
   recoveryRate: number;
-  directCredit: string; // 'yes' | 'no' | ''
+  directCredit: string;
   paymentReference: string;
   income: {
     benefit: number;
@@ -30,9 +30,9 @@ interface ClothingFormData {
   decisionReason: string;
 }
 
-interface ClothingQuestionsProps {
-  formData: ClothingFormData;
-  onFormDataChange: (data: Partial<ClothingFormData>) => void;
+interface BedsQuestionsProps {
+  formData: BedsFormData;
+  onFormDataChange: (data: Partial<BedsFormData>) => void;
 }
 
 function autoResizeTextarea(el: HTMLTextAreaElement | null) {
@@ -47,7 +47,7 @@ function autoResizeTextarea(el: HTMLTextAreaElement | null) {
   }
 }
 
-const ClothingQuestions: React.FC<ClothingQuestionsProps> = ({ formData, onFormDataChange }) => {
+const BedsQuestions: React.FC<BedsQuestionsProps> = ({ formData, onFormDataChange }) => {
   const [visibleSections, setVisibleSections] = useState<Set<string>>(new Set(['general']));
 
   useEffect(() => {
@@ -79,11 +79,11 @@ const ClothingQuestions: React.FC<ClothingQuestionsProps> = ({ formData, onFormD
     };
   }, []);
 
-  const handleInputChange = (field: keyof ClothingFormData, value: any) => {
+  const handleInputChange = (field: keyof BedsFormData, value: any) => {
     onFormDataChange({ [field]: value });
   };
 
-  const handleIncomeChange = (field: keyof ClothingFormData['income'], value: number) => {
+  const handleIncomeChange = (field: keyof BedsFormData['income'], value: number) => {
     onFormDataChange({
       income: {
         ...formData.income,
@@ -109,7 +109,6 @@ const ClothingQuestions: React.FC<ClothingQuestionsProps> = ({ formData, onFormD
 
   return (
     <div className="form-sections-container">
-
       {/* General Questions */}
       <div className="form-section-card section-visible">
         <div className="section-header">
@@ -139,11 +138,11 @@ const ClothingQuestions: React.FC<ClothingQuestionsProps> = ({ formData, onFormD
           </div>
         </div>
         <div className="form-group">
-          <label>1. Why is the client needing clothing?</label>
+          <label>1. Why is the client needing beds?</label>
           <textarea
             className="form-control"
-            value={formData.whyNeedClothing}
-            onChange={e => handleInputChange('whyNeedClothing', e.target.value)}
+            value={formData.whyNeedBeds}
+            onChange={e => handleInputChange('whyNeedBeds', e.target.value)}
             placeholder="Please describe the client's situation..."
             ref={el => autoResizeTextarea(el)}
             onInput={e => autoResizeTextarea(e.currentTarget)}
@@ -184,7 +183,6 @@ const ClothingQuestions: React.FC<ClothingQuestionsProps> = ({ formData, onFormD
           />
         </div>
       </div>
-
       {/* Income Section */}
       <IncomeSection
         income={formData.income}
@@ -196,7 +194,6 @@ const ClothingQuestions: React.FC<ClothingQuestionsProps> = ({ formData, onFormD
         sectionNumber={2}
         isVisible={visibleSections.has('income')}
       />
-
       {/* Payment Section */}
       <PaymentSection
         supplierName={formData.supplierName}
@@ -214,7 +211,6 @@ const ClothingQuestions: React.FC<ClothingQuestionsProps> = ({ formData, onFormD
         sectionNumber={3}
         isVisible={visibleSections.has('payment')}
       />
-
       {/* Decision Section */}
       <DecisionSection
         decision={formData.decision}
@@ -228,4 +224,4 @@ const ClothingQuestions: React.FC<ClothingQuestionsProps> = ({ formData, onFormD
   );
 };
 
-export default ClothingQuestions; 
+export default BedsQuestions; 

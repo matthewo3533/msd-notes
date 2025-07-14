@@ -8,6 +8,18 @@ interface FoodQuestionsProps {
   onFormDataChange: (data: Partial<FoodFormData>) => void;
 }
 
+function autoResizeTextarea(el: HTMLTextAreaElement | null) {
+  if (el) {
+    el.style.height = 'auto';
+    el.style.height = el.scrollHeight + 'px';
+    if (el.scrollHeight > 800) {
+      el.style.overflowY = 'auto';
+    } else {
+      el.style.overflowY = 'hidden';
+    }
+  }
+}
+
 const FoodQuestions: React.FC<FoodQuestionsProps> = ({ formData, onFormDataChange }) => {
   const [skippedQuestions, setSkippedQuestions] = useState<Set<string>>(new Set());
   const [visibleSections, setVisibleSections] = useState<Set<string>>(new Set());
@@ -155,6 +167,8 @@ const FoodQuestions: React.FC<FoodQuestionsProps> = ({ formData, onFormDataChang
               value={formData.whyNeedFood}
               onChange={(e) => handleInputChange('whyNeedFood', e.target.value)}
               placeholder="Please describe the client's situation..."
+              ref={el => autoResizeTextarea(el)}
+              onInput={e => autoResizeTextarea(e.currentTarget)}
             />
             <button className="skip-btn" onClick={() => handleSkip('whyNeedFood')}>
               Skip this question
@@ -179,7 +193,7 @@ const FoodQuestions: React.FC<FoodQuestionsProps> = ({ formData, onFormDataChang
                 className="form-control"
                 value={formData.foodAmountRequested || ''}
                 onChange={(e) => handleInputChange('foodAmountRequested', parseFloat(e.target.value) || 0)}
-                placeholder="$0.00"
+                placeholder="0.00"
                 step="0.01"
                 min="0"
               />
@@ -244,7 +258,7 @@ const FoodQuestions: React.FC<FoodQuestionsProps> = ({ formData, onFormDataChang
                 className="form-control"
                 value={formData.currentFoodBalance || ''}
                 onChange={(e) => handleInputChange('currentFoodBalance', parseFloat(e.target.value) || 0)}
-                placeholder="$0.00"
+                placeholder="0.00"
                 step="0.01"
                 min="0"
               />
@@ -308,6 +322,8 @@ const FoodQuestions: React.FC<FoodQuestionsProps> = ({ formData, onFormDataChang
               value={formData.unforeseenCircumstance}
               onChange={(e) => handleInputChange('unforeseenCircumstance', e.target.value)}
               placeholder="Please describe the unforeseen circumstance..."
+              ref={el => autoResizeTextarea(el)}
+              onInput={e => autoResizeTextarea(e.currentTarget)}
             />
             <button className="skip-btn" onClick={() => handleSkip('unforeseenCircumstance')}>
               Skip this question
@@ -331,6 +347,8 @@ const FoodQuestions: React.FC<FoodQuestionsProps> = ({ formData, onFormDataChang
               value={formData.reasonableSteps}
               onChange={(e) => handleInputChange('reasonableSteps', e.target.value)}
               placeholder="Describe steps taken..."
+              ref={el => autoResizeTextarea(el)}
+              onInput={e => autoResizeTextarea(e.currentTarget)}
             />
             <button className="skip-btn" onClick={() => handleSkip('reasonableSteps')}>
               Skip this question

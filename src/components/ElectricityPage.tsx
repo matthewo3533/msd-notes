@@ -1,26 +1,56 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import FoodQuestions from './FoodQuestions';
+import ElectricityQuestions from './ElectricityQuestions';
 import NoteOutput from './NoteOutput';
 import DarkModeToggle from './DarkModeToggle';
-import { FoodFormData } from '../App';
 
-interface FoodPageProps {
+interface ElectricityFormData {
+  clientId: boolean | null;
+  whyNeedPower: string;
+  canMeetNeedOtherWay: string;
+  reasonableSteps: string;
+  supplierName: string;
+  supplierId: string;
+  amount: number;
+  recoveryRate: number;
+  directCredit: string;
+  paymentReference: string;
+  powerAccountNumber: string;
+  income: {
+    benefit: number;
+    employment: number;
+    familyTaxCredit: number;
+    childSupport: number;
+    childDisabilityAllowance: number;
+    otherIncome: number;
+  };
+  costs: Array<{
+    amount: number;
+    cost: string;
+  }>;
+  decision: string;
+  decisionReason: string;
+}
+
+interface ElectricityPageProps {
   darkMode: boolean;
   onToggleDarkMode: (darkMode: boolean) => void;
 }
 
-const FoodPage: React.FC<FoodPageProps> = ({ darkMode, onToggleDarkMode }) => {
+const ElectricityPage: React.FC<ElectricityPageProps> = ({ darkMode, onToggleDarkMode }) => {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState<FoodFormData>({
+  const [formData, setFormData] = useState<ElectricityFormData>({
     clientId: null,
-    whyNeedFood: '',
+    whyNeedPower: '',
     canMeetNeedOtherWay: '',
-    currentFoodBalance: 0,
-    foodAmountRequested: 0,
-    hardshipUnforeseen: '',
-    unforeseenCircumstance: '',
     reasonableSteps: '',
+    supplierName: '',
+    supplierId: '',
+    amount: 0,
+    recoveryRate: 0,
+    directCredit: '',
+    paymentReference: '',
+    powerAccountNumber: '',
     income: {
       benefit: 0,
       employment: 0,
@@ -34,20 +64,19 @@ const FoodPage: React.FC<FoodPageProps> = ({ darkMode, onToggleDarkMode }) => {
     decisionReason: '',
   });
 
-  const handleFormDataChange = (data: Partial<FoodFormData>) => {
-    setFormData(prev => ({ ...prev, ...data }));
-  };
-
   const resetForm = () => {
     setFormData({
       clientId: null,
-      whyNeedFood: '',
+      whyNeedPower: '',
       canMeetNeedOtherWay: '',
-      currentFoodBalance: 0,
-      foodAmountRequested: 0,
-      hardshipUnforeseen: '',
-      unforeseenCircumstance: '',
       reasonableSteps: '',
+      supplierName: '',
+      supplierId: '',
+      amount: 0,
+      recoveryRate: 0,
+      directCredit: '',
+      paymentReference: '',
+      powerAccountNumber: '',
       income: {
         benefit: 0,
         employment: 0,
@@ -61,6 +90,10 @@ const FoodPage: React.FC<FoodPageProps> = ({ darkMode, onToggleDarkMode }) => {
       decisionReason: '',
     });
     navigate('/');
+  };
+
+  const handleFormDataChange = (data: Partial<ElectricityFormData>) => {
+    setFormData(prev => ({ ...prev, ...data, income: { ...prev.income, ...data.income } }));
   };
 
   const handleBack = () => {
@@ -82,29 +115,28 @@ const FoodPage: React.FC<FoodPageProps> = ({ darkMode, onToggleDarkMode }) => {
       <div className="header">
         <div className="header-top">
           <div className="greeting-section">
-            <h1 className="greeting">Food</h1>
+            <h1 className="greeting">Electricity Assistance</h1>
             <p className="date">{getCurrentDate()}</p>
           </div>
           <DarkModeToggle darkMode={darkMode} onToggle={onToggleDarkMode} />
         </div>
       </div>
-      
       <div style={{ marginBottom: '1.5rem' }}>
         <button className="copy-btn" onClick={handleBack}>
           ← Back to Services
         </button>
       </div>
       <div className="food-layout">
-        <FoodQuestions 
-          formData={formData} 
+        <ElectricityQuestions
+          formData={formData}
           onFormDataChange={handleFormDataChange}
         />
         <div className="note-section">
-          <NoteOutput formData={formData} onReset={resetForm} />
+          <NoteOutput formData={formData} service="electricity" onReset={resetForm} />
         </div>
       </div>
     </div>
   );
 };
 
-export default FoodPage; 
+export default ElectricityPage; 

@@ -3,9 +3,9 @@ import IncomeSection from './IncomeSection';
 import PaymentSection from './PaymentSection';
 import DecisionSection from './DecisionSection';
 
-interface ClothingFormData {
+interface ElectricityFormData {
   clientId: boolean | null;
-  whyNeedClothing: string;
+  whyNeedPower: string;
   canMeetNeedOtherWay: string;
   reasonableSteps: string;
   supplierName: string;
@@ -14,6 +14,7 @@ interface ClothingFormData {
   recoveryRate: number;
   directCredit: string; // 'yes' | 'no' | ''
   paymentReference: string;
+  powerAccountNumber: string;
   income: {
     benefit: number;
     employment: number;
@@ -30,24 +31,12 @@ interface ClothingFormData {
   decisionReason: string;
 }
 
-interface ClothingQuestionsProps {
-  formData: ClothingFormData;
-  onFormDataChange: (data: Partial<ClothingFormData>) => void;
+interface ElectricityQuestionsProps {
+  formData: ElectricityFormData;
+  onFormDataChange: (data: Partial<ElectricityFormData>) => void;
 }
 
-function autoResizeTextarea(el: HTMLTextAreaElement | null) {
-  if (el) {
-    el.style.height = 'auto';
-    el.style.height = el.scrollHeight + 'px';
-    if (el.scrollHeight > 800) {
-      el.style.overflowY = 'auto';
-    } else {
-      el.style.overflowY = 'hidden';
-    }
-  }
-}
-
-const ClothingQuestions: React.FC<ClothingQuestionsProps> = ({ formData, onFormDataChange }) => {
+const ElectricityQuestions: React.FC<ElectricityQuestionsProps> = ({ formData, onFormDataChange }) => {
   const [visibleSections, setVisibleSections] = useState<Set<string>>(new Set(['general']));
 
   useEffect(() => {
@@ -79,11 +68,19 @@ const ClothingQuestions: React.FC<ClothingQuestionsProps> = ({ formData, onFormD
     };
   }, []);
 
-  const handleInputChange = (field: keyof ClothingFormData, value: any) => {
+  // When powerAccountNumber changes, update paymentReference
+  useEffect(() => {
+    if (formData.powerAccountNumber !== formData.paymentReference) {
+      onFormDataChange({ paymentReference: formData.powerAccountNumber });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [formData.powerAccountNumber]);
+
+  const handleInputChange = (field: keyof ElectricityFormData, value: any) => {
     onFormDataChange({ [field]: value });
   };
 
-  const handleIncomeChange = (field: keyof ClothingFormData['income'], value: number) => {
+  const handleIncomeChange = (field: keyof ElectricityFormData['income'], value: number) => {
     onFormDataChange({
       income: {
         ...formData.income,
@@ -109,7 +106,6 @@ const ClothingQuestions: React.FC<ClothingQuestionsProps> = ({ formData, onFormD
 
   return (
     <div className="form-sections-container">
-
       {/* General Questions */}
       <div className="form-section-card section-visible">
         <div className="section-header">
@@ -139,14 +135,12 @@ const ClothingQuestions: React.FC<ClothingQuestionsProps> = ({ formData, onFormD
           </div>
         </div>
         <div className="form-group">
-          <label>1. Why is the client needing clothing?</label>
+          <label>1. Why is the client needing power assistance?</label>
           <textarea
             className="form-control"
-            value={formData.whyNeedClothing}
-            onChange={e => handleInputChange('whyNeedClothing', e.target.value)}
+            value={formData.whyNeedPower}
+            onChange={e => handleInputChange('whyNeedPower', e.target.value)}
             placeholder="Please describe the client's situation..."
-            ref={el => autoResizeTextarea(el)}
-            onInput={e => autoResizeTextarea(e.currentTarget)}
           />
         </div>
         <div className="form-group">
@@ -179,8 +173,16 @@ const ClothingQuestions: React.FC<ClothingQuestionsProps> = ({ formData, onFormD
             value={formData.reasonableSteps}
             onChange={e => handleInputChange('reasonableSteps', e.target.value)}
             placeholder="Describe steps taken..."
-            ref={el => autoResizeTextarea(el)}
-            onInput={e => autoResizeTextarea(e.currentTarget)}
+          />
+        </div>
+        <div className="form-group">
+          <label>4. What is the client's power account number?</label>
+          <input
+            type="text"
+            className="form-control"
+            value={formData.powerAccountNumber || ''}
+            onChange={e => handleInputChange('powerAccountNumber', e.target.value)}
+            placeholder="Enter power account number"
           />
         </div>
       </div>
@@ -205,12 +207,12 @@ const ClothingQuestions: React.FC<ClothingQuestionsProps> = ({ formData, onFormD
         recoveryRate={formData.recoveryRate}
         directCredit={formData.directCredit}
         paymentReference={formData.paymentReference}
-        onSupplierNameChange={(name) => handleInputChange('supplierName', name)}
-        onSupplierIdChange={(id) => handleInputChange('supplierId', id)}
-        onAmountChange={(amount) => handleInputChange('amount', amount)}
-        onRecoveryRateChange={(rate) => handleInputChange('recoveryRate', rate)}
-        onDirectCreditChange={(credit) => handleInputChange('directCredit', credit)}
-        onPaymentReferenceChange={(reference) => handleInputChange('paymentReference', reference)}
+        onSupplierNameChange={name => handleInputChange('supplierName', name)}
+        onSupplierIdChange={id => handleInputChange('supplierId', id)}
+        onAmountChange={amount => handleInputChange('amount', amount)}
+        onRecoveryRateChange={rate => handleInputChange('recoveryRate', rate)}
+        onDirectCreditChange={credit => handleInputChange('directCredit', credit)}
+        onPaymentReferenceChange={reference => handleInputChange('paymentReference', reference)}
         sectionNumber={3}
         isVisible={visibleSections.has('payment')}
       />
@@ -219,8 +221,8 @@ const ClothingQuestions: React.FC<ClothingQuestionsProps> = ({ formData, onFormD
       <DecisionSection
         decision={formData.decision}
         decisionReason={formData.decisionReason}
-        onDecisionChange={(decision) => handleInputChange('decision', decision)}
-        onDecisionReasonChange={(reason) => handleInputChange('decisionReason', reason)}
+        onDecisionChange={decision => handleInputChange('decision', decision)}
+        onDecisionReasonChange={reason => handleInputChange('decisionReason', reason)}
         sectionNumber={4}
         isVisible={visibleSections.has('decision')}
       />
@@ -228,4 +230,4 @@ const ClothingQuestions: React.FC<ClothingQuestionsProps> = ({ formData, onFormD
   );
 };
 
-export default ClothingQuestions; 
+export default ElectricityQuestions; 

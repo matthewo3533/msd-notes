@@ -1,26 +1,28 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import FoodQuestions from './FoodQuestions';
+import BeddingQuestions from './BeddingQuestions';
 import NoteOutput from './NoteOutput';
 import DarkModeToggle from './DarkModeToggle';
-import { FoodFormData } from '../App';
+import { ClothingFormData } from '../App';
 
-interface FoodPageProps {
+interface BeddingPageProps {
   darkMode: boolean;
   onToggleDarkMode: (darkMode: boolean) => void;
 }
 
-const FoodPage: React.FC<FoodPageProps> = ({ darkMode, onToggleDarkMode }) => {
+const BeddingPage: React.FC<BeddingPageProps> = ({ darkMode, onToggleDarkMode }) => {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState<FoodFormData>({
+  const [formData, setFormData] = useState<ClothingFormData>({
     clientId: null,
-    whyNeedFood: '',
+    whyNeedClothing: '',
     canMeetNeedOtherWay: '',
-    currentFoodBalance: 0,
-    foodAmountRequested: 0,
-    hardshipUnforeseen: '',
-    unforeseenCircumstance: '',
     reasonableSteps: '',
+    supplierName: '',
+    supplierId: '',
+    amount: 0,
+    recoveryRate: 0,
+    directCredit: '',
+    paymentReference: '',
     income: {
       benefit: 0,
       employment: 0,
@@ -34,20 +36,22 @@ const FoodPage: React.FC<FoodPageProps> = ({ darkMode, onToggleDarkMode }) => {
     decisionReason: '',
   });
 
-  const handleFormDataChange = (data: Partial<FoodFormData>) => {
+  const handleFormDataChange = (data: Partial<ClothingFormData>) => {
     setFormData(prev => ({ ...prev, ...data }));
   };
 
   const resetForm = () => {
     setFormData({
       clientId: null,
-      whyNeedFood: '',
+      whyNeedClothing: '',
       canMeetNeedOtherWay: '',
-      currentFoodBalance: 0,
-      foodAmountRequested: 0,
-      hardshipUnforeseen: '',
-      unforeseenCircumstance: '',
       reasonableSteps: '',
+      supplierName: '',
+      supplierId: '',
+      amount: 0,
+      recoveryRate: 0,
+      directCredit: '',
+      paymentReference: '',
       income: {
         benefit: 0,
         employment: 0,
@@ -82,7 +86,7 @@ const FoodPage: React.FC<FoodPageProps> = ({ darkMode, onToggleDarkMode }) => {
       <div className="header">
         <div className="header-top">
           <div className="greeting-section">
-            <h1 className="greeting">Food</h1>
+            <h1 className="greeting">Bedding</h1>
             <p className="date">{getCurrentDate()}</p>
           </div>
           <DarkModeToggle darkMode={darkMode} onToggle={onToggleDarkMode} />
@@ -95,16 +99,16 @@ const FoodPage: React.FC<FoodPageProps> = ({ darkMode, onToggleDarkMode }) => {
         </button>
       </div>
       <div className="food-layout">
-        <FoodQuestions 
-          formData={formData} 
+        <BeddingQuestions
+          formData={formData}
           onFormDataChange={handleFormDataChange}
         />
         <div className="note-section">
-          <NoteOutput formData={formData} onReset={resetForm} />
+          <NoteOutput formData={formData} service="bedding" onReset={resetForm} />
         </div>
       </div>
     </div>
   );
 };
 
-export default FoodPage; 
+export default BeddingPage; 

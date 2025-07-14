@@ -6,6 +6,8 @@ export interface IncomeData {
   employment: number;
   childSupport: number;
   otherIncome: number;
+  familyTaxCredit: number;
+  childDisabilityAllowance: number;
 }
 
 export interface CostData {
@@ -111,6 +113,36 @@ const IncomeSection: React.FC<IncomeSectionProps> = ({
                 />
               </div>
             </div>
+
+            <div className="form-group">
+              <label>Family Tax Credit</label>
+              <div className="dollar-input">
+                <input
+                  type="number"
+                  className="form-control"
+                  value={income.familyTaxCredit || ''}
+                  onChange={(e) => onIncomeChange('familyTaxCredit', parseFloat(e.target.value) || 0)}
+                  placeholder="Enter amount"
+                  step="0.01"
+                  min="0"
+                />
+              </div>
+            </div>
+
+            <div className="form-group">
+              <label>Child Disability Allowance</label>
+              <div className="dollar-input">
+                <input
+                  type="number"
+                  className="form-control"
+                  value={income.childDisabilityAllowance || ''}
+                  onChange={(e) => onIncomeChange('childDisabilityAllowance', parseFloat(e.target.value) || 0)}
+                  placeholder="Enter amount"
+                  step="0.01"
+                  min="0"
+                />
+              </div>
+            </div>
           </div>
 
           <div className="form-group">
@@ -131,7 +163,7 @@ const IncomeSection: React.FC<IncomeSectionProps> = ({
                 <CostInput
                   value={cost.cost}
                   onChange={(value) => onCostChange(index, 'cost', value)}
-                  placeholder="Type cost..."
+                  placeholder="Type"
                 />
                 <button
                   className="remove-cost-btn"
@@ -148,44 +180,86 @@ const IncomeSection: React.FC<IncomeSectionProps> = ({
           </div>
         </div>
 
-        <div className="income-summary">
-          <h4>Income Summary</h4>
-          <div className="income-item">
-            <span>Benefit:</span>
-            <span>${income.benefit.toFixed(2)}</span>
-          </div>
-          <div className="income-item">
-            <span>Employment:</span>
-            <span>${income.employment.toFixed(2)}</span>
-          </div>
-          <div className="income-item">
-            <span>Child Support:</span>
-            <span>${income.childSupport.toFixed(2)}</span>
-          </div>
-          <div className="income-item">
-            <span>Other Income:</span>
-            <span>${income.otherIncome.toFixed(2)}</span>
-          </div>
-          <div className="income-item">
-            <span>Total Income:</span>
-            <span>${totalIncome.toFixed(2)}</span>
-          </div>
-          
-          {costs.length > 0 && (
-            <>
-              <hr style={{ margin: '1rem 0', border: 'none', borderTop: '1px solid var(--border-secondary)' }} />
-              {costs.map((cost, index) => (
-                <div key={index} className="income-item" style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>
-                  <span>-{cost.cost}:</span>
-                  <span>-${cost.amount.toFixed(2)}</span>
+        <div className="income-summary-sticky">
+          <div className="income-summary">
+            <h4>Income Summary</h4>
+            <div className="income-item">
+              <span>Benefit:</span>
+              <span>${income.benefit.toFixed(2)}</span>
+            </div>
+            <div className="income-item">
+              <span>Employment:</span>
+              <span>${income.employment.toFixed(2)}</span>
+            </div>
+            <div className="income-item">
+              <span>Child Support:</span>
+              <span>${income.childSupport.toFixed(2)}</span>
+            </div>
+            <div className="income-item">
+              <span>Other Income:</span>
+              <span>${income.otherIncome.toFixed(2)}</span>
+            </div>
+            <div className="income-item">
+              <span>Family Tax Credit:</span>
+              <span>${income.familyTaxCredit.toFixed(2)}</span>
+            </div>
+            <div className="income-item">
+              <span>Child Disability Allowance:</span>
+              <span>${income.childDisabilityAllowance.toFixed(2)}</span>
+            </div>
+            <div className="income-item">
+              <span>Total Income:</span>
+              <span>${totalIncome.toFixed(2)}</span>
+            </div>
+            {costs.length > 0 && (
+              <>
+                <hr style={{ margin: '1rem 0', border: 'none', borderTop: '1px solid var(--border-secondary)' }} />
+                {costs.map((cost, index) => (
+                  <div key={index} className="income-item" style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>
+                    <span>-{cost.cost}:</span>
+                    <span>-${cost.amount.toFixed(2)}</span>
+                  </div>
+                ))}
+                <div className="income-item">
+                  <span>Remaining:</span>
+                  <span>${remainingIncome.toFixed(2)}</span>
                 </div>
-              ))}
-              <div className="income-item">
-                <span>Remaining:</span>
-                <span>${remainingIncome.toFixed(2)}</span>
-              </div>
-            </>
-          )}
+              </>
+            )}
+          </div>
+        </div>
+        <div className="income-links-plain">
+          <a
+            href="https://www.workandincome.govt.nz/map/deskfile/extra-help-information/special-needs-grant-tables/income-limits-current.html"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            SNG income limits
+          </a>
+          <span>·</span>
+          <a
+            href="https://www.workandincome.govt.nz/map/deskfile/extra-help-information/special-needs-grant-tables/asset-limits-current.html"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            SNG asset limits
+          </a>
+          <span>·</span>
+          <a
+            href="https://www.workandincome.govt.nz/map/deskfile/extra-help-information/recoverable-assistance-payment-tables/income-limits-current.html"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            RAP income limits
+          </a>
+          <span>·</span>
+          <a
+            href="https://www.workandincome.govt.nz/map/deskfile/extra-help-information/recoverable-assistance-payment-tables/asset-limits-current.html"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            RAP asset limits
+          </a>
         </div>
       </div>
     </div>
