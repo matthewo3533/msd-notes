@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import BedsQuestions from './BedsQuestions';
 import NoteOutput from './NoteOutput';
 import DarkModeToggle from './DarkModeToggle';
-import { BedsFormData } from './BedsQuestions';
+import type { BedsFormData } from './BedsQuestions';
 
 interface BedsPageProps {
   darkMode: boolean;
@@ -37,11 +37,11 @@ const BedsPage: React.FC<BedsPageProps> = ({ darkMode, onToggleDarkMode }) => {
   });
 
   const handleFormDataChange = (data: Partial<BedsFormData>) => {
-    setFormData(prev => ({ ...prev, ...data }));
+    setFormData((prev: BedsFormData) => ({ ...prev, ...data }));
   };
 
   const resetForm = () => {
-    setFormData({
+    setFormData((prev: BedsFormData) => ({
       clientId: null,
       whyNeedBeds: '',
       canMeetNeedOtherWay: '',
@@ -63,7 +63,7 @@ const BedsPage: React.FC<BedsPageProps> = ({ darkMode, onToggleDarkMode }) => {
       costs: [],
       decision: '',
       decisionReason: '',
-    });
+    }));
     navigate('/');
   };
 

@@ -3,7 +3,7 @@ import IncomeSection from './IncomeSection';
 import PaymentSection from './PaymentSection';
 import DecisionSection from './DecisionSection';
 
-interface BeddingFormData {
+export interface BeddingFormData {
   clientId: boolean | null;
   whyNeedBedding: string;
   canMeetNeedOtherWay: string;

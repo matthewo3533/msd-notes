@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import BeddingQuestions from './BeddingQuestions';
 import NoteOutput from './NoteOutput';
 import DarkModeToggle from './DarkModeToggle';
-import { BeddingFormData } from './BeddingQuestions';
+import type { BeddingFormData } from './BeddingQuestions';
 
 interface BeddingPageProps {
   darkMode: boolean;
@@ -39,11 +39,11 @@ const BeddingPage: React.FC<BeddingPageProps> = ({ darkMode, onToggleDarkMode })
   });
 
   const handleFormDataChange = (data: Partial<BeddingFormData>) => {
-    setFormData(prev => ({ ...prev, ...data }));
+    setFormData((prev: BeddingFormData) => ({ ...prev, ...data }));
   };
 
   const resetForm = () => {
-    setFormData({
+    setFormData((prev: BeddingFormData) => ({
       clientId: null,
       whyNeedBedding: '',
       canMeetNeedOtherWay: '',
@@ -67,7 +67,7 @@ const BeddingPage: React.FC<BeddingPageProps> = ({ darkMode, onToggleDarkMode })
       decisionReason: '',
       beddingSngEligible: '',
       beddingSngReason: '',
-    });
+    }));
     navigate('/');
   };
 
