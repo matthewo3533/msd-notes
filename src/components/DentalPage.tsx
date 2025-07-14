@@ -113,9 +113,6 @@ const DentalPage: React.FC<DentalPageProps> = ({ darkMode, onToggleDarkMode }) =
     return `${dayName} ${day}/${month}/${year}`;
   };
 
-  // Calculate advance for recovery rate
-  const advance = formData.sngEligible === 'yes' ? Math.max(0, formData.amount - (formData.sngBalance || 0)) : formData.amount;
-
   return (
     <div className="container">
       <div className="header">

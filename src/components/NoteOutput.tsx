@@ -34,12 +34,12 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       if (c.income.employment > 0) note += `$${c.income.employment.toFixed(2)} Employment\n`;
       if (c.income.childSupport > 0) note += `$${c.income.childSupport.toFixed(2)} Child Support\n`;
       if (c.income.otherIncome > 0) note += `$${c.income.otherIncome.toFixed(2)} Other Income\n`;
-      c.costs.forEach(cost => {
+      c.costs.forEach((cost: { amount: number; cost: string }) => {
         if (cost.amount > 0) note += `-$${cost.amount.toFixed(2)} ${cost.cost}\n`;
       });
       if (c.costs.length > 0) {
-        const totalIncome = Object.values(c.income).reduce((sum, value) => sum + (value || 0), 0);
-        const totalCosts = c.costs.reduce((sum, cost) => sum + (cost.amount || 0), 0);
+        const totalIncome = (Object.values(c.income) as number[]).reduce((sum: number, value: number) => sum + (value || 0), 0);
+        const totalCosts = c.costs.reduce((sum: number, cost: { amount: number; cost: string }) => sum + (cost.amount || 0), 0);
         const remainingIncome = totalIncome - totalCosts;
         note += '--------------\n';
         note += `Client is left with $${remainingIncome.toFixed(2)}\n`;
@@ -75,12 +75,12 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       if (e.income.childSupport > 0) note += `$${e.income.childSupport.toFixed(2)} Child Support\n`;
       if (e.income.childDisabilityAllowance > 0) note += `$${e.income.childDisabilityAllowance.toFixed(2)} Child Disability Allowance\n`;
       if (e.income.otherIncome > 0) note += `$${e.income.otherIncome.toFixed(2)} Other Income\n`;
-      e.costs.forEach(cost => {
+      e.costs.forEach((cost: { amount: number; cost: string }) => {
         if (cost.amount > 0) note += `-$${cost.amount.toFixed(2)} ${cost.cost}\n`;
       });
       if (e.costs.length > 0) {
-        const totalIncome = Object.values(e.income).reduce((sum, value) => sum + (value || 0), 0);
-        const totalCosts = e.costs.reduce((sum, cost) => sum + (cost.amount || 0), 0);
+        const totalIncome = (Object.values(e.income) as number[]).reduce((sum: number, value: number) => sum + (value || 0), 0);
+        const totalCosts = e.costs.reduce((sum: number, cost: { amount: number; cost: string }) => sum + (cost.amount || 0), 0);
         const remainingIncome = totalIncome - totalCosts;
         note += '--------------\n';
         note += `Client is left with $${remainingIncome.toFixed(2)}\n`;
@@ -121,12 +121,12 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       if (d.income.childSupport > 0) note += `$${d.income.childSupport.toFixed(2)} Child Support\n`;
       if (d.income.childDisabilityAllowance > 0) note += `$${d.income.childDisabilityAllowance.toFixed(2)} Child Disability Allowance\n`;
       if (d.income.otherIncome > 0) note += `$${d.income.otherIncome.toFixed(2)} Other Income\n`;
-      d.costs.forEach((cost: any) => {
+      d.costs.forEach((cost: { amount: number; cost: string }) => {
         if (cost.amount > 0) note += `-$${cost.amount.toFixed(2)} ${cost.cost}\n`;
       });
       if (d.costs.length > 0) {
-        const totalIncome = Object.values(d.income).reduce((sum: number, value: number) => sum + (value || 0), 0);
-        const totalCosts = d.costs.reduce((sum: number, cost: any) => sum + (cost.amount || 0), 0);
+        const totalIncome = (Object.values(d.income) as number[]).reduce((sum: number, value: number) => sum + (value || 0), 0);
+        const totalCosts = d.costs.reduce((sum: number, cost: { amount: number; cost: string }) => sum + (cost.amount || 0), 0);
         const remainingIncome = totalIncome - totalCosts;
         note += '--------------\n';
         note += `Client is left with $${remainingIncome.toFixed(2)}\n`;
@@ -205,12 +205,12 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       if (b.income.childSupport > 0) note += `$${b.income.childSupport.toFixed(2)} Child Support\n`;
       if (b.income.childDisabilityAllowance > 0) note += `$${b.income.childDisabilityAllowance.toFixed(2)} Child Disability Allowance\n`;
       if (b.income.otherIncome > 0) note += `$${b.income.otherIncome.toFixed(2)} Other Income\n`;
-      (b.costs as Array<{amount:number;cost:string}>).forEach((cost) => {
+      (b.costs as Array<{amount:number;cost:string}>).forEach((cost: {amount:number;cost:string}) => {
         if (cost.amount > 0) note += `-$${cost.amount.toFixed(2)} ${cost.cost}\n`;
       });
       if (b.costs && b.costs.length > 0) {
-        const totalIncome = Object.values(b.income as {[k:string]:number}).reduce((sum, value) => sum + (value || 0), 0);
-        const totalCosts = (b.costs as Array<{amount:number}>).reduce((sum, cost) => sum + (cost.amount || 0), 0);
+        const totalIncome = (Object.values(b.income as {[k:string]:number}) as number[]).reduce((sum: number, value: number) => sum + (value || 0), 0);
+        const totalCosts = (b.costs as Array<{amount:number}>).reduce((sum: number, cost: {amount:number}) => sum + (cost.amount || 0), 0);
         const remainingIncome = totalIncome - totalCosts;
         note += '--------------\n';
         note += `Client is left with $${remainingIncome.toFixed(2)}\n`;
@@ -225,8 +225,8 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
     } else {
       // Food note output (existing logic)
       const f: FoodFormData = formData;
-      const totalIncome = Object.values(f.income).reduce((sum, value) => sum + (value || 0), 0);
-      const totalCosts = f.costs.reduce((sum, cost) => sum + (cost.amount || 0), 0);
+      const totalIncome = Object.values(f.income).reduce((sum: number, value: number) => sum + (value || 0), 0);
+      const totalCosts = f.costs.reduce((sum: number, cost: { amount: number; cost: string }) => sum + (cost.amount || 0), 0);
       const remainingIncome = totalIncome - totalCosts;
       let note = '';
       note += `CCID: ${f.clientId ? 'Yes' : 'No'}\n\n`;
@@ -245,7 +245,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       if (f.income.employment > 0) note += `$${f.income.employment.toFixed(2)} Employment\n`;
       if (f.income.childSupport > 0) note += `$${f.income.childSupport.toFixed(2)} Child Support\n`;
       if (f.income.otherIncome > 0) note += `$${f.income.otherIncome.toFixed(2)} Other Income\n`;
-      f.costs.forEach(cost => {
+      f.costs.forEach((cost: { amount: number; cost: string }) => {
         if (cost.amount > 0) note += `-$${cost.amount.toFixed(2)} ${cost.cost}\n`;
       });
       if (f.costs.length > 0) {
