@@ -1345,4 +1345,231 @@ input[type="number"] {
 .tip-box strong {
   font-weight: 600;
   color: rgba(255, 255, 255, 0.9);
+}
+
+/* Declare Income Styles */
+.week-section {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-primary);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: var(--shadow-primary);
+  transition: all 0.3s ease;
+}
+
+.week-section:hover {
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-2px);
+}
+
+.week-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid var(--border-secondary);
+}
+
+.week-header h4 {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+  background: var(--accent-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.week-display {
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+.income-sources-section {
+  margin-top: 1.5rem;
+}
+
+.section-subheader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.section-subheader h5 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.income-source-card {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-secondary);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  transition: all 0.2s ease;
+}
+
+.income-source-card:hover {
+  border-color: var(--border-primary);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.income-source-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border-secondary);
+}
+
+.income-source-header h6 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.income-calculator {
+  background: var(--accent-gradient);
+  color: white;
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  margin-top: 1rem;
+  text-align: center;
+}
+
+.income-calculator p {
+  margin: 0;
+  font-weight: 600;
+}
+
+.week-total {
+  background: var(--success-gradient);
+  color: white;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-top: 1.5rem;
+  text-align: center;
+}
+
+.week-total h5 {
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 2rem;
+  color: var(--text-muted);
+  background: var(--bg-tertiary);
+  border: 2px dashed var(--border-secondary);
+  border-radius: 8px;
+  margin: 1rem 0;
+}
+
+.empty-state p {
+  margin: 0;
+  font-style: italic;
+}
+
+.form-description {
+  color: var(--text-secondary);
+  font-size: 1rem;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: var(--bg-tertiary);
+  border-radius: 8px;
+  border-left: 4px solid var(--accent-gradient);
+}
+
+.add-week-btn {
+  background: var(--accent-gradient) !important;
+  border: none !important;
+  color: white !important;
+  padding: 1rem 2rem !important;
+  border-radius: 8px !important;
+  cursor: pointer !important;
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+  width: 100% !important;
+  margin-top: 1rem !important;
+  transition: all 0.3s ease !important;
+}
+
+.add-week-btn:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3) !important;
+}
+
+.add-btn {
+  background: var(--accent-gradient) !important;
+  border: none !important;
+  color: white !important;
+  padding: 0.5rem 1rem !important;
+  border-radius: 6px !important;
+  cursor: pointer !important;
+  font-size: 0.9rem !important;
+  transition: all 0.2s ease !important;
+}
+
+.add-btn:hover {
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3) !important;
+}
+
+.remove-btn {
+  background: var(--bg-tertiary) !important;
+  border: 1px solid var(--border-primary) !important;
+  color: var(--text-primary) !important;
+  padding: 0.25rem 0.5rem !important;
+  border-radius: 4px !important;
+  cursor: pointer !important;
+  font-size: 0.8rem !important;
+  transition: all 0.2s ease !important;
+}
+
+.remove-btn:hover {
+  background: var(--danger-gradient) !important;
+  color: white !important;
+  border-color: transparent !important;
+}
+
+/* Responsive adjustments for Declare Income */
+@media (max-width: 768px) {
+  .week-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  
+  .section-subheader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  
+  .income-source-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  
+  .week-section {
+    padding: 1rem;
+  }
+  
+  .income-source-card {
+    padding: 0.75rem;
+  }
 } 

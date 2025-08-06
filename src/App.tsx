@@ -9,6 +9,7 @@ import DentalPage from './components/DentalPage';
 import BedsPage from './components/BedsPage';
 import BeddingPage from './components/BeddingPage';
 import TASGrantPage from './components/TASGrantPage';
+import DeclareIncomePage from './components/DeclareIncomePage';
 
 export interface Service {
   id: string;
@@ -96,6 +97,21 @@ export interface TASGrantFormData {
   arrearsIssued: number;
 }
 
+export interface DeclareIncomeFormData {
+  weeks: Array<{
+    id: string;
+    weekBeginning: string;
+    incomeSources: Array<{
+      id: string;
+      type: 'hourly' | 'lump-sum';
+      description: string;
+      hoursWorked?: number;
+      hourlyRate?: number;
+      lumpSumAmount?: number;
+    }>;
+  }>;
+}
+
 function App() {
   // Initialize theme from localStorage or default to 'dark-blue'
   const [currentTheme, setCurrentTheme] = useState(() => {
@@ -151,6 +167,10 @@ function App() {
       <Route 
         path="/tas-grant" 
         element={<TASGrantPage currentTheme={currentTheme} onThemeChange={setCurrentTheme} />} 
+      />
+      <Route 
+        path="/declare-income" 
+        element={<DeclareIncomePage currentTheme={currentTheme} onThemeChange={setCurrentTheme} />} 
       />
       <Route 
         path="/:serviceId" 

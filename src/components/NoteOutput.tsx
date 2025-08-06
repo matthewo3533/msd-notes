@@ -1,15 +1,75 @@
 import React from 'react';
-import { FoodFormData, ClothingFormData, TASGrantFormData } from '../App';
+import { FoodFormData, ClothingFormData, TASGrantFormData, DeclareIncomeFormData } from '../App';
 
 interface NoteOutputProps {
   formData: any;
-  service?: 'food' | 'clothing' | 'electricity' | 'dental' | 'beds' | 'bedding' | 'tas-grant';
+  service?: 'food' | 'clothing' | 'electricity' | 'dental' | 'beds' | 'bedding' | 'tas-grant' | 'declare-income';
   onReset: () => void;
 }
 
 const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onReset }) => {
   const generateNote = () => {
-    if (service === 'tas-grant') {
+    if (service === 'declare-income') {
+      // Declare Income note output
+      const d: DeclareIncomeFormData = formData;
+      let note = '';
+      note += '=== INCOME DECLARATION ===\n\n';
+      
+      if (d.weeks.length === 0) {
+        note += 'No income declared.\n';
+        return note;
+      }
+
+      d.weeks.forEach((week, weekIndex) => {
+        note += `Week ${weekIndex + 1}: Week Beginning ${week.weekBeginning || 'Not specified'}\n`;
+        
+        if (week.incomeSources.length === 0) {
+          note += '  No income sources declared for this week.\n';
+        } else {
+          let weekTotal = 0;
+          week.incomeSources.forEach((source, sourceIndex) => {
+            note += `  Income Source ${sourceIndex + 1}: ${source.description || 'No description'}\n`;
+            
+            if (source.type === 'hourly') {
+              const hours = source.hoursWorked || 0;
+              const rate = source.hourlyRate || 0;
+              const calculated = hours * rate;
+              weekTotal += calculated;
+              note += `    Type: Hourly Rate\n`;
+              note += `    Hours Worked: ${hours}\n`;
+              note += `    Hourly Rate: $${rate.toFixed(2)}\n`;
+              note += `    Calculated Income: $${calculated.toFixed(2)}\n`;
+            } else if (source.type === 'lump-sum') {
+              const amount = source.lumpSumAmount || 0;
+              weekTotal += amount;
+              note += `    Type: Lump Sum\n`;
+              note += `    Amount: $${amount.toFixed(2)}\n`;
+            }
+            note += '\n';
+          });
+          
+          note += `  Week Total: $${weekTotal.toFixed(2)}\n`;
+        }
+        
+        note += '\n';
+      });
+
+      // Calculate grand total
+      const grandTotal = d.weeks.reduce((total, week) => {
+        return total + week.incomeSources.reduce((weekTotal, source) => {
+          if (source.type === 'hourly' && source.hoursWorked && source.hourlyRate) {
+            return weekTotal + (source.hoursWorked * source.hourlyRate);
+          } else if (source.type === 'lump-sum' && source.lumpSumAmount) {
+            return weekTotal + source.lumpSumAmount;
+          }
+          return weekTotal;
+        }, 0);
+      }, 0);
+
+      note += `=== GRAND TOTAL: $${grandTotal.toFixed(2)} ===\n`;
+      
+      return note;
+    } else if (service === 'tas-grant') {
       // TAS Grant/Reapplication note output
       const t: TASGrantFormData = formData;
       let note = '';
