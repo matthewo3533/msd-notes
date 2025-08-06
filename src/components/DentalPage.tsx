@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DentalQuestions from './DentalQuestions';
 import NoteOutput from './NoteOutput';
-import DarkModeToggle from './DarkModeToggle';
+import ThemeSelector from './ThemeSelector';
 
 interface DentalFormData {
   clientId: boolean | null;
@@ -34,11 +34,11 @@ interface DentalFormData {
 }
 
 interface DentalPageProps {
-  darkMode: boolean;
-  onToggleDarkMode: (darkMode: boolean) => void;
+  currentTheme: string;
+  onThemeChange: (themeId: string) => void;
 }
 
-const DentalPage: React.FC<DentalPageProps> = ({ darkMode, onToggleDarkMode }) => {
+const DentalPage: React.FC<DentalPageProps> = ({ currentTheme, onThemeChange }) => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState<DentalFormData>({
     clientId: null,
@@ -65,6 +65,10 @@ const DentalPage: React.FC<DentalPageProps> = ({ darkMode, onToggleDarkMode }) =
     decision: '',
     decisionReason: '',
   });
+
+  const handleFormDataChange = (data: Partial<DentalFormData>) => {
+    setFormData(prev => ({ ...prev, ...data }));
+  };
 
   const resetForm = () => {
     setFormData({
@@ -95,10 +99,6 @@ const DentalPage: React.FC<DentalPageProps> = ({ darkMode, onToggleDarkMode }) =
     navigate('/');
   };
 
-  const handleFormDataChange = (data: Partial<DentalFormData>) => {
-    setFormData(prev => ({ ...prev, ...data, income: { ...prev.income, ...data.income } }));
-  };
-
   const handleBack = () => {
     navigate('/');
   };
@@ -121,17 +121,18 @@ const DentalPage: React.FC<DentalPageProps> = ({ darkMode, onToggleDarkMode }) =
             <h1 className="greeting">Dental</h1>
             <p className="date">{getCurrentDate()}</p>
           </div>
-          <DarkModeToggle darkMode={darkMode} onToggle={onToggleDarkMode} />
+          <ThemeSelector currentTheme={currentTheme} onThemeChange={onThemeChange} />
         </div>
       </div>
+      
       <div style={{ marginBottom: '1.5rem' }}>
         <button className="copy-btn" onClick={handleBack}>
           ← Back to Services
         </button>
       </div>
       <div className="food-layout">
-        <DentalQuestions
-          formData={formData}
+        <DentalQuestions 
+          formData={formData} 
           onFormDataChange={handleFormDataChange}
         />
         <div className="note-section">

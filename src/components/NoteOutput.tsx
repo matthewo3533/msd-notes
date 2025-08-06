@@ -1,19 +1,71 @@
 import React from 'react';
-import { FoodFormData, ClothingFormData } from '../App';
+import { FoodFormData, ClothingFormData, TASGrantFormData } from '../App';
 
 interface NoteOutputProps {
   formData: any;
-  service?: 'food' | 'clothing' | 'electricity' | 'dental' | 'beds' | 'bedding';
+  service?: 'food' | 'clothing' | 'electricity' | 'dental' | 'beds' | 'bedding' | 'tas-grant';
   onReset: () => void;
 }
 
 const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onReset }) => {
   const generateNote = () => {
-    if (service === 'clothing') {
+    if (service === 'tas-grant') {
+      // TAS Grant/Reapplication note output
+      const t: TASGrantFormData = formData;
+      let note = '';
+      note += `Date of first contact: ${t.dateOfFirstContact || '-'}\n`;
+      note += `Client consented to re-application being completed on their behalf: ${t.clientConsent === 'yes' ? 'Yes' : t.clientConsent === 'no' ? 'No' : '-'}\n`;
+      note += `Does the client have Child Support liable costs? ${t.childSupportLiableCosts === 'yes' ? 'Yes' : t.childSupportLiableCosts === 'no' ? 'No' : '-'}\n`;
+      if (t.childSupportLiableCosts === 'yes') {
+        note += `Child Support API consent given? ${t.childSupportAPIConsent === 'yes' ? 'Yes' : t.childSupportAPIConsent === 'no' ? 'No' : '-'}\n`;
+      }
+      note += `Address details correct: ${t.addressDetailsCorrect === 'yes' ? 'Yes' : t.addressDetailsCorrect === 'no' ? 'No' : '-'}\n`;
+      note += `Contact details correct: ${t.contactDetailsCorrect === 'yes' ? 'Yes' : t.contactDetailsCorrect === 'no' ? 'No' : '-'}\n`;
+      note += `SWIFTT Accommodation costs: $${t.accommodationCosts?.toFixed(2) || '0.00'}\n`;
+      note += `Checked if Rent/Board costs include utilities: ${t.rentBoardIncludesUtilities === 'yes' ? 'Yes' : t.rentBoardIncludesUtilities === 'no' ? 'No' : '-'}\n`;
+      note += `Checked if Home Ownership costs have changed: ${t.homeOwnershipCostsChanged === 'yes' ? 'Yes' : t.homeOwnershipCostsChanged === 'no' ? 'No' : '-'}\n`;
+      note += `SWIFTT Disability costs: $ [${t.disabilityCostsChanged === 'yes' ? 'updated' : 'no change'}]\n`;
+      note += `SWIFTT TAS costs: ${t.tasCostsChanged === 'yes' ? 'Yes' : t.tasCostsChanged === 'no' ? 'No' : '-'}\n`;
+      note += `If FTC is paid by IRD is SWIFTT amount correct: ${t.familyTaxCreditsCorrect === 'yes' ? 'Yes' : t.familyTaxCreditsCorrect === 'no' ? 'No' : '-'}\n`;
+      note += `SWIFTT Income is correct: ${t.incomeCorrect === 'yes' ? 'Yes' : t.incomeCorrect === 'no' ? 'No' : '-'}\n`;
+      note += `SWIFTT Assets are correct: ${t.assetsCorrect === 'yes' ? 'Yes' : t.assetsCorrect === 'no' ? 'No' : '-'}\n`;
+      note += `Relationship details are correct: ${t.relationshipDetailsCorrect === 'yes' ? 'Yes' : t.relationshipDetailsCorrect === 'no' ? 'No' : '-'}\n`;
+      note += `If allowable costs are updated has verification been received? ${t.verificationReceived === 'yes' ? 'Yes' : t.verificationReceived === 'no' ? 'No' : '-'}\n`;
+      note += `Deficiency: $${t.deficiency?.toFixed(2) || '0.00'}\n`;
+      note += `TAS rate payable: $${t.tasRatePayable?.toFixed(2) || '0.00'}\n`;
+      note += `Necessary and reasonable steps discussed: ${t.necessaryReasonableSteps || '-'}\n`;
+      note += `Read obligations to client, client understands: ${t.clientUnderstandsObligations === 'yes' ? 'Yes' : t.clientUnderstandsObligations === 'no' ? 'No' : '-'}\n`;
+      
+      // Outcome section
+      let outcomeText = '';
+      if (t.outcome === 'regranted') {
+        outcomeText = `re-granted from ${t.regrantDate || t.dateOfFirstContact}`;
+      } else if (t.outcome === 'no-entitlement') {
+        outcomeText = 'no entitlement';
+      } else if (t.outcome === 'client-declined') {
+        outcomeText = 'client declined to re-apply';
+      } else if (t.outcome === 'not-regranted') {
+        outcomeText = 'not re-granted - further action needed';
+      }
+      note += `Outcome: ${outcomeText}\n`;
+      
+      if (t.outcome === 'not-regranted' && t.furtherActionNeeded) {
+        note += `Further action needed: ${t.furtherActionNeeded}\n`;
+      }
+      
+      note += `LSUM sent: ${t.lsumSent === 'yes' ? 'Yes' : t.lsumSent === 'no' ? 'No' : '-'}\n`;
+      
+      // Only show Arrears issued if it has a value greater than 0
+      if (t.arrearsIssued && t.arrearsIssued > 0) {
+        note += `Arrears issued: $${t.arrearsIssued.toFixed(2)}\n`;
+      }
+      
+      return note;
+    } else if (service === 'clothing') {
       // Clothing note output
       const c: ClothingFormData = formData;
       let note = '';
-      note += `CCID: ${c.clientId ? 'Yes' : 'No'}\n\n`;
+      note += `CCID: ${c.clientId === false ? 'No' : 'Yes'}\n\n`;
       note += '~~~ Need ~~~\n';
       if (c.whyNeedClothing) {
         note += `Why is the client needing clothing?\n${c.whyNeedClothing}\n`;
@@ -55,7 +107,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       // Electricity note output (similar to clothing)
       const e = formData;
       let note = '';
-      note += `CCID: ${e.clientId ? 'Yes' : 'No'}\n\n`;
+      note += `CCID: ${e.clientId === false ? 'No' : 'Yes'}\n\n`;
       note += '~~~ Need ~~~\n';
       if (e.whyNeedPower) note += `Why is the client needing power assistance?\n${e.whyNeedPower}\n`;
       if (e.canMeetNeedOtherWay) note += `Can client meet this need in any other way?\n${e.canMeetNeedOtherWay}\n`;
@@ -96,7 +148,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       // Dental note output
       const d = formData;
       let note = '';
-      note += `CCID: ${d.clientId ? 'Yes' : 'No'}\n\n`;
+      note += `CCID: ${d.clientId === false ? 'No' : 'Yes'}\n\n`;
       note += '~~~ Need ~~~\n';
       if (d.whyNeedDental) note += `Why is the client needing dental assistance?\n${d.whyNeedDental}\n`;
       if (d.canMeetNeedOtherWay) note += `Can client meet this need in any other way?\n${d.canMeetNeedOtherWay}\n`;
@@ -142,7 +194,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       // Beds note output (like clothing, but beds wording)
       const b = formData;
       let note = '';
-      note += `CCID: ${b.clientId ? 'Yes' : 'No'}\n\n`;
+      note += `CCID: ${b.clientId === false ? 'No' : 'Yes'}\n\n`;
       note += '~~~ Need ~~~\n';
       if (b.whyNeedBeds) note += `Why is the client needing beds?\n${b.whyNeedBeds}\n`;
       if (b.canMeetNeedOtherWay) note += `Can client meet this need in any other way?\n${b.canMeetNeedOtherWay}\n`;
@@ -182,7 +234,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       // Bedding note output (like beds, with SNG logic)
       const b = formData;
       let note = '';
-      note += `CCID: ${b.clientId ? 'Yes' : 'No'}\n\n`;
+      note += `CCID: ${b.clientId === false ? 'No' : 'Yes'}\n\n`;
       note += '~~~ Need ~~~\n';
       if (b.whyNeedBedding) note += `Why is the client needing bedding?\n${b.whyNeedBedding}\n`;
       if (b.canMeetNeedOtherWay) note += `Can client meet this need in any other way?\n${b.canMeetNeedOtherWay}\n`;
@@ -229,7 +281,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       const totalCosts = f.costs.reduce((sum: number, cost: { amount: number; cost: string }) => sum + (cost.amount || 0), 0);
       const remainingIncome = totalIncome - totalCosts;
       let note = '';
-      note += `CCID: ${f.clientId ? 'Yes' : 'No'}\n\n`;
+      note += `CCID: ${f.clientId === false ? 'No' : 'Yes'}\n\n`;
       note += '~~~ Need ~~~\n';
       if (f.whyNeedFood) note += `Why is client needing food?\n${f.whyNeedFood}\n`;
       if (f.canMeetNeedOtherWay) note += `Can client meet this need in any other way?\n${f.canMeetNeedOtherWay}\n`;

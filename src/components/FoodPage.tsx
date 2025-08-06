@@ -2,15 +2,15 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import FoodQuestions from './FoodQuestions';
 import NoteOutput from './NoteOutput';
-import DarkModeToggle from './DarkModeToggle';
+import ThemeSelector from './ThemeSelector';
 import { FoodFormData } from '../App';
 
 interface FoodPageProps {
-  darkMode: boolean;
-  onToggleDarkMode: (darkMode: boolean) => void;
+  currentTheme: string;
+  onThemeChange: (themeId: string) => void;
 }
 
-const FoodPage: React.FC<FoodPageProps> = ({ darkMode, onToggleDarkMode }) => {
+const FoodPage: React.FC<FoodPageProps> = ({ currentTheme, onThemeChange }) => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState<FoodFormData>({
     clientId: null,
@@ -85,7 +85,7 @@ const FoodPage: React.FC<FoodPageProps> = ({ darkMode, onToggleDarkMode }) => {
             <h1 className="greeting">Food</h1>
             <p className="date">{getCurrentDate()}</p>
           </div>
-          <DarkModeToggle darkMode={darkMode} onToggle={onToggleDarkMode} />
+          <ThemeSelector currentTheme={currentTheme} onThemeChange={onThemeChange} />
         </div>
       </div>
       
@@ -100,7 +100,7 @@ const FoodPage: React.FC<FoodPageProps> = ({ darkMode, onToggleDarkMode }) => {
           onFormDataChange={handleFormDataChange}
         />
         <div className="note-section">
-          <NoteOutput formData={formData} onReset={resetForm} />
+          <NoteOutput formData={formData} service="food" onReset={resetForm} />
         </div>
       </div>
     </div>

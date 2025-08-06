@@ -2,15 +2,15 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ClothingQuestions from './ClothingQuestions';
 import NoteOutput from './NoteOutput';
-import DarkModeToggle from './DarkModeToggle';
+import ThemeSelector from './ThemeSelector';
 import { ClothingFormData } from '../App';
 
 interface ClothingPageProps {
-  darkMode: boolean;
-  onToggleDarkMode: (darkMode: boolean) => void;
+  currentTheme: string;
+  onThemeChange: (themeId: string) => void;
 }
 
-const ClothingPage: React.FC<ClothingPageProps> = ({ darkMode, onToggleDarkMode }) => {
+const ClothingPage: React.FC<ClothingPageProps> = ({ currentTheme, onThemeChange }) => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState<ClothingFormData>({
     clientId: null,
@@ -89,7 +89,7 @@ const ClothingPage: React.FC<ClothingPageProps> = ({ darkMode, onToggleDarkMode 
             <h1 className="greeting">Clothing</h1>
             <p className="date">{getCurrentDate()}</p>
           </div>
-          <DarkModeToggle darkMode={darkMode} onToggle={onToggleDarkMode} />
+          <ThemeSelector currentTheme={currentTheme} onThemeChange={onThemeChange} />
         </div>
       </div>
       
@@ -99,8 +99,8 @@ const ClothingPage: React.FC<ClothingPageProps> = ({ darkMode, onToggleDarkMode 
         </button>
       </div>
       <div className="food-layout">
-        <ClothingQuestions
-          formData={formData}
+        <ClothingQuestions 
+          formData={formData} 
           onFormDataChange={handleFormDataChange}
         />
         <div className="note-section">

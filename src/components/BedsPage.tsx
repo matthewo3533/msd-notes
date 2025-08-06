@@ -2,15 +2,41 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import BedsQuestions from './BedsQuestions';
 import NoteOutput from './NoteOutput';
-import DarkModeToggle from './DarkModeToggle';
-import type { BedsFormData } from './BedsQuestions';
+import ThemeSelector from './ThemeSelector';
 
-interface BedsPageProps {
-  darkMode: boolean;
-  onToggleDarkMode: (darkMode: boolean) => void;
+interface BedsFormData {
+  clientId: boolean | null;
+  whyNeedBeds: string;
+  canMeetNeedOtherWay: string;
+  reasonableSteps: string;
+  supplierName: string;
+  supplierId: string;
+  amount: number;
+  recoveryRate: number;
+  directCredit: string;
+  paymentReference: string;
+  income: {
+    benefit: number;
+    employment: number;
+    familyTaxCredit: number;
+    childSupport: number;
+    childDisabilityAllowance: number;
+    otherIncome: number;
+  };
+  costs: Array<{
+    amount: number;
+    cost: string;
+  }>;
+  decision: string;
+  decisionReason: string;
 }
 
-const BedsPage: React.FC<BedsPageProps> = ({ darkMode, onToggleDarkMode }) => {
+interface BedsPageProps {
+  currentTheme: string;
+  onThemeChange: (themeId: string) => void;
+}
+
+const BedsPage: React.FC<BedsPageProps> = ({ currentTheme, onThemeChange }) => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState<BedsFormData>({
     clientId: null,
@@ -37,7 +63,7 @@ const BedsPage: React.FC<BedsPageProps> = ({ darkMode, onToggleDarkMode }) => {
   });
 
   const handleFormDataChange = (data: Partial<BedsFormData>) => {
-    setFormData((prev: BedsFormData) => ({ ...prev, ...data }));
+    setFormData(prev => ({ ...prev, ...data }));
   };
 
   const resetForm = () => {
@@ -89,7 +115,7 @@ const BedsPage: React.FC<BedsPageProps> = ({ darkMode, onToggleDarkMode }) => {
             <h1 className="greeting">Beds</h1>
             <p className="date">{getCurrentDate()}</p>
           </div>
-          <DarkModeToggle darkMode={darkMode} onToggle={onToggleDarkMode} />
+          <ThemeSelector currentTheme={currentTheme} onThemeChange={onThemeChange} />
         </div>
       </div>
       
@@ -99,8 +125,8 @@ const BedsPage: React.FC<BedsPageProps> = ({ darkMode, onToggleDarkMode }) => {
         </button>
       </div>
       <div className="food-layout">
-        <BedsQuestions
-          formData={formData}
+        <BedsQuestions 
+          formData={formData} 
           onFormDataChange={handleFormDataChange}
         />
         <div className="note-section">

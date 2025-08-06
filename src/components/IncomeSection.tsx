@@ -52,7 +52,7 @@ const IncomeSection: React.FC<IncomeSectionProps> = ({
       <div className="income-section">
         <div>
           <div className="form-group">
-            <label>5. How much did client earn this week?</label>
+            <label>How much did client earn this week?</label>
             
             <div className="form-group">
               <label>Benefit</label>
@@ -146,7 +146,21 @@ const IncomeSection: React.FC<IncomeSectionProps> = ({
           </div>
 
           <div className="form-group">
-            <label>6. What costs did the client have to meet this week?</label>
+            <div className="section-header" style={{ marginBottom: '2rem', paddingBottom: '1rem', borderBottom: '2px solid var(--border-secondary)' }}>
+              <h3 style={{ 
+                fontSize: '1.8rem', 
+                fontWeight: '600', 
+                color: 'var(--text-primary)', 
+                margin: '0', 
+                background: 'var(--accent-gradient)', 
+                WebkitBackgroundClip: 'text', 
+                WebkitTextFillColor: 'transparent', 
+                backgroundClip: 'text' 
+              }}>
+                Expenses
+              </h3>
+            </div>
+            <label>What costs did the client have to meet this week?</label>
             
             {costs.map((cost, index) => (
               <div key={index} className="cost-row">

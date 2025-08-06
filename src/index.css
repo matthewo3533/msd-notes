@@ -106,62 +106,144 @@ body {
   letter-spacing: -0.025em;
 }
 
-.dark-mode-toggle {
+/* Theme Selector */
+.theme-selector {
   position: relative;
+  z-index: 1000;
 }
 
-.toggle-button {
+.theme-selector-button {
   background: var(--bg-secondary);
   border: 2px solid var(--border-primary);
   border-radius: 50px;
-  width: 60px;
-  height: 30px;
+  padding: 8px 16px;
   cursor: pointer;
   position: relative;
   transition: all 0.3s ease;
-  overflow: hidden;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 120px;
+  font-family: inherit;
 }
 
-.toggle-button:hover {
+.theme-selector-button:hover {
   border-color: var(--accent-gradient);
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  transform: translateY(-1px);
 }
 
-.toggle-slider {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  transition: transform 0.3s ease;
+.theme-preview-circle {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.toggle-button.dark .toggle-slider {
-  transform: translateX(30px);
-}
-
-.toggle-icon {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
+.theme-selector-text {
   font-size: 14px;
-  transition: all 0.3s ease;
+  font-weight: 500;
+  color: var(--text-primary);
 }
 
-.toggle-icon:first-child {
-  left: 8px;
+.theme-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: var(--bg-secondary);
+  border: 2px solid var(--border-primary);
+  border-radius: 12px;
+  box-shadow: var(--shadow-hover);
+  padding: 8px;
+  min-width: 220px;
+  z-index: 1001;
+  margin-top: 4px;
+  animation: fadeIn 0.2s ease-out;
 }
 
-.toggle-icon:last-child {
-  right: 8px;
+.theme-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 8px 12px;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+  font-family: inherit;
+  font-size: 14px;
 }
 
-.toggle-button.light .toggle-icon:last-child,
-.toggle-button.dark .toggle-icon:first-child {
-  opacity: 0.3;
+.theme-option:hover {
+  background: var(--bg-tertiary);
+  transform: translateX(2px);
 }
+
+.theme-option.selected {
+  background: var(--accent-gradient);
+  color: white;
+  font-weight: 600;
+}
+
+.theme-circle {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.theme-name {
+  font-size: 14px;
+  font-weight: 500;
+  flex: 1;
+}
+
+/* Theme Definitions */
+.theme-dark-blue {
+  --bg-primary: #0f172a;
+  --bg-secondary: #1e293b;
+  --bg-tertiary: #334155;
+  --text-primary: #f1f5f9;
+  --text-secondary: #cbd5e1;
+  --text-muted: #94a3b8;
+  --border-primary: #334155;
+  --border-secondary: #475569;
+  --shadow-primary: 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.2);
+  --shadow-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.4), 0 10px 10px -5px rgba(0, 0, 0, 0.3);
+  --accent-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.theme-light {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8fafc;
+  --bg-tertiary: #f1f5f9;
+  --text-primary: #1e293b;
+  --text-secondary: #475569;
+  --text-muted: #64748b;
+  --border-primary: #e2e8f0;
+  --border-secondary: #cbd5e1;
+  --shadow-primary: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+  --shadow-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --accent-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+
 
 .services-grid {
   display: grid;
   grid-template-columns: repeat(6, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.general-notes-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
   gap: 1.5rem;
   margin-bottom: 2rem;
 }
@@ -351,17 +433,41 @@ textarea.form-control {
   padding: 6px 0 6px 0;
 }
 
+/* Special styling for radio buttons with longer text */
+.radio-btn.long-text {
+  width: auto;
+  min-width: 120px;
+  padding: 6px 12px;
+  white-space: nowrap;
+  font-size: 0.9rem;
+}
+
+/* For very long text options, use a vertical layout */
+.radio-group.vertical {
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.radio-group.vertical .radio-btn {
+  width: 100%;
+  justify-content: flex-start;
+  text-align: left;
+  padding: 8px 12px;
+  height: auto;
+  min-height: 42px;
+}
+
 .radio-btn.selected {
-  background: var(--accent-color);
-  border-color: var(--accent-color);
+  background: #667eea;
+  border-color: #667eea;
   color: #fff;
   box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
 }
 
 .radio-btn:hover {
-  border-color: var(--accent-color);
+  border-color: #667eea;
   background: var(--bg-secondary);
-  color: var(--accent-color);
+  color: #667eea;
 }
 
 .visually-hidden {
@@ -396,15 +502,15 @@ textarea.form-control {
 }
 
 .radio-option input[type="checkbox"]:hover {
-  border-color: var(--accent-color);
+  border-color: #667eea;
   background: var(--bg-secondary);
   transform: translateY(-1px);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .radio-option input[type="checkbox"]:checked {
-  background: var(--accent-color);
-  border-color: var(--accent-color);
+  background: #667eea;
+  border-color: #667eea;
   color: white;
   transform: translateY(-1px);
   box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
@@ -422,7 +528,7 @@ textarea.form-control {
 }
 
 .radio-option input[type="checkbox"]:focus {
-  outline: 2px solid var(--accent-color);
+  outline: 2px solid #667eea;
   outline-offset: 2px;
 }
 
@@ -595,7 +701,7 @@ textarea.form-control {
 }
 
 .cost-suggestion:active {
-  background-color: var(--accent-color);
+  background-color: #667eea;
   color: white;
 }
 
@@ -740,13 +846,13 @@ textarea.form-control {
 }
 
 .skip-btn.restore {
-  color: var(--accent-color);
-  text-decoration-color: var(--accent-color);
+  color: #667eea;
+  text-decoration-color: #667eea;
 }
 
 .skip-btn.restore:hover {
-  color: var(--accent-hover);
-  text-decoration-color: var(--accent-hover);
+  color: #5a67d8;
+  text-decoration-color: #5a67d8;
 }
 
 /* Dollar input styling */
@@ -767,6 +873,17 @@ textarea.form-control {
 
 .dollar-input input {
   padding-left: 1.75rem;
+}
+
+/* Remove number input spinners/arrows */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield; /* Firefox */
 }
 
 @keyframes zoomInUp {
@@ -853,11 +970,17 @@ textarea.form-control {
   .services-grid {
     grid-template-columns: repeat(4, 1fr);
   }
+  .general-notes-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 @media (max-width: 900px) {
   .services-grid {
     grid-template-columns: repeat(3, 1fr);
+  }
+  .general-notes-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
@@ -893,6 +1016,11 @@ textarea.form-control {
     gap: 1rem;
   }
   
+  .general-notes-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+  
   .income-section {
     grid-template-columns: 1fr;
     gap: 1.5rem;
@@ -913,6 +1041,11 @@ textarea.form-control {
 
 @media (max-width: 480px) {
   .services-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+  
+  .general-notes-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 1rem;
   }
@@ -953,6 +1086,10 @@ textarea.form-control {
 .service-card:nth-child(16) { animation-delay: 1.6s; }
 .service-card:nth-child(17) { animation-delay: 1.7s; }
 .service-card:nth-child(18) { animation-delay: 1.8s; }
+
+/* Loading animation for general notes cards */
+.general-notes-grid .service-card:nth-child(1) { animation-delay: 1.9s; }
+.general-notes-grid .service-card:nth-child(2) { animation-delay: 2.0s; }
 
 /* Side-by-side layout for food questions */
 .food-layout {
@@ -1182,4 +1319,30 @@ textarea.form-control {
   color: var(--border-secondary);
   font-size: 1.1em;
   margin: 0 0.2em;
+} 
+
+/* Tip information boxes */
+.tip-box {
+  margin-top: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  background: var(--accent-gradient);
+  color: white;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.tip-box::before {
+  content: '💡';
+  margin-right: 0.5rem;
+  font-size: 1rem;
+}
+
+.tip-box strong {
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
 } 

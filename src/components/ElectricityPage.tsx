@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ElectricityQuestions from './ElectricityQuestions';
 import NoteOutput from './NoteOutput';
-import DarkModeToggle from './DarkModeToggle';
+import ThemeSelector from './ThemeSelector';
 
 interface ElectricityFormData {
   clientId: boolean | null;
@@ -33,11 +33,11 @@ interface ElectricityFormData {
 }
 
 interface ElectricityPageProps {
-  darkMode: boolean;
-  onToggleDarkMode: (darkMode: boolean) => void;
+  currentTheme: string;
+  onThemeChange: (themeId: string) => void;
 }
 
-const ElectricityPage: React.FC<ElectricityPageProps> = ({ darkMode, onToggleDarkMode }) => {
+const ElectricityPage: React.FC<ElectricityPageProps> = ({ currentTheme, onThemeChange }) => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState<ElectricityFormData>({
     clientId: null,
@@ -63,6 +63,10 @@ const ElectricityPage: React.FC<ElectricityPageProps> = ({ darkMode, onToggleDar
     decision: '',
     decisionReason: '',
   });
+
+  const handleFormDataChange = (data: Partial<ElectricityFormData>) => {
+    setFormData(prev => ({ ...prev, ...data }));
+  };
 
   const resetForm = () => {
     setFormData({
@@ -92,10 +96,6 @@ const ElectricityPage: React.FC<ElectricityPageProps> = ({ darkMode, onToggleDar
     navigate('/');
   };
 
-  const handleFormDataChange = (data: Partial<ElectricityFormData>) => {
-    setFormData(prev => ({ ...prev, ...data, income: { ...prev.income, ...data.income } }));
-  };
-
   const handleBack = () => {
     navigate('/');
   };
@@ -118,17 +118,18 @@ const ElectricityPage: React.FC<ElectricityPageProps> = ({ darkMode, onToggleDar
             <h1 className="greeting">Electricity Assistance</h1>
             <p className="date">{getCurrentDate()}</p>
           </div>
-          <DarkModeToggle darkMode={darkMode} onToggle={onToggleDarkMode} />
+          <ThemeSelector currentTheme={currentTheme} onThemeChange={onThemeChange} />
         </div>
       </div>
+      
       <div style={{ marginBottom: '1.5rem' }}>
         <button className="copy-btn" onClick={handleBack}>
           ← Back to Services
         </button>
       </div>
       <div className="food-layout">
-        <ElectricityQuestions
-          formData={formData}
+        <ElectricityQuestions 
+          formData={formData} 
           onFormDataChange={handleFormDataChange}
         />
         <div className="note-section">

@@ -2,15 +2,41 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import BeddingQuestions from './BeddingQuestions';
 import NoteOutput from './NoteOutput';
-import DarkModeToggle from './DarkModeToggle';
-import type { BeddingFormData } from './BeddingQuestions';
+import ThemeSelector from './ThemeSelector';
 
-interface BeddingPageProps {
-  darkMode: boolean;
-  onToggleDarkMode: (darkMode: boolean) => void;
+interface BeddingFormData {
+  clientId: boolean | null;
+  whyNeedBedding: string;
+  canMeetNeedOtherWay: string;
+  reasonableSteps: string;
+  supplierName: string;
+  supplierId: string;
+  amount: number;
+  recoveryRate: number;
+  directCredit: string;
+  paymentReference: string;
+  income: {
+    benefit: number;
+    employment: number;
+    familyTaxCredit: number;
+    childSupport: number;
+    childDisabilityAllowance: number;
+    otherIncome: number;
+  };
+  costs: Array<{
+    amount: number;
+    cost: string;
+  }>;
+  decision: string;
+  decisionReason: string;
 }
 
-const BeddingPage: React.FC<BeddingPageProps> = ({ darkMode, onToggleDarkMode }) => {
+interface BeddingPageProps {
+  currentTheme: string;
+  onThemeChange: (themeId: string) => void;
+}
+
+const BeddingPage: React.FC<BeddingPageProps> = ({ currentTheme, onThemeChange }) => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState<BeddingFormData>({
     clientId: null,
@@ -34,12 +60,10 @@ const BeddingPage: React.FC<BeddingPageProps> = ({ darkMode, onToggleDarkMode })
     costs: [],
     decision: '',
     decisionReason: '',
-    beddingSngEligible: '',
-    beddingSngReason: '',
   });
 
   const handleFormDataChange = (data: Partial<BeddingFormData>) => {
-    setFormData((prev: BeddingFormData) => ({ ...prev, ...data }));
+    setFormData(prev => ({ ...prev, ...data }));
   };
 
   const resetForm = () => {
@@ -65,8 +89,6 @@ const BeddingPage: React.FC<BeddingPageProps> = ({ darkMode, onToggleDarkMode })
       costs: [],
       decision: '',
       decisionReason: '',
-      beddingSngEligible: '',
-      beddingSngReason: '',
     });
     navigate('/');
   };
@@ -93,7 +115,7 @@ const BeddingPage: React.FC<BeddingPageProps> = ({ darkMode, onToggleDarkMode })
             <h1 className="greeting">Bedding</h1>
             <p className="date">{getCurrentDate()}</p>
           </div>
-          <DarkModeToggle darkMode={darkMode} onToggle={onToggleDarkMode} />
+          <ThemeSelector currentTheme={currentTheme} onThemeChange={onThemeChange} />
         </div>
       </div>
       
@@ -103,8 +125,8 @@ const BeddingPage: React.FC<BeddingPageProps> = ({ darkMode, onToggleDarkMode })
         </button>
       </div>
       <div className="food-layout">
-        <BeddingQuestions
-          formData={formData}
+        <BeddingQuestions 
+          formData={formData} 
           onFormDataChange={handleFormDataChange}
         />
         <div className="note-section">

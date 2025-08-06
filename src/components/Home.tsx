@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import ServiceGrid from './ServiceGrid';
-import DarkModeToggle from './DarkModeToggle';
+import ThemeSelector from './ThemeSelector';
 
 export interface Service {
   id: string;
@@ -10,8 +10,8 @@ export interface Service {
 }
 
 interface HomeProps {
-  darkMode: boolean;
-  onToggleDarkMode: (darkMode: boolean) => void;
+  currentTheme: string;
+  onThemeChange: (themeId: string) => void;
 }
 
 const services: Service[] = [
@@ -35,7 +35,12 @@ const services: Service[] = [
   { id: 'emergency', title: 'Other Emergency Payment', emoji: '🚨' },
 ];
 
-const Home: React.FC<HomeProps> = ({ darkMode, onToggleDarkMode }) => {
+const generalNotes: Service[] = [
+  { id: 'tas-grant', title: 'TAS Grant/Reapplication', emoji: '📋' },
+  { id: 'declare-income', title: 'Declare Income', emoji: '💰' },
+];
+
+const Home: React.FC<HomeProps> = ({ currentTheme, onThemeChange }) => {
   const navigate = useNavigate();
 
   const handleServiceSelect = (serviceId: string) => {
@@ -60,14 +65,30 @@ const Home: React.FC<HomeProps> = ({ darkMode, onToggleDarkMode }) => {
             <h1 className="greeting">MSD Notes App</h1>
             <p className="date">{getCurrentDate()}</p>
           </div>
-          <DarkModeToggle darkMode={darkMode} onToggle={onToggleDarkMode} />
+          <ThemeSelector currentTheme={currentTheme} onThemeChange={onThemeChange} />
         </div>
       </div>
       
       <div className="service-question">
-        <h2>What does the client need help with?</h2>
+        <h2>Hardship Assistance</h2>
       </div>
       <ServiceGrid services={services} onServiceSelect={handleServiceSelect} />
+      
+      <div className="service-question">
+        <h2>General Notes</h2>
+      </div>
+      <div className="general-notes-grid">
+        {generalNotes.map((note) => (
+          <div
+            key={note.id}
+            className="service-card"
+            onClick={() => handleServiceSelect(note.id)}
+          >
+            <span className="service-emoji">{note.emoji}</span>
+            <div className="service-title">{note.title}</div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };
