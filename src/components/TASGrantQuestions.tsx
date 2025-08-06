@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { TASGrantFormData } from '../App';
 
 interface TASGrantQuestionsProps {
@@ -19,10 +19,7 @@ function autoResizeTextarea(el: HTMLTextAreaElement | null) {
 }
 
 const TASGrantQuestions: React.FC<TASGrantQuestionsProps> = ({ formData, onFormDataChange }) => {
-  const [skippedQuestions, setSkippedQuestions] = useState<Set<string>>(new Set());
   const [visibleSections, setVisibleSections] = useState<Set<string>>(new Set());
-  const [animatingQuestions, setAnimatingQuestions] = useState<Set<string>>(new Set());
-  const sectionRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
 
   // Intersection Observer for scroll animations
   useEffect(() => {
@@ -67,46 +64,8 @@ const TASGrantQuestions: React.FC<TASGrantQuestionsProps> = ({ formData, onFormD
     };
   }, []);
 
-  const handleSkip = (questionKey: string) => {
-    setAnimatingQuestions(prev => new Set(prev).add(questionKey));
-    
-    // Wait for animation to complete before hiding
-    setTimeout(() => {
-      setSkippedQuestions(prev => new Set(prev).add(questionKey));
-      setAnimatingQuestions(prev => {
-        const newSet = new Set(prev);
-        newSet.delete(questionKey);
-        return newSet;
-      });
-    }, 300);
-  };
-
-  const handleRestore = (questionKey: string) => {
-    setSkippedQuestions(prev => {
-      const newSet = new Set(prev);
-      newSet.delete(questionKey);
-      return newSet;
-    });
-  };
-
   const handleInputChange = (field: keyof TASGrantFormData, value: any) => {
     onFormDataChange({ [field]: value });
-  };
-
-  const handleDateChange = (field: keyof TASGrantFormData, value: string) => {
-    // Convert date from dd/mm/yyyy to yyyy-mm-dd for input
-    if (value) {
-      const parts = value.split('/');
-      if (parts.length === 3) {
-        const day = parts[0];
-        const month = parts[1];
-        const year = parts[2];
-        const formattedDate = `${year}-${month}-${day}`;
-        onFormDataChange({ [field]: value });
-      }
-    } else {
-      onFormDataChange({ [field]: value });
-    }
   };
 
   const formatDateForInput = (dateString: string) => {
@@ -125,7 +84,6 @@ const TASGrantQuestions: React.FC<TASGrantQuestionsProps> = ({ formData, onFormD
     <div className="form-sections-container">
       {/* General Questions Section */}
       <div 
-        ref={(el) => { sectionRefs.current['general'] = el; }}
         data-section="general"
         className={`form-section-card ${visibleSections.has('general') ? 'section-visible' : ''}`}
       >
