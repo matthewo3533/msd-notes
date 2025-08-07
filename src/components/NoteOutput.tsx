@@ -21,34 +21,34 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       }
 
       d.weeks.forEach((week, weekIndex) => {
-        note += `Week ${weekIndex + 1}: Week Beginning ${week.weekBeginning || 'Not specified'}\n`;
+        note += `Week Beginning ${week.weekBeginning || 'Not specified'}:\n`;
         
         if (week.incomeSources.length === 0) {
-          note += '  No income sources declared for this week.\n';
+          note += 'No income sources declared for this week.\n';
         } else {
           let weekTotal = 0;
           week.incomeSources.forEach((source, sourceIndex) => {
-            note += `  Income Source ${sourceIndex + 1}: ${source.description || 'No description'}\n`;
+            note += `${source.description || 'No description'}\n`;
             
             if (source.type === 'hourly') {
               const hours = source.hoursWorked || 0;
               const rate = source.hourlyRate || 0;
               const calculated = hours * rate;
               weekTotal += calculated;
-              note += `    Type: Hourly Rate\n`;
-              note += `    Hours Worked: ${hours}\n`;
-              note += `    Hourly Rate: $${rate.toFixed(2)}\n`;
-              note += `    Calculated Income: $${calculated.toFixed(2)}\n`;
+              note += `- Type: Hourly Rate\n`;
+              note += `- Hours Worked: ${hours}\n`;
+              note += `- Hourly Rate: $${rate.toFixed(2)}\n`;
+              note += `- Calculated Income: $${calculated.toFixed(2)}\n`;
             } else if (source.type === 'lump-sum') {
               const amount = source.lumpSumAmount || 0;
               weekTotal += amount;
-              note += `    Type: Lump Sum\n`;
-              note += `    Amount: $${amount.toFixed(2)}\n`;
+              note += `- Type: Lump Sum\n`;
+              note += `- Amount: $${amount.toFixed(2)}\n`;
             }
             note += '\n';
           });
           
-          note += `  Week Total: $${weekTotal.toFixed(2)}\n`;
+          note += `Total weekly income: $${weekTotal.toFixed(2)}\n`;
         }
         
         note += '\n';
@@ -66,7 +66,9 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
         }, 0);
       }, 0);
 
-      note += `=== GRAND TOTAL: $${grandTotal.toFixed(2)} ===\n`;
+      if (d.weeks.length > 1) {
+        note += `=== GRAND TOTAL: $${grandTotal.toFixed(2)} ===\n`;
+      }
       
       return note;
     } else if (service === 'tas-grant') {

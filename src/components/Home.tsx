@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ServiceGrid from './ServiceGrid';
 import ThemeSelector from './ThemeSelector';
@@ -42,6 +42,8 @@ const generalNotes: Service[] = [
 
 const Home: React.FC<HomeProps> = ({ currentTheme, onThemeChange }) => {
   const navigate = useNavigate();
+  const servicesGridRef = useRef<HTMLDivElement>(null);
+  const generalNotesRef = useRef<HTMLDivElement>(null);
 
   const handleServiceSelect = (serviceId: string) => {
     navigate(`/${serviceId}`);
@@ -56,6 +58,34 @@ const Home: React.FC<HomeProps> = ({ currentTheme, onThemeChange }) => {
     const year = now.getFullYear();
     return `${dayName} ${day}/${month}/${year}`;
   };
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('animate-in');
+          }
+        });
+      },
+      {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+      }
+    );
+
+    // Observe the service grids
+    if (servicesGridRef.current) {
+      observer.observe(servicesGridRef.current);
+    }
+    if (generalNotesRef.current) {
+      observer.observe(generalNotesRef.current);
+    }
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
 
   return (
     <div className="container">
@@ -72,12 +102,23 @@ const Home: React.FC<HomeProps> = ({ currentTheme, onThemeChange }) => {
       <div className="service-question">
         <h2>Hardship Assistance</h2>
       </div>
-      <ServiceGrid services={services} onServiceSelect={handleServiceSelect} />
+      <div ref={servicesGridRef} className="services-grid">
+        {services.map((service) => (
+          <div
+            key={service.id}
+            className="service-card"
+            onClick={() => handleServiceSelect(service.id)}
+          >
+            <span className="service-emoji">{service.emoji}</span>
+            <div className="service-title">{service.title}</div>
+          </div>
+        ))}
+      </div>
       
       <div className="service-question">
         <h2>General Notes</h2>
       </div>
-      <div className="general-notes-grid">
+      <div ref={generalNotesRef} className="general-notes-grid">
         {generalNotes.map((note) => (
           <div
             key={note.id}
