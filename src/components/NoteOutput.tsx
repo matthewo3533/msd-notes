@@ -20,14 +20,14 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
         return note;
       }
 
-      d.weeks.forEach((week, weekIndex) => {
+      d.weeks.forEach((week) => {
         note += `Week Beginning ${week.weekBeginning || 'Not specified'}:\n`;
         
         if (week.incomeSources.length === 0) {
           note += 'No income sources declared for this week.\n';
         } else {
           let weekTotal = 0;
-          week.incomeSources.forEach((source, sourceIndex) => {
+          week.incomeSources.forEach((source) => {
             note += `${source.description || 'No description'}\n`;
             
             if (source.type === 'hourly') {

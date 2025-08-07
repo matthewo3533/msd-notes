@@ -1,6 +1,5 @@
 import React, { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import ServiceGrid from './ServiceGrid';
 import ThemeSelector from './ThemeSelector';
 
 export interface Service {
