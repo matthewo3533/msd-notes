@@ -69,18 +69,6 @@ const TASGrantQuestions: React.FC<TASGrantQuestionsProps> = ({ formData, onFormD
     onFormDataChange({ [field]: value });
   };
 
-  const formatDateForInput = (dateString: string) => {
-    if (!dateString) return '';
-    const parts = dateString.split('/');
-    if (parts.length === 3) {
-      const day = parts[0];
-      const month = parts[1];
-      const year = parts[2];
-      return `${year}-${month}-${day}`;
-    }
-    return dateString;
-  };
-
   return (
     <div className="form-sections-container">
       {/* General Questions Section */}

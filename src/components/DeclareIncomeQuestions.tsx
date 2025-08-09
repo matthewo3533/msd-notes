@@ -112,18 +112,6 @@ const DeclareIncomeQuestions: React.FC<DeclareIncomeQuestionsProps> = ({ formDat
     }
   };
 
-  const formatDateForInput = (dateString: string) => {
-    if (!dateString) return '';
-    const parts = dateString.split('/');
-    if (parts.length === 3) {
-      const day = parts[0];
-      const month = parts[1];
-      const year = parts[2];
-      return `${year}-${month}-${day}`;
-    }
-    return dateString;
-  };
-
   const getWeekBeginningDate = (dateString: string) => {
     if (!dateString) return '';
     const parts = dateString.split('/');
