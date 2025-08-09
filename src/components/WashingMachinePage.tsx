@@ -27,6 +27,7 @@ const WashingMachinePage: React.FC<WashingMachinePageProps> = ({ currentTheme, o
     addressContactConfirmed: '',
     spaceMeasured: '',
     specialDeliveryInstructions: '',
+    deliveryInstructionsDetails: '',
     applianceModel: '',
     applianceCANumber: '',
     income: {
@@ -62,6 +63,7 @@ const WashingMachinePage: React.FC<WashingMachinePageProps> = ({ currentTheme, o
       addressContactConfirmed: '',
       spaceMeasured: '',
       specialDeliveryInstructions: '',
+      deliveryInstructionsDetails: '',
       applianceModel: '',
       applianceCANumber: '',
       income: {

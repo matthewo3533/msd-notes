@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import IncomeSection from './IncomeSection';
+import IncomeSection, { IncomeLabels } from './IncomeSection';
 import PaymentSection from './PaymentSection';
 import DecisionSection from './DecisionSection';
 import { FridgeFormData } from '../App';
@@ -23,6 +23,14 @@ function autoResizeTextarea(el: HTMLTextAreaElement | null) {
 
 const FridgeQuestions: React.FC<FridgeQuestionsProps> = ({ formData, onFormDataChange }) => {
   const [visibleSections, setVisibleSections] = useState<Set<string>>(new Set(['general']));
+  const [incomeLabels, setIncomeLabels] = useState<IncomeLabels>({
+    benefit: 'Benefit',
+    employment: 'Employment',
+    childSupport: 'Child Support',
+    otherIncome: 'Other Income',
+    familyTaxCredit: 'Family Tax Credit',
+    childDisabilityAllowance: 'Child Disability Allowance'
+  });
 
   useEffect(() => {
     const observer = new window.IntersectionObserver(
@@ -71,6 +79,10 @@ const FridgeQuestions: React.FC<FridgeQuestionsProps> = ({ formData, onFormDataC
         [field]: value,
       },
     });
+  };
+
+  const handleIncomeLabelsChange = (labels: IncomeLabels) => {
+    setIncomeLabels(labels);
   };
 
   const handleCostChange = (index: number, field: 'amount' | 'cost', value: any) => {
@@ -250,6 +262,26 @@ const FridgeQuestions: React.FC<FridgeQuestionsProps> = ({ formData, onFormDataC
           </div>
         </div>
         <div className="form-group">
+          <label>Appliance Model:</label>
+          <input
+            type="text"
+            className="form-control"
+            value={formData.applianceModel}
+            onChange={e => handleInputChange('applianceModel', e.target.value)}
+            placeholder="Enter appliance model..."
+          />
+        </div>
+        <div className="form-group">
+          <label>Appliance CA number</label>
+          <input
+            type="text"
+            className="form-control"
+            value={formData.applianceCANumber}
+            onChange={e => handleInputChange('applianceCANumber', e.target.value)}
+            placeholder="Enter appliance CA number..."
+          />
+        </div>
+        <div className="form-group">
           <label>Does client have any special delivery instructions?</label>
           <div className="radio-group">
             <label className={`radio-btn ${formData.specialDeliveryInstructions === 'yes' ? 'selected' : ''}`}>Yes
@@ -271,38 +303,33 @@ const FridgeQuestions: React.FC<FridgeQuestionsProps> = ({ formData, onFormDataC
               />
             </label>
           </div>
-        </div>
-        <div className="form-group">
-          <label>Appliance Model:</label>
-          <input
-            type="text"
-            className="form-control"
-            value={formData.applianceModel}
-            onChange={e => handleInputChange('applianceModel', e.target.value)}
-            placeholder="Enter appliance model..."
-          />
-        </div>
-        <div className="form-group">
-          <label>Appliance CA number:</label>
-          <input
-            type="text"
-            className="form-control"
-            value={formData.applianceCANumber}
-            onChange={e => handleInputChange('applianceCANumber', e.target.value)}
-            placeholder="Enter appliance CA number..."
-          />
+          {formData.specialDeliveryInstructions === 'yes' && (
+            <div className="form-group">
+              <label>Please outline the delivery instructions.</label>
+              <textarea
+                className="form-control"
+                value={formData.deliveryInstructionsDetails || ''}
+                onChange={e => handleInputChange('deliveryInstructionsDetails', e.target.value)}
+                placeholder="Enter delivery instructions..."
+                ref={el => autoResizeTextarea(el)}
+                onInput={e => autoResizeTextarea(e.currentTarget)}
+              />
+            </div>
+          )}
         </div>
       </div>
 
       {/* Income Section */}
       <IncomeSection
         income={formData.income}
+        incomeLabels={incomeLabels}
         costs={formData.costs}
         onIncomeChange={handleIncomeChange}
+        onIncomeLabelsChange={handleIncomeLabelsChange}
         onCostChange={handleCostChange}
         onAddCost={addCost}
         onRemoveCost={removeCost}
-        sectionNumber={3}
+        sectionNumber={2}
         isVisible={visibleSections.has('income')}
       />
 

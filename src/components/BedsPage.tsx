@@ -23,6 +23,14 @@ interface BedsFormData {
     childDisabilityAllowance: number;
     otherIncome: number;
   };
+  incomeLabels?: {
+    benefit: string;
+    employment: string;
+    childSupport: string;
+    otherIncome: string;
+    familyTaxCredit: string;
+    childDisabilityAllowance: string;
+  };
   costs: Array<{
     amount: number;
     cost: string;
@@ -57,6 +65,14 @@ const BedsPage: React.FC<BedsPageProps> = ({ currentTheme, onThemeChange }) => {
       childDisabilityAllowance: 0,
       otherIncome: 0,
     },
+    incomeLabels: {
+      benefit: 'Benefit',
+      employment: 'Employment',
+      childSupport: 'Child Support',
+      otherIncome: 'Other Income',
+      familyTaxCredit: 'Family Tax Credit',
+      childDisabilityAllowance: 'Child Disability Allowance'
+    },
     costs: [],
     decision: '',
     decisionReason: '',
@@ -85,6 +101,14 @@ const BedsPage: React.FC<BedsPageProps> = ({ currentTheme, onThemeChange }) => {
         childSupport: 0,
         childDisabilityAllowance: 0,
         otherIncome: 0,
+      },
+      incomeLabels: {
+        benefit: 'Benefit',
+        employment: 'Employment',
+        childSupport: 'Child Support',
+        otherIncome: 'Other Income',
+        familyTaxCredit: 'Family Tax Credit',
+        childDisabilityAllowance: 'Child Disability Allowance'
       },
       costs: [],
       decision: '',

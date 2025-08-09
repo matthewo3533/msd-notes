@@ -436,6 +436,9 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       note += 'CA: ' + (f.applianceCANumber || '-') + '\n';
       note += '\nAddress/contact details confirmed: ' + (f.addressContactConfirmed || '-') + '\n';
       note += 'Space measured: ' + (f.spaceMeasured || '-') + '\n';
+      if (f.deliveryInstructionsDetails) {
+        note += 'Special delivery instructions:\n' + f.deliveryInstructionsDetails + '\n';
+      }
       
       note += '\n~~~ Payment ~~~\n';
       note += `Supplier Name: ${f.supplierName || '-'}\n`;
@@ -488,6 +491,9 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       note += 'CA: ' + (w.applianceCANumber || '-') + '\n';
       note += '\nAddress/contact details confirmed: ' + (w.addressContactConfirmed || '-') + '\n';
       note += 'Space measured: ' + (w.spaceMeasured || '-') + '\n';
+      if (w.deliveryInstructionsDetails) {
+        note += 'Special delivery instructions:\n' + w.deliveryInstructionsDetails + '\n';
+      }
       
       note += '\n~~~ Payment ~~~\n';
       note += `Supplier Name: ${w.supplierName || '-'}\n`;

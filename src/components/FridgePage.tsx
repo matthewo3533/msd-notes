@@ -27,6 +27,7 @@ const FridgePage: React.FC<FridgePageProps> = ({ currentTheme, onThemeChange }) 
     addressContactConfirmed: '',
     spaceMeasured: '',
     specialDeliveryInstructions: '',
+    deliveryInstructionsDetails: '',
     applianceModel: '',
     applianceCANumber: '',
     income: {
@@ -62,6 +63,7 @@ const FridgePage: React.FC<FridgePageProps> = ({ currentTheme, onThemeChange }) 
       addressContactConfirmed: '',
       spaceMeasured: '',
       specialDeliveryInstructions: '',
+      deliveryInstructionsDetails: '',
       applianceModel: '',
       applianceCANumber: '',
       income: {

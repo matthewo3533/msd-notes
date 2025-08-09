@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import IncomeSection from './IncomeSection';
+import IncomeSection, { IncomeLabels } from './IncomeSection';
 import DecisionSection from './DecisionSection';
 import { FoodFormData } from '../App';
 
@@ -24,6 +24,14 @@ const FoodQuestions: React.FC<FoodQuestionsProps> = ({ formData, onFormDataChang
   const [skippedQuestions, setSkippedQuestions] = useState<Set<string>>(new Set());
   const [visibleSections, setVisibleSections] = useState<Set<string>>(new Set());
   const [animatingQuestions, setAnimatingQuestions] = useState<Set<string>>(new Set());
+  const [incomeLabels, setIncomeLabels] = useState<IncomeLabels>({
+    benefit: 'Benefit',
+    employment: 'Employment',
+    childSupport: 'Child Support',
+    otherIncome: 'Other Income',
+    familyTaxCredit: 'Family Tax Credit',
+    childDisabilityAllowance: 'Child Disability Allowance'
+  });
   const sectionRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
 
   // Intersection Observer for scroll animations
@@ -102,6 +110,10 @@ const FoodQuestions: React.FC<FoodQuestionsProps> = ({ formData, onFormDataChang
         [field]: value
       }
     });
+  };
+
+  const handleIncomeLabelsChange = (labels: IncomeLabels) => {
+    setIncomeLabels(labels);
   };
 
   const handleCostChange = (index: number, field: 'amount' | 'cost', value: any) => {
@@ -368,8 +380,10 @@ const FoodQuestions: React.FC<FoodQuestionsProps> = ({ formData, onFormDataChang
       {/* Income Section */}
       <IncomeSection
         income={formData.income}
+        incomeLabels={incomeLabels}
         costs={formData.costs}
         onIncomeChange={handleIncomeChange}
+        onIncomeLabelsChange={handleIncomeLabelsChange}
         onCostChange={handleCostChange}
         onAddCost={addCost}
         onRemoveCost={removeCost}

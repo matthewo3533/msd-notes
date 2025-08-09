@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import CostInput from './CostInput';
 
 export interface IncomeData {
@@ -10,6 +10,15 @@ export interface IncomeData {
   childDisabilityAllowance: number;
 }
 
+export interface IncomeLabels {
+  benefit: string;
+  employment: string;
+  childSupport: string;
+  otherIncome: string;
+  familyTaxCredit: string;
+  childDisabilityAllowance: string;
+}
+
 export interface CostData {
   amount: number;
   cost: string;
@@ -17,8 +26,10 @@ export interface CostData {
 
 interface IncomeSectionProps {
   income: IncomeData;
+  incomeLabels?: IncomeLabels;
   costs: CostData[];
   onIncomeChange: (field: keyof IncomeData, value: number) => void;
+  onIncomeLabelsChange?: (labels: IncomeLabels) => void;
   onCostChange: (index: number, field: 'amount' | 'cost', value: any) => void;
   onAddCost: () => void;
   onRemoveCost: (index: number) => void;
@@ -28,17 +39,150 @@ interface IncomeSectionProps {
 
 const IncomeSection: React.FC<IncomeSectionProps> = ({
   income,
+  incomeLabels,
   costs,
   onIncomeChange,
+  onIncomeLabelsChange,
   onCostChange,
   onAddCost,
   onRemoveCost,
   sectionNumber = 2,
   isVisible = false
 }) => {
+  const [editingField, setEditingField] = useState<keyof IncomeLabels | null>(null);
+  const [editValue, setEditValue] = useState('');
+  const editInputRef = useRef<HTMLInputElement>(null);
+
+  // Default labels if none provided
+  const defaultLabels: IncomeLabels = {
+    benefit: 'Benefit',
+    employment: 'Employment',
+    childSupport: 'Child Support',
+    otherIncome: 'Other Income',
+    familyTaxCredit: 'Family Tax Credit',
+    childDisabilityAllowance: 'Child Disability Allowance'
+  };
+
+  const labels = incomeLabels || defaultLabels;
+
   const totalIncome = Object.values(income).reduce((sum, value) => sum + (value || 0), 0);
   const totalCosts = costs.reduce((sum, cost) => sum + (cost.amount || 0), 0);
   const remainingIncome = totalIncome - totalCosts;
+
+  const handleEditClick = (field: keyof IncomeLabels) => {
+    setEditingField(field);
+    setEditValue(labels[field]);
+  };
+
+  const handleSaveEdit = () => {
+    if (editingField && onIncomeLabelsChange) {
+      const newLabels = { ...labels, [editingField]: editValue };
+      onIncomeLabelsChange(newLabels);
+    }
+    setEditingField(null);
+    setEditValue('');
+  };
+
+  const handleDeleteLabel = (field: keyof IncomeLabels) => {
+    if (onIncomeLabelsChange) {
+      const newLabels = { ...labels };
+      delete newLabels[field];
+      onIncomeLabelsChange(newLabels);
+    }
+  };
+
+  const handleRestoreLabel = (field: keyof IncomeLabels) => {
+    if (onIncomeLabelsChange) {
+      const newLabels = { ...labels, [field]: defaultLabels[field] };
+      onIncomeLabelsChange(newLabels);
+    }
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleSaveEdit();
+    } else if (e.key === 'Escape') {
+      setEditingField(null);
+      setEditValue('');
+    }
+  };
+
+  // Auto-focus and select text when editing starts
+  useEffect(() => {
+    if (editingField && editInputRef.current) {
+      editInputRef.current.focus();
+      editInputRef.current.select();
+    }
+  }, [editingField]);
+
+  const renderIncomeField = (field: keyof IncomeData, labelField: keyof IncomeLabels) => {
+    const isEditing = editingField === labelField;
+    const currentLabel = labels[labelField] || defaultLabels[labelField];
+    
+    // Don't render if the label has been deleted
+    if (!currentLabel) {
+      return null;
+    }
+    
+    return (
+      <div className="form-group" key={field}>
+        <div className="income-label-container">
+          {isEditing ? (
+            <div className="edit-label-container">
+              <input
+                ref={editInputRef}
+                type="text"
+                className="form-control edit-label-input"
+                value={editValue}
+                onChange={(e) => setEditValue(e.target.value)}
+                onKeyDown={handleKeyPress}
+                onBlur={handleSaveEdit}
+                autoFocus
+              />
+              <button
+                className="save-label-btn"
+                onClick={handleSaveEdit}
+                title="Save"
+              >
+                ✓
+              </button>
+            </div>
+          ) : (
+            <div className="label-with-actions">
+              <label>{currentLabel}</label>
+              <div className="label-actions">
+                <button
+                  className="edit-label-btn"
+                  onClick={() => handleEditClick(labelField)}
+                  title="Edit label"
+                >
+                  ✏️
+                </button>
+                <button
+                  className="delete-label-btn"
+                  onClick={() => handleDeleteLabel(labelField)}
+                  title="Delete label"
+                >
+                  🗑️
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+        <div className="dollar-input">
+          <input
+            type="number"
+            className="form-control"
+            value={income[field] || ''}
+            onChange={(e) => onIncomeChange(field, parseFloat(e.target.value) || 0)}
+            placeholder="Enter amount"
+            step="0.01"
+            min="0"
+          />
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div 
@@ -54,95 +198,52 @@ const IncomeSection: React.FC<IncomeSectionProps> = ({
           <div className="form-group">
             <label>How much did client earn this week?</label>
             
-            <div className="form-group">
-              <label>Benefit</label>
-              <div className="dollar-input">
-                <input
-                  type="number"
-                  className="form-control"
-                  value={income.benefit || ''}
-                  onChange={(e) => onIncomeChange('benefit', parseFloat(e.target.value) || 0)}
-                  placeholder="Enter amount"
-                  step="0.01"
-                  min="0"
-                />
-              </div>
-            </div>
-
-            <div className="form-group">
-              <label>Employment</label>
-              <div className="dollar-input">
-                <input
-                  type="number"
-                  className="form-control"
-                  value={income.employment || ''}
-                  onChange={(e) => onIncomeChange('employment', parseFloat(e.target.value) || 0)}
-                  placeholder="Enter amount"
-                  step="0.01"
-                  min="0"
-                />
-              </div>
-            </div>
-
-            <div className="form-group">
-              <label>Child Support</label>
-              <div className="dollar-input">
-                <input
-                  type="number"
-                  className="form-control"
-                  value={income.childSupport || ''}
-                  onChange={(e) => onIncomeChange('childSupport', parseFloat(e.target.value) || 0)}
-                  placeholder="Enter amount"
-                  step="0.01"
-                  min="0"
-                />
-              </div>
-            </div>
-
-            <div className="form-group">
-              <label>Other Income</label>
-              <div className="dollar-input">
-                <input
-                  type="number"
-                  className="form-control"
-                  value={income.otherIncome || ''}
-                  onChange={(e) => onIncomeChange('otherIncome', parseFloat(e.target.value) || 0)}
-                  placeholder="Enter amount"
-                  step="0.01"
-                  min="0"
-                />
-              </div>
-            </div>
-
-            <div className="form-group">
-              <label>Family Tax Credit</label>
-              <div className="dollar-input">
-                <input
-                  type="number"
-                  className="form-control"
-                  value={income.familyTaxCredit || ''}
-                  onChange={(e) => onIncomeChange('familyTaxCredit', parseFloat(e.target.value) || 0)}
-                  placeholder="Enter amount"
-                  step="0.01"
-                  min="0"
-                />
-              </div>
-            </div>
-
-            <div className="form-group">
-              <label>Child Disability Allowance</label>
-              <div className="dollar-input">
-                <input
-                  type="number"
-                  className="form-control"
-                  value={income.childDisabilityAllowance || ''}
-                  onChange={(e) => onIncomeChange('childDisabilityAllowance', parseFloat(e.target.value) || 0)}
-                  placeholder="Enter amount"
-                  step="0.01"
-                  min="0"
-                />
-              </div>
-            </div>
+            {renderIncomeField('benefit', 'benefit')}
+            {renderIncomeField('employment', 'employment')}
+            {renderIncomeField('childSupport', 'childSupport')}
+            {renderIncomeField('otherIncome', 'otherIncome')}
+            {renderIncomeField('familyTaxCredit', 'familyTaxCredit')}
+            {renderIncomeField('childDisabilityAllowance', 'childDisabilityAllowance')}
+            
+            {/* Show restore options for deleted labels */}
+            {Object.entries(defaultLabels).map(([key, defaultLabel]) => {
+              const labelKey = key as keyof IncomeLabels;
+              if (!labels[labelKey]) {
+                                 return (
+                   <div key={labelKey} className="form-group deleted-label-row">
+                     <div className="income-label-container">
+                       <div className="label-with-actions">
+                         <label className="deleted">
+                           {defaultLabel} (deleted)
+                         </label>
+                         <div className="label-actions">
+                           <button
+                             className="restore-label-btn"
+                             onClick={() => handleRestoreLabel(labelKey)}
+                             title="Restore label"
+                           >
+                             ➕
+                           </button>
+                         </div>
+                       </div>
+                     </div>
+                     <div className="dollar-input">
+                       <input
+                         type="number"
+                         className="form-control"
+                         value={income[labelKey as keyof IncomeData] || ''}
+                         onChange={(e) => onIncomeChange(labelKey as keyof IncomeData, parseFloat(e.target.value) || 0)}
+                         placeholder="Enter amount"
+                         step="0.01"
+                         min="0"
+                         disabled
+                       />
+                     </div>
+                   </div>
+                 );
+              }
+              return null;
+            })}
           </div>
 
           <div className="form-group">
@@ -197,30 +298,20 @@ const IncomeSection: React.FC<IncomeSectionProps> = ({
         <div className="income-summary-sticky">
           <div className="income-summary">
             <h4>Income Summary</h4>
-            <div className="income-item">
-              <span>Benefit:</span>
-              <span>${income.benefit.toFixed(2)}</span>
-            </div>
-            <div className="income-item">
-              <span>Employment:</span>
-              <span>${income.employment.toFixed(2)}</span>
-            </div>
-            <div className="income-item">
-              <span>Child Support:</span>
-              <span>${income.childSupport.toFixed(2)}</span>
-            </div>
-            <div className="income-item">
-              <span>Other Income:</span>
-              <span>${income.otherIncome.toFixed(2)}</span>
-            </div>
-            <div className="income-item">
-              <span>Family Tax Credit:</span>
-              <span>${income.familyTaxCredit.toFixed(2)}</span>
-            </div>
-            <div className="income-item">
-              <span>Child Disability Allowance:</span>
-              <span>${income.childDisabilityAllowance.toFixed(2)}</span>
-            </div>
+            {Object.entries(income).map(([key, value]) => {
+              const fieldKey = key as keyof IncomeData;
+              const labelKey = key as keyof IncomeLabels;
+              const label = labels[labelKey] || defaultLabels[labelKey];
+              if (label && value > 0) {
+                return (
+                  <div key={fieldKey} className="income-item">
+                    <span>{label}:</span>
+                    <span>${value.toFixed(2)}</span>
+                  </div>
+                );
+              }
+              return null;
+            })}
             <div className="income-item">
               <span>Total Income:</span>
               <span>${totalIncome.toFixed(2)}</span>

@@ -117,6 +117,7 @@ export interface FridgeFormData {
   addressContactConfirmed: string;
   spaceMeasured: string;
   specialDeliveryInstructions: string;
+  deliveryInstructionsDetails: string;
   applianceModel: string;
   applianceCANumber: string;
   income: {
@@ -151,6 +152,7 @@ export interface WashingMachineFormData {
   addressContactConfirmed: string;
   spaceMeasured: string;
   specialDeliveryInstructions: string;
+  deliveryInstructionsDetails: string;
   applianceModel: string;
   applianceCANumber: string;
   income: {

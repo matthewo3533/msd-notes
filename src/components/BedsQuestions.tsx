@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import IncomeSection from './IncomeSection';
+import IncomeSection, { IncomeLabels } from './IncomeSection';
 import PaymentSection from './PaymentSection';
 import DecisionSection from './DecisionSection';
 
@@ -21,6 +21,14 @@ export interface BedsFormData {
     childSupport: number;
     childDisabilityAllowance: number;
     otherIncome: number;
+  };
+  incomeLabels?: {
+    benefit: string;
+    employment: string;
+    childSupport: string;
+    otherIncome: string;
+    familyTaxCredit: string;
+    childDisabilityAllowance: string;
   };
   costs: Array<{
     amount: number;
@@ -49,6 +57,14 @@ function autoResizeTextarea(el: HTMLTextAreaElement | null) {
 
 const BedsQuestions: React.FC<BedsQuestionsProps> = ({ formData, onFormDataChange }) => {
   const [visibleSections, setVisibleSections] = useState<Set<string>>(new Set(['general']));
+  const [incomeLabels, setIncomeLabels] = useState<IncomeLabels>({
+    benefit: 'Benefit',
+    employment: 'Employment',
+    childSupport: 'Child Support',
+    otherIncome: 'Other Income',
+    familyTaxCredit: 'Family Tax Credit',
+    childDisabilityAllowance: 'Child Disability Allowance'
+  });
 
   useEffect(() => {
     const observer = new window.IntersectionObserver(
@@ -90,6 +106,10 @@ const BedsQuestions: React.FC<BedsQuestionsProps> = ({ formData, onFormDataChang
         [field]: value,
       },
     });
+  };
+
+  const handleIncomeLabelsChange = (labels: IncomeLabels) => {
+    setIncomeLabels(labels);
   };
 
   const handleCostChange = (index: number, field: 'amount' | 'cost', value: any) => {
@@ -186,8 +206,10 @@ const BedsQuestions: React.FC<BedsQuestionsProps> = ({ formData, onFormDataChang
       {/* Income Section */}
       <IncomeSection
         income={formData.income}
+        incomeLabels={incomeLabels}
         costs={formData.costs}
         onIncomeChange={handleIncomeChange}
+        onIncomeLabelsChange={handleIncomeLabelsChange}
         onCostChange={handleCostChange}
         onAddCost={addCost}
         onRemoveCost={removeCost}
