@@ -3,7 +3,7 @@ import { FoodFormData, ClothingFormData, TASGrantFormData, DeclareIncomeFormData
 
 interface NoteOutputProps {
   formData: any;
-  service?: 'food' | 'clothing' | 'electricity' | 'dental' | 'beds' | 'bedding' | 'tas-grant' | 'declare-income';
+  service?: 'food' | 'clothing' | 'electricity' | 'dental' | 'beds' | 'bedding' | 'furniture' | 'glasses' | 'fridge' | 'washing' | 'tas-grant' | 'declare-income';
   onReset: () => void;
 }
 
@@ -292,6 +292,47 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       else if (b.decision === 'declined') note += 'APPLICATION DECLINED\n';
       if (b.decisionReason) note += `${b.decisionReason}\n`;
       return note;
+    } else if (service === 'furniture') {
+      // Furniture note output (like beds, but furniture wording)
+      const f = formData;
+      let note = '';
+      note += `CCID: ${f.clientId === false ? 'No' : 'Yes'}\n\n`;
+      note += '~~~ Need ~~~\n';
+      if (f.whyNeedFurniture) note += `Why is the client needing furniture?\n${f.whyNeedFurniture}\n`;
+      if (f.furnitureType) note += `Client is requesting help with a ${f.furnitureType}\n`;
+      if (f.canMeetNeedOtherWay) note += `Can client meet this need in any other way?\n${f.canMeetNeedOtherWay}\n`;
+      note += '\n~~~ Payment ~~~\n';
+      note += `Supplier Name: ${f.supplierName || '-'}\n`;
+      note += `Supplier ID: ${f.supplierId || '-'}\n`;
+      note += `Amount: $${f.amount?.toFixed(2) || '0.00'}\n`;
+      note += `Recovery rate: $${f.recoveryRate?.toFixed(2) || '0.00'}\n`;
+      if (f.directCredit === 'yes' && f.paymentReference) {
+        note += `Reference number: ${f.paymentReference}\n`;
+      }
+      note += '\n~~~ Income ~~~\n';
+      if (f.income.benefit > 0) note += `$${f.income.benefit.toFixed(2)} Benefit\n`;
+      if (f.income.employment > 0) note += `$${f.income.employment.toFixed(2)} Employment\n`;
+      if (f.income.familyTaxCredit > 0) note += `$${f.income.familyTaxCredit.toFixed(2)} Family Tax Credit\n`;
+      if (f.income.childSupport > 0) note += `$${f.income.childSupport.toFixed(2)} Child Support\n`;
+      if (f.income.childDisabilityAllowance > 0) note += `$${f.income.childDisabilityAllowance.toFixed(2)} Child Disability Allowance\n`;
+      if (f.income.otherIncome > 0) note += `$${f.income.otherIncome.toFixed(2)} Other Income\n`;
+      (f.costs as Array<{amount:number;cost:string}>).forEach((cost: {amount:number;cost:string}) => {
+        if (cost.amount > 0) note += `-$${cost.amount.toFixed(2)} ${cost.cost}\n`;
+      });
+      if (f.costs && f.costs.length > 0) {
+        const totalIncome = (Object.values(f.income) as number[]).reduce((sum: number, value: number) => sum + (value || 0), 0);
+        const totalCosts = (f.costs as Array<{amount:number}>).reduce((sum: number, cost: {amount:number}) => sum + (cost.amount || 0), 0);
+        const remainingIncome = totalIncome - totalCosts;
+        note += '--------------\n';
+        note += `Client is left with $${remainingIncome.toFixed(2)}\n`;
+      }
+      note += '\n~~~ Reasonable Steps ~~~\n';
+      if (f.reasonableSteps) note += `${f.reasonableSteps}\n`;
+      note += '\n~~~ Outcome ~~~\n';
+      if (f.decision === 'approved') note += 'APPLICATION APPROVED\n';
+      else if (f.decision === 'declined') note += 'APPLICATION DECLINED\n';
+      if (f.decisionReason) note += `${f.decisionReason}\n`;
+      return note;
     } else if (service === 'bedding') {
       // Bedding note output (like beds, with SNG logic)
       const b = formData;
@@ -335,6 +376,148 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       if (b.decision === 'approved') note += 'APPLICATION APPROVED\n';
       else if (b.decision === 'declined') note += 'APPLICATION DECLINED\n';
       if (b.decisionReason) note += `${b.decisionReason}\n`;
+      return note;
+    } else if (service === 'glasses') {
+      // Glasses note output (similar to clothing)
+      const g = formData;
+      let note = '';
+      note += `CCID: ${g.clientId === false ? 'No' : 'Yes'}\n\n`;
+      note += '~~~ Need ~~~\n';
+      if (g.whyNeedGlasses) note += `Why is the client needing glasses?\n${g.whyNeedGlasses}\n`;
+      if (g.canMeetNeedOtherWay) note += `Can client meet this need in any other way?\n${g.canMeetNeedOtherWay}\n`;
+      note += '\n~~~ Payment ~~~\n';
+      note += `Supplier Name: ${g.supplierName || '-'}\n`;
+      note += `Supplier ID: ${g.supplierId || '-'}\n`;
+      note += `Amount: $${g.amount?.toFixed(2) || '0.00'}\n`;
+      note += `Recovery rate: $${g.recoveryRate?.toFixed(2) || '0.00'}\n`;
+      if (g.directCredit === 'yes' && g.paymentReference) {
+        note += `Reference number: ${g.paymentReference}\n`;
+      }
+      note += '\n~~~ Income ~~~\n';
+      if (g.income.benefit > 0) note += `$${g.income.benefit.toFixed(2)} Benefit\n`;
+      if (g.income.employment > 0) note += `$${g.income.employment.toFixed(2)} Employment\n`;
+      if (g.income.childSupport > 0) note += `$${g.income.childSupport.toFixed(2)} Child Support\n`;
+      if (g.income.otherIncome > 0) note += `$${g.income.otherIncome.toFixed(2)} Other Income\n`;
+      g.costs.forEach((cost: { amount: number; cost: string }) => {
+        if (cost.amount > 0) note += `-$${cost.amount.toFixed(2)} ${cost.cost}\n`;
+      });
+      if (g.costs.length > 0) {
+        const totalIncome = (Object.values(g.income) as number[]).reduce((sum: number, value: number) => sum + (value || 0), 0);
+        const totalCosts = g.costs.reduce((sum: number, cost: { amount: number; cost: string }) => sum + (cost.amount || 0), 0);
+        const remainingIncome = totalIncome - totalCosts;
+        note += '--------------\n';
+        note += `Client is left with $${remainingIncome.toFixed(2)}\n`;
+      }
+      note += '\n~~~ Reasonable Steps ~~~\n';
+      if (g.reasonableSteps) note += `${g.reasonableSteps}\n`;
+      note += '\n~~~ Outcome ~~~\n';
+      if (g.decision === 'approved') note += 'APPLICATION APPROVED\n';
+      else if (g.decision === 'declined') note += 'APPLICATION DECLINED\n';
+      if (g.decisionReason) note += `${g.decisionReason}\n`;
+      return note;
+    } else if (service === 'fridge') {
+      // Fridge note output
+      const f = formData;
+      let note = '';
+      note += `CCID: ${f.clientId === false ? 'No' : 'Yes'}\n\n`;
+      note += '~~~ Need ~~~\n';
+      if (f.whyNeedFridge) note += `Why is the client needing a fridge?\n${f.whyNeedFridge}\n`;
+      if (f.canMeetNeedOtherWay) note += `Can client meet this need in any other way?\n${f.canMeetNeedOtherWay}\n`;
+      if (f.reasonableSteps) note += `What reasonable steps is the client taken to improve their situation?\n${f.reasonableSteps}\n`;
+      
+      // Whiteware Info section
+      const householdSizeLabels: { [key: string]: string } = {
+        '1-2': '1-2 people',
+        '3-4': '3-4 people',
+        '5+': '5+ people'
+      };
+      note += '\nHousehold size: ' + (householdSizeLabels[f.householdSize] || f.householdSize || '-') + '\n';
+      note += 'Model: ' + (f.applianceModel || '-') + '\n';
+      note += 'CA: ' + (f.applianceCANumber || '-') + '\n';
+      note += '\nAddress/contact details confirmed: ' + (f.addressContactConfirmed || '-') + '\n';
+      note += 'Space measured: ' + (f.spaceMeasured || '-') + '\n';
+      
+      note += '\n~~~ Payment ~~~\n';
+      note += `Supplier Name: ${f.supplierName || '-'}\n`;
+      note += `Supplier ID: ${f.supplierId || '-'}\n`;
+      note += `Amount: $${f.amount?.toFixed(2) || '0.00'}\n`;
+      note += `Recovery rate: $${f.recoveryRate?.toFixed(2) || '0.00'}\n`;
+      if (f.directCredit === 'yes' && f.paymentReference) {
+        note += `Reference number: ${f.paymentReference}\n`;
+      }
+      note += '\n~~~ Income ~~~\n';
+      if (f.income.benefit > 0) note += `$${f.income.benefit.toFixed(2)} Benefit\n`;
+      if (f.income.employment > 0) note += `$${f.income.employment.toFixed(2)} Employment\n`;
+      if (f.income.childSupport > 0) note += `$${f.income.childSupport.toFixed(2)} Child Support\n`;
+      if (f.income.otherIncome > 0) note += `$${f.income.otherIncome.toFixed(2)} Other Income\n`;
+      f.costs.forEach((cost: { amount: number; cost: string }) => {
+        if (cost.amount > 0) note += `-$${cost.amount.toFixed(2)} ${cost.cost}\n`;
+      });
+      if (f.costs.length > 0) {
+        const totalIncome = (Object.values(f.income) as number[]).reduce((sum: number, value: number) => sum + (value || 0), 0);
+        const totalCosts = f.costs.reduce((sum: number, cost: { amount: number; cost: string }) => sum + (cost.amount || 0), 0);
+        const remainingIncome = totalIncome - totalCosts;
+        note += '--------------\n';
+        note += `Client is left with $${remainingIncome.toFixed(2)}\n`;
+      }
+      note += '\n~~~ Reasonable Steps ~~~\n';
+      if (f.reasonableSteps) note += `${f.reasonableSteps}\n`;
+      note += '\n~~~ Outcome ~~~\n';
+      if (f.decision === 'approved') note += 'APPLICATION APPROVED\n';
+      else if (f.decision === 'declined') note += 'APPLICATION DECLINED\n';
+      if (f.decisionReason) note += `${f.decisionReason}\n`;
+      return note;
+    } else if (service === 'washing') {
+      // Washing Machine note output
+      const w = formData;
+      let note = '';
+      note += `CCID: ${w.clientId === false ? 'No' : 'Yes'}\n\n`;
+      note += '~~~ Need ~~~\n';
+      if (w.whyNeedWashingMachine) note += `Why is the client needing a washing machine?\n${w.whyNeedWashingMachine}\n`;
+      if (w.canMeetNeedOtherWay) note += `Can client meet this need in any other way?\n${w.canMeetNeedOtherWay}\n`;
+      if (w.reasonableSteps) note += `What reasonable steps is the client taken to improve their situation?\n${w.reasonableSteps}\n`;
+      
+      // Whiteware Info section
+      const householdSizeLabels: { [key: string]: string } = {
+        '1-2': '1-2 people',
+        '3-4': '3-4 people',
+        '5+': '5+ people'
+      };
+      note += '\nHousehold size: ' + (householdSizeLabels[w.householdSize] || w.householdSize || '-') + '\n';
+      note += 'Model: ' + (w.applianceModel || '-') + '\n';
+      note += 'CA: ' + (w.applianceCANumber || '-') + '\n';
+      note += '\nAddress/contact details confirmed: ' + (w.addressContactConfirmed || '-') + '\n';
+      note += 'Space measured: ' + (w.spaceMeasured || '-') + '\n';
+      
+      note += '\n~~~ Payment ~~~\n';
+      note += `Supplier Name: ${w.supplierName || '-'}\n`;
+      note += `Supplier ID: ${w.supplierId || '-'}\n`;
+      note += `Amount: $${w.amount?.toFixed(2) || '0.00'}\n`;
+      note += `Recovery rate: $${w.recoveryRate?.toFixed(2) || '0.00'}\n`;
+      if (w.directCredit === 'yes' && w.paymentReference) {
+        note += `Reference number: ${w.paymentReference}\n`;
+      }
+      note += '\n~~~ Income ~~~\n';
+      if (w.income.benefit > 0) note += `$${w.income.benefit.toFixed(2)} Benefit\n`;
+      if (w.income.employment > 0) note += `$${w.income.employment.toFixed(2)} Employment\n`;
+      if (w.income.childSupport > 0) note += `$${w.income.childSupport.toFixed(2)} Child Support\n`;
+      if (w.income.otherIncome > 0) note += `$${w.income.otherIncome.toFixed(2)} Other Income\n`;
+      w.costs.forEach((cost: { amount: number; cost: string }) => {
+        if (cost.amount > 0) note += `-$${cost.amount.toFixed(2)} ${cost.cost}\n`;
+      });
+      if (w.costs.length > 0) {
+        const totalIncome = (Object.values(w.income) as number[]).reduce((sum: number, value: number) => sum + (value || 0), 0);
+        const totalCosts = w.costs.reduce((sum: number, cost: { amount: number; cost: string }) => sum + (cost.amount || 0), 0);
+        const remainingIncome = totalIncome - totalCosts;
+        note += '--------------\n';
+        note += `Client is left with $${remainingIncome.toFixed(2)}\n`;
+      }
+      note += '\n~~~ Reasonable Steps ~~~\n';
+      if (w.reasonableSteps) note += `${w.reasonableSteps}\n`;
+      note += '\n~~~ Outcome ~~~\n';
+      if (w.decision === 'approved') note += 'APPLICATION APPROVED\n';
+      else if (w.decision === 'declined') note += 'APPLICATION DECLINED\n';
+      if (w.decisionReason) note += `${w.decisionReason}\n`;
       return note;
     } else {
       // Food note output (existing logic)
