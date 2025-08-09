@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { TASGrantFormData } from '../App';
+import Calendar from './Calendar';
 
 interface TASGrantQuestionsProps {
   formData: TASGrantFormData;
@@ -94,18 +95,12 @@ const TASGrantQuestions: React.FC<TASGrantQuestionsProps> = ({ formData, onFormD
         
         <div className="form-group">
           <label>What is the date of first contact?</label>
-          <input
-            type="date"
-            className="form-control"
-            value={formatDateForInput(formData.dateOfFirstContact)}
-            onChange={(e) => {
-              const date = e.target.value;
-              if (date) {
-                const [year, month, day] = date.split('-');
-                const formattedDate = `${day}/${month}/${year}`;
-                handleInputChange('dateOfFirstContact', formattedDate);
-              }
+          <Calendar
+            value={formData.dateOfFirstContact}
+            onChange={(date) => {
+              handleInputChange('dateOfFirstContact', date);
             }}
+            placeholder="Select date of first contact"
           />
         </div>
 
@@ -579,18 +574,12 @@ const TASGrantQuestions: React.FC<TASGrantQuestionsProps> = ({ formData, onFormD
         {formData.outcome === 'regranted' && (
           <div className="form-group">
             <label>Regrant date:</label>
-            <input
-              type="date"
-              className="form-control"
-              value={formatDateForInput(formData.regrantDate)}
-              onChange={(e) => {
-                const date = e.target.value;
-                if (date) {
-                  const [year, month, day] = date.split('-');
-                  const formattedDate = `${day}/${month}/${year}`;
-                  handleInputChange('regrantDate', formattedDate);
-                }
+            <Calendar
+              value={formData.regrantDate}
+              onChange={(date) => {
+                handleInputChange('regrantDate', date);
               }}
+              placeholder="Select regrant date"
             />
           </div>
         )}

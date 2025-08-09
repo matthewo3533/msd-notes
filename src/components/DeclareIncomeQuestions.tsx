@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { DeclareIncomeFormData } from '../App';
+import Calendar from './Calendar';
 
 interface DeclareIncomeQuestionsProps {
   formData: DeclareIncomeFormData;
@@ -207,18 +208,12 @@ const DeclareIncomeQuestions: React.FC<DeclareIncomeQuestionsProps> = ({ formDat
 
             <div className="form-group">
               <label>Week Beginning:</label>
-              <input
-                type="date"
-                className="form-control"
-                value={formatDateForInput(week.weekBeginning)}
-                onChange={(e) => {
-                  const date = e.target.value;
-                  if (date) {
-                    const [year, month, day] = date.split('-');
-                    const formattedDate = `${day}/${month}/${year}`;
-                    updateWeek(week.id, { weekBeginning: formattedDate });
-                  }
+              <Calendar
+                value={week.weekBeginning}
+                onChange={(date) => {
+                  updateWeek(week.id, { weekBeginning: date });
                 }}
+                placeholder="Select week beginning date"
               />
               {week.weekBeginning && (
                 <p className="week-display">
