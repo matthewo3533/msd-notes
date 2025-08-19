@@ -170,9 +170,31 @@ const FurnitureQuestions: React.FC<FurnitureQuestionsProps> = ({ formData, onFor
             placeholder="e.g., couch, table, chairs, etc."
           />
         </div>
-
         <div className="form-group">
-          <label>3. What reasonable steps is the client taken to improve their situation?</label>
+          <label>3. Can client meet this need in any other way?</label>
+          <div className="radio-group">
+            <label className={`radio-btn ${formData.canMeetNeedOtherWay === 'yes' ? 'selected' : ''}`}>Yes
+              <input
+                type="checkbox"
+                name="canMeetNeedOtherWayYes"
+                checked={formData.canMeetNeedOtherWay === 'yes'}
+                onChange={() => handleInputChange('canMeetNeedOtherWay', formData.canMeetNeedOtherWay === 'yes' ? '' : 'yes')}
+                className="visually-hidden"
+              />
+            </label>
+            <label className={`radio-btn ${formData.canMeetNeedOtherWay === 'no' ? 'selected' : ''}`}>No
+              <input
+                type="checkbox"
+                name="canMeetNeedOtherWayNo"
+                checked={formData.canMeetNeedOtherWay === 'no'}
+                onChange={() => handleInputChange('canMeetNeedOtherWay', formData.canMeetNeedOtherWay === 'no' ? '' : 'no')}
+                className="visually-hidden"
+              />
+            </label>
+          </div>
+        </div>
+        <div className="form-group">
+          <label>4. What reasonable steps is the client taken to improve their situation?</label>
           <textarea
             className="form-control"
             value={formData.reasonableSteps}

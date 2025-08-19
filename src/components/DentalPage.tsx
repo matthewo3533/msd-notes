@@ -7,6 +7,7 @@ import ThemeSelector from './ThemeSelector';
 interface DentalFormData {
   clientId: boolean | null;
   whyNeedDental: string;
+  canMeetNeedOtherWay: string;
   reasonableSteps: string;
   sngEligible: string;
   sngBalance: number;

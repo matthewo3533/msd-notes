@@ -49,6 +49,8 @@ const Home: React.FC<HomeProps> = ({ currentTheme, onThemeChange }) => {
     navigate(`/${serviceId}`);
   };
 
+
+
   const getCurrentDate = () => {
     const now = new Date();
     const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];

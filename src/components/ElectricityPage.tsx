@@ -7,6 +7,7 @@ import ThemeSelector from './ThemeSelector';
 interface ElectricityFormData {
   clientId: boolean | null;
   whyNeedPower: string;
+  canMeetNeedOtherWay: string;
   reasonableSteps: string;
   supplierName: string;
   supplierId: string;

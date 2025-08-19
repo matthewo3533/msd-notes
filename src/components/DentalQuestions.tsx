@@ -164,9 +164,31 @@ const DentalQuestions: React.FC<DentalQuestionsProps> = ({ formData, onFormDataC
             onInput={e => autoResizeTextarea(e.currentTarget)}
           />
         </div>
-
         <div className="form-group">
-          <label>2. What reasonable steps is the client taken to improve their situation?</label>
+          <label>2. Can client meet this need in any other way?</label>
+          <div className="radio-group">
+            <label className={`radio-btn ${formData.canMeetNeedOtherWay === 'yes' ? 'selected' : ''}`}>Yes
+              <input
+                type="checkbox"
+                name="canMeetNeedOtherWayYes"
+                checked={formData.canMeetNeedOtherWay === 'yes'}
+                onChange={() => handleInputChange('canMeetNeedOtherWay', formData.canMeetNeedOtherWay === 'yes' ? '' : 'yes')}
+                className="visually-hidden"
+              />
+            </label>
+            <label className={`radio-btn ${formData.canMeetNeedOtherWay === 'no' ? 'selected' : ''}`}>No
+              <input
+                type="checkbox"
+                name="canMeetNeedOtherWayNo"
+                checked={formData.canMeetNeedOtherWay === 'no'}
+                onChange={() => handleInputChange('canMeetNeedOtherWay', formData.canMeetNeedOtherWay === 'no' ? '' : 'no')}
+                className="visually-hidden"
+              />
+            </label>
+          </div>
+        </div>
+        <div className="form-group">
+          <label>3. What reasonable steps is the client taken to improve their situation?</label>
           <textarea
             className="form-control"
             value={formData.reasonableSteps}
@@ -177,7 +199,7 @@ const DentalQuestions: React.FC<DentalQuestionsProps> = ({ formData, onFormDataC
           />
         </div>
         <div className="form-group">
-          <label>3. Does the client qualify for non-recoverable SNG?</label>
+          <label>4. Does the client qualify for non-recoverable SNG?</label>
           <div className="radio-group">
             <label className={`radio-btn ${formData.sngEligible === 'yes' ? 'selected' : ''}`}>Yes
               <input

@@ -6,6 +6,7 @@ import DecisionSection from './DecisionSection';
 interface ClothingFormData {
   clientId: boolean | null;
   whyNeedClothing: string;
+  canMeetNeedOtherWay: string;
   reasonableSteps: string;
   supplierName: string;
   supplierId: string;

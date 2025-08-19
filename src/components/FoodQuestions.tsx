@@ -224,11 +224,46 @@ const FoodQuestions: React.FC<FoodQuestionsProps> = ({ formData, onFormDataChang
           </div>
         )}
 
+        {!skippedQuestions.has('canMeetNeedOtherWay') && (
+          <div className={`form-group ${animatingQuestions.has('canMeetNeedOtherWay') ? 'question-skipped' : ''}`}>
+            <label>3. Can client meet this need in any other way?</label>
+            <div className="radio-group">
+              <label className={`radio-btn ${formData.canMeetNeedOtherWay === 'yes' ? 'selected' : ''}`}>Yes
+                <input
+                  type="checkbox"
+                  name="canMeetNeedOtherWayYes"
+                  checked={formData.canMeetNeedOtherWay === 'yes'}
+                  onChange={() => handleInputChange('canMeetNeedOtherWay', formData.canMeetNeedOtherWay === 'yes' ? '' : 'yes')}
+                  className="visually-hidden"
+                />
+              </label>
+              <label className={`radio-btn ${formData.canMeetNeedOtherWay === 'no' ? 'selected' : ''}`}>No
+                <input
+                  type="checkbox"
+                  name="canMeetNeedOtherWayNo"
+                  checked={formData.canMeetNeedOtherWay === 'no'}
+                  onChange={() => handleInputChange('canMeetNeedOtherWay', formData.canMeetNeedOtherWay === 'no' ? '' : 'no')}
+                  className="visually-hidden"
+                />
+              </label>
+            </div>
+            <button className="skip-btn" onClick={() => handleSkip('canMeetNeedOtherWay')}>
+              Skip this question
+            </button>
+          </div>
+        )}
 
+        {skippedQuestions.has('canMeetNeedOtherWay') && (
+          <div className="form-group question-restored">
+            <button className="skip-btn restore" onClick={() => handleRestore('canMeetNeedOtherWay')}>
+              Question skipped. Click to restore
+            </button>
+          </div>
+        )}
 
         {!skippedQuestions.has('currentFoodBalance') && (
           <div className={`form-group ${animatingQuestions.has('currentFoodBalance') ? 'question-skipped' : ''}`}>
-            <label>3. What is the client's current food balance?</label>
+            <label>4. What is the client's current food balance?</label>
             <div className="dollar-input">
               <input
                 type="number"

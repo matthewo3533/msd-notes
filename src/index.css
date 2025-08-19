@@ -1,4 +1,5 @@
-
+/* Import iOS-style emoji font */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Color+Emoji:wght@400;700&display=swap');
 
 * {
   margin: 0;
@@ -327,9 +328,12 @@ body {
   position: relative;
   z-index: 2;
   transition: transform 0.3s ease;
+  font-family: "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji", "Android Emoji", "EmojiSymbols", "EmojiOne Mozilla", "Twemoji Mozilla", "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", "Android Emoji", "EmojiSymbols", "EmojiOne Mozilla", "Twemoji Mozilla", "Noto Emoji", sans-serif;
+  -webkit-font-feature-settings: "emoji";
+  font-feature-settings: "emoji";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
-
-
 
 .service-card:hover .service-emoji {
   transform: scale(1.2) rotate(5deg);
@@ -788,6 +792,7 @@ textarea.form-control {
   margin-bottom: 1.25rem;
   font-size: 1.4rem;
   font-weight: 600;
+  text-align:center;
 }
 
 .note-output pre {
@@ -2169,6 +2174,152 @@ input[type="number"] {
   
   .btn {
     width: 100%;
+  }
+} 
+
+/* Quick Copy Section */
+        .quick-copy-section {
+          margin-top: 1.5rem;
+          padding: 1.5rem;
+          background: var(--bg-secondary);
+          border: 1px solid var(--border-primary);
+          border-radius: 12px;
+          box-shadow: var(--shadow-primary);
+          position: sticky;
+          top: 2rem;
+          animation: fadeInUp 0.5s ease-out;
+          transition: all 0.3s ease-out;
+        }
+
+.quick-copy-section h4 {
+  margin: 0 0 1rem 0;
+  color: var(--text-primary);
+  font-size: 1.1rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+        .quick-copy-section.quick-copy-empty {
+          max-height: 0;
+          opacity: 0;
+          padding: 0;
+          margin: 0;
+          border: none;
+          box-shadow: none;
+          overflow: hidden;
+          background: transparent;
+        }
+
+.quick-copy-empty-text {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  font-style: italic;
+}
+
+.quick-copy-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+
+.quick-copy-item {
+  animation: slideInRight 0.4s ease-out;
+  animation-fill-mode: both;
+}
+
+.quick-copy-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+}
+
+.quick-copy-btn {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-secondary);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+  text-align: left;
+  font-family: inherit;
+}
+
+.quick-copy-btn:hover {
+  background: var(--bg-tertiary);
+  border-color: var(--border-primary);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.quick-copy-btn:active {
+  transform: translateY(0);
+}
+
+.quick-copy-btn::before {
+  content: '';
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='9' y='9' width='13' height='13' rx='2' ry='2'%3E%3C/rect%3E%3Cpath d='M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1'%3E%3C/path%3E%3C/svg%3E");
+  background-size: contain;
+  background-repeat: no-repeat;
+  opacity: 0.6;
+  transition: opacity 0.2s ease;
+}
+
+.quick-copy-btn:hover::before {
+  opacity: 0.8;
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .quick-copy-section {
+    position: static;
+    margin-top: 1rem;
+  }
+  
+  .quick-copy-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .quick-copy-btn {
+    padding: 1rem;
+    font-size: 1rem;
   }
 } 
 

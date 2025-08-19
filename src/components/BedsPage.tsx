@@ -7,6 +7,7 @@ import ThemeSelector from './ThemeSelector';
 interface BedsFormData {
   clientId: boolean | null;
   whyNeedBeds: string;
+  canMeetNeedOtherWay: string;
   reasonableSteps: string;
   supplierName: string;
   supplierId: string;

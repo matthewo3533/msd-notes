@@ -646,7 +646,77 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
     }
   };
 
+  const handleQuickCopy = async (text: string, label: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      // Show a subtle toast notification
+      const toast = document.createElement('div');
+      toast.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #10b981;
+        color: white;
+        padding: 12px 20px;
+        border-radius: 8px;
+        font-size: 14px;
+        z-index: 1000;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        transform: translateX(100%);
+        transition: transform 0.3s ease;
+      `;
+      toast.textContent = `${label} copied!`;
+      document.body.appendChild(toast);
+      
+      // Animate in
+      setTimeout(() => toast.style.transform = 'translateX(0)', 100);
+      
+      // Remove after 2 seconds
+      setTimeout(() => {
+        toast.style.transform = 'translateX(100%)';
+        setTimeout(() => document.body.removeChild(toast), 300);
+      }, 2000);
+    } catch (err) {
+      console.error('Failed to copy: ', err);
+      alert(`Failed to copy ${label}`);
+    }
+  };
+
+  const getQuickCopyFields = () => {
+    const fields = [];
+    
+    // Check for Supplier ID
+    if (formData.supplierId && formData.supplierId.trim()) {
+      fields.push({
+        label: 'Supplier ID',
+        value: formData.supplierId,
+        key: 'supplierId'
+      });
+    }
+    
+    // Check for Supplier Name
+    if (formData.supplierName && formData.supplierName.trim()) {
+      fields.push({
+        label: 'Supplier Name',
+        value: formData.supplierName,
+        key: 'supplierName'
+      });
+    }
+    
+    // Check for Payment Reference
+    if (formData.paymentReference && formData.paymentReference.trim()) {
+      fields.push({
+        label: 'Payment Reference',
+        value: formData.paymentReference,
+        key: 'paymentReference'
+      });
+    }
+    
+    return fields;
+  };
+
   const note = generateNote();
+  const quickCopyFields = getQuickCopyFields();
 
   return (
     <div className="note-output">
@@ -663,6 +733,31 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
         >
           Start New Application
         </button>
+      </div>
+      
+      {/* Quick Copy Section */}
+      <div className={`quick-copy-section ${quickCopyFields.length === 0 ? 'quick-copy-empty' : ''}`}>
+        <h4>Quick Copy</h4>
+        {quickCopyFields.length > 0 ? (
+          <div className="quick-copy-grid">
+            {quickCopyFields.map((field, index) => (
+              <div key={field.key} className="quick-copy-item" style={{ animationDelay: `${index * 0.1}s` }}>
+                <div className="quick-copy-label">{field.label}</div>
+                <button 
+                  className="quick-copy-btn"
+                  onClick={() => handleQuickCopy(field.value, field.label)}
+                  title={`Copy ${field.label}`}
+                >
+                  {field.value}
+                </button>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="quick-copy-empty-text">
+            Fill out Supplier ID, Supplier Name, or Payment Reference to see quick copy options
+          </div>
+        )}
       </div>
     </div>
   );
