@@ -3,38 +3,7 @@ import IncomeSection, { IncomeLabels } from './IncomeSection';
 import BondRentPaymentSection from './BondRentPaymentSection';
 import DecisionSection from './DecisionSection';
 import Calendar from './Calendar';
-
-interface BondRentFormData {
-  clientId: boolean | null;
-  newAddress: string;
-  asZone: number;
-  weeklyRent: number;
-  bondAmount: number;
-  rentInAdvanceAmount: number;
-  reasonableSteps: string;
-  tenancyAffordable: string;
-  supplierName: string;
-  supplierId: string;
-  bondPaymentAmount: number;
-  rentAdvancePaymentAmount: number;
-  recoveryRate: number;
-  directCredit: string; // 'yes' | 'no' | ''
-  paymentReference: string;
-  income: {
-    benefit: number;
-    employment: number;
-    familyTaxCredit: number;
-    childSupport: number;
-    childDisabilityAllowance: number;
-    otherIncome: number;
-  };
-  costs: Array<{
-    amount: number;
-    cost: string;
-  }>;
-  decision: string;
-  decisionReason: string;
-}
+import { BondRentFormData } from '../App';
 
 interface BondRentQuestionsProps {
   formData: BondRentFormData;
@@ -125,8 +94,7 @@ const BondRentQuestions: React.FC<BondRentQuestionsProps> = ({ formData, onFormD
     onFormDataChange({ costs: newCosts });
   };
 
-  // Calculate total amount for recovery rate
-  const totalAmount = formData.bondAmount + formData.rentInAdvanceAmount;
+
 
   return (
     <div className="form-sections-container">
