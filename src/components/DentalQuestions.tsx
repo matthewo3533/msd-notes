@@ -7,6 +7,7 @@ interface DentalFormData {
   clientId: boolean | null;
   whyNeedDental: string;
   reasonableSteps: string;
+  canMeetNeedOtherWay: string;
   sngEligible: string; // 'yes' | 'no' | ''
   sngBalance: number;
   supplierName: string;
