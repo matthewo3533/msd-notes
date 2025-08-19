@@ -1,18 +1,24 @@
 import React, { useEffect, useState } from 'react';
 import IncomeSection, { IncomeLabels } from './IncomeSection';
-import PaymentSection from './PaymentSection';
+import BondRentPaymentSection from './BondRentPaymentSection';
 import DecisionSection from './DecisionSection';
+import Calendar from './Calendar';
 
-export interface FurnitureFormData {
+interface BondRentFormData {
   clientId: boolean | null;
-  whyNeedFurniture: string;
-  furnitureType: string;
+  newAddress: string;
+  asZone: number;
+  weeklyRent: number;
+  bondAmount: number;
+  rentInAdvanceAmount: number;
   reasonableSteps: string;
+  tenancyAffordable: string;
   supplierName: string;
   supplierId: string;
-  amount: number;
+  bondPaymentAmount: number;
+  rentAdvancePaymentAmount: number;
   recoveryRate: number;
-  directCredit: string;
+  directCredit: string; // 'yes' | 'no' | ''
   paymentReference: string;
   income: {
     benefit: number;
@@ -30,9 +36,9 @@ export interface FurnitureFormData {
   decisionReason: string;
 }
 
-interface FurnitureQuestionsProps {
-  formData: FurnitureFormData;
-  onFormDataChange: (data: Partial<FurnitureFormData>) => void;
+interface BondRentQuestionsProps {
+  formData: BondRentFormData;
+  onFormDataChange: (data: Partial<BondRentFormData>) => void;
 }
 
 function autoResizeTextarea(el: HTMLTextAreaElement | null) {
@@ -47,7 +53,7 @@ function autoResizeTextarea(el: HTMLTextAreaElement | null) {
   }
 }
 
-const FurnitureQuestions: React.FC<FurnitureQuestionsProps> = ({ formData, onFormDataChange }) => {
+const BondRentQuestions: React.FC<BondRentQuestionsProps> = ({ formData, onFormDataChange }) => {
   const [visibleSections, setVisibleSections] = useState<Set<string>>(new Set(['client']));
   const [incomeLabels, setIncomeLabels] = useState<IncomeLabels>({
     benefit: 'Benefit',
@@ -87,11 +93,11 @@ const FurnitureQuestions: React.FC<FurnitureQuestionsProps> = ({ formData, onFor
     };
   }, []);
 
-  const handleInputChange = (field: keyof FurnitureFormData, value: any) => {
+  const handleInputChange = (field: keyof BondRentFormData, value: any) => {
     onFormDataChange({ [field]: value });
   };
 
-  const handleIncomeChange = (field: keyof FurnitureFormData['income'], value: number) => {
+  const handleIncomeChange = (field: keyof BondRentFormData['income'], value: number) => {
     onFormDataChange({
       income: {
         ...formData.income,
@@ -119,8 +125,12 @@ const FurnitureQuestions: React.FC<FurnitureQuestionsProps> = ({ formData, onFor
     onFormDataChange({ costs: newCosts });
   };
 
+  // Calculate total amount for recovery rate
+  const totalAmount = formData.bondAmount + formData.rentInAdvanceAmount;
+
   return (
     <div className="form-sections-container">
+
       {/* General Questions */}
       <div className="form-section-card section-visible">
         <div className="section-header">
@@ -150,29 +160,115 @@ const FurnitureQuestions: React.FC<FurnitureQuestionsProps> = ({ formData, onFor
           </div>
         </div>
         <div className="form-group">
-          <label>1. Why is the client needing furniture?</label>
+          <label>Why is the client needing accommodation assistance?</label>
           <textarea
             className="form-control"
-            value={formData.whyNeedFurniture}
-            onChange={e => handleInputChange('whyNeedFurniture', e.target.value)}
-            placeholder="Please describe the client's situation..."
-            ref={el => autoResizeTextarea(el)}
-            onInput={e => autoResizeTextarea(e.currentTarget)}
+            value={formData.whyNeedAccommodation}
+            onChange={e => handleInputChange('whyNeedAccommodation', e.target.value)}
+            placeholder="Explain why the client needs accommodation assistance"
+            rows={3}
           />
         </div>
         <div className="form-group">
-          <label>2. What type of furniture is the client needing assistance with?</label>
+          <label>What's the client's new address?</label>
           <input
             type="text"
             className="form-control"
-            value={formData.furnitureType}
-            onChange={e => handleInputChange('furnitureType', e.target.value)}
-            placeholder="e.g., couch, table, chairs, etc."
+            value={formData.newAddress}
+            onChange={e => handleInputChange('newAddress', e.target.value)}
+            placeholder="Enter the client's new address"
           />
+        </div>
+        <div className="form-group">
+          <label>AS Zone</label>
+          <select
+            className="form-control"
+            value={formData.asZone || ''}
+            onChange={e => handleInputChange('asZone', parseInt(e.target.value) || 0)}
+          >
+            <option value="">Select AS Zone</option>
+            <option value="1">Zone 1</option>
+            <option value="2">Zone 2</option>
+            <option value="3">Zone 3</option>
+            <option value="4">Zone 4</option>
+          </select>
+        </div>
+        <div className="form-group">
+          <label>Weekly Rent</label>
+          <div className="dollar-input">
+            <input
+              type="number"
+              className="form-control"
+              value={formData.weeklyRent || ''}
+              onChange={e => handleInputChange('weeklyRent', parseFloat(e.target.value) || 0)}
+              placeholder="0.00"
+              step="0.01"
+              min="0"
+            />
+          </div>
+        </div>
+        <div className="form-group">
+          <label>Date tenancy is starting</label>
+          <Calendar
+            value={formData.tenancyStartDate}
+            onChange={(date) => handleInputChange('tenancyStartDate', date)}
+            placeholder="Select tenancy start date"
+          />
+        </div>
+        <div className="form-group">
+          <label>How much bond does the client need help with?</label>
+          <div className="dollar-input">
+            <input
+              type="number"
+              className="form-control"
+              value={formData.bondAmount || ''}
+              onChange={e => handleInputChange('bondAmount', parseFloat(e.target.value) || 0)}
+              placeholder="0.00"
+              step="0.01"
+              min="0"
+            />
+          </div>
+        </div>
+        <div className="form-group">
+          <label>How much rent in advance does the client need help with?</label>
+          <div className="dollar-input">
+            <input
+              type="number"
+              className="form-control"
+              value={formData.rentInAdvanceAmount || ''}
+              onChange={e => handleInputChange('rentInAdvanceAmount', parseFloat(e.target.value) || 0)}
+              placeholder="0.00"
+              step="0.01"
+              min="0"
+            />
+          </div>
+        </div>
+        <div className="form-group">
+          <label>Will this tenancy leave the client with enough leftover money to meet their weekly living costs?</label>
+          <div className="radio-group">
+            <label className={`radio-btn ${formData.tenancyAffordable === 'yes' ? 'selected' : ''}`}>Yes
+              <input
+                type="checkbox"
+                name="tenancyAffordableYes"
+                checked={formData.tenancyAffordable === 'yes'}
+                onChange={() => handleInputChange('tenancyAffordable', formData.tenancyAffordable === 'yes' ? '' : 'yes')}
+                className="visually-hidden"
+              />
+            </label>
+            <label className={`radio-btn ${formData.tenancyAffordable === 'no' ? 'selected' : ''}`}>No
+              <input
+                type="checkbox"
+                name="tenancyAffordableNo"
+                checked={formData.tenancyAffordable === 'no'}
+                onChange={() => handleInputChange('tenancyAffordable', formData.tenancyAffordable === 'no' ? '' : 'no')}
+                className="visually-hidden"
+              />
+            </label>
+          </div>
         </div>
 
         <div className="form-group">
-          <label>3. What reasonable steps is the client taken to improve their situation?</label>
+          <label>What reasonable steps is the client taking to improve their situation?</label>
           <textarea
             className="form-control"
             value={formData.reasonableSteps}
@@ -183,7 +279,8 @@ const FurnitureQuestions: React.FC<FurnitureQuestionsProps> = ({ formData, onFor
           />
         </div>
       </div>
-      {/* Income Section */}
+
+      {/* Tenancy Affordability Section */}
       <IncomeSection
         income={formData.income}
         incomeLabels={incomeLabels}
@@ -195,24 +292,29 @@ const FurnitureQuestions: React.FC<FurnitureQuestionsProps> = ({ formData, onFor
         onRemoveCost={removeCost}
         sectionNumber={2}
         isVisible={visibleSections.has('income')}
+        sectionTitle="Tenancy Affordability"
       />
+
       {/* Payment Section */}
-      <PaymentSection
+      <BondRentPaymentSection
         supplierName={formData.supplierName}
         supplierId={formData.supplierId}
-        amount={formData.amount}
+        bondAmount={formData.bondAmount}
+        rentAdvanceAmount={formData.rentInAdvanceAmount}
         recoveryRate={formData.recoveryRate}
         directCredit={formData.directCredit}
         paymentReference={formData.paymentReference}
         onSupplierNameChange={(name) => handleInputChange('supplierName', name)}
         onSupplierIdChange={(id) => handleInputChange('supplierId', id)}
-        onAmountChange={(amount) => handleInputChange('amount', amount)}
+        onBondAmountChange={(amount) => handleInputChange('bondAmount', amount)}
+        onRentAdvanceAmountChange={(amount) => handleInputChange('rentInAdvanceAmount', amount)}
         onRecoveryRateChange={(rate) => handleInputChange('recoveryRate', rate)}
         onDirectCreditChange={(credit) => handleInputChange('directCredit', credit)}
         onPaymentReferenceChange={(reference) => handleInputChange('paymentReference', reference)}
         sectionNumber={3}
         isVisible={visibleSections.has('payment')}
       />
+
       {/* Decision Section */}
       <DecisionSection
         decision={formData.decision}
@@ -226,4 +328,4 @@ const FurnitureQuestions: React.FC<FurnitureQuestionsProps> = ({ formData, onFor
   );
 };
 
-export default FurnitureQuestions;
+export default BondRentQuestions;

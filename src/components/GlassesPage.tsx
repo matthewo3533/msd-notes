@@ -15,7 +15,6 @@ const GlassesPage: React.FC<GlassesPageProps> = ({ currentTheme, onThemeChange }
   const [formData, setFormData] = useState<GlassesFormData>({
     clientId: null,
     whyNeedGlasses: '',
-    canMeetNeedOtherWay: '',
     reasonableSteps: '',
     supplierName: '',
     supplierId: '',
@@ -44,7 +43,6 @@ const GlassesPage: React.FC<GlassesPageProps> = ({ currentTheme, onThemeChange }
     setFormData({
       clientId: null,
       whyNeedGlasses: '',
-      canMeetNeedOtherWay: '',
       reasonableSteps: '',
       supplierName: '',
       supplierId: '',

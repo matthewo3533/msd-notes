@@ -7,7 +7,6 @@ import ThemeSelector from './ThemeSelector';
 interface ElectricityFormData {
   clientId: boolean | null;
   whyNeedPower: string;
-  canMeetNeedOtherWay: string;
   reasonableSteps: string;
   supplierName: string;
   supplierId: string;
@@ -42,7 +41,6 @@ const ElectricityPage: React.FC<ElectricityPageProps> = ({ currentTheme, onTheme
   const [formData, setFormData] = useState<ElectricityFormData>({
     clientId: null,
     whyNeedPower: '',
-    canMeetNeedOtherWay: '',
     reasonableSteps: '',
     supplierName: '',
     supplierId: '',
@@ -72,7 +70,6 @@ const ElectricityPage: React.FC<ElectricityPageProps> = ({ currentTheme, onTheme
     setFormData({
       clientId: null,
       whyNeedPower: '',
-      canMeetNeedOtherWay: '',
       reasonableSteps: '',
       supplierName: '',
       supplierId: '',

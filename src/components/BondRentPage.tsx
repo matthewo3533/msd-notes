@@ -1,25 +1,32 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import FurnitureQuestions from './FurnitureQuestions';
-import type { FurnitureFormData } from './FurnitureQuestions';
+import BondRentQuestions from './BondRentQuestions';
 import NoteOutput from './NoteOutput';
 import ThemeSelector from './ThemeSelector';
+import { BondRentFormData } from '../App';
 
-interface FurniturePageProps {
+interface BondRentPageProps {
   currentTheme: string;
   onThemeChange: (themeId: string) => void;
 }
 
-const FurniturePage: React.FC<FurniturePageProps> = ({ currentTheme, onThemeChange }) => {
+const BondRentPage: React.FC<BondRentPageProps> = ({ currentTheme, onThemeChange }) => {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState<FurnitureFormData>({
+  const [formData, setFormData] = useState<BondRentFormData>({
     clientId: null,
-    whyNeedFurniture: '',
-    furnitureType: '',
+    whyNeedAccommodation: '',
+    newAddress: '',
+    asZone: 0,
+    weeklyRent: 0,
+    tenancyStartDate: '',
+    bondAmount: 0,
+    rentInAdvanceAmount: 0,
     reasonableSteps: '',
+    tenancyAffordable: '',
     supplierName: '',
     supplierId: '',
-    amount: 0,
+    bondPaymentAmount: 0,
+    rentAdvancePaymentAmount: 0,
     recoveryRate: 0,
     directCredit: '',
     paymentReference: '',
@@ -36,19 +43,26 @@ const FurniturePage: React.FC<FurniturePageProps> = ({ currentTheme, onThemeChan
     decisionReason: '',
   });
 
-  const handleFormDataChange = (data: Partial<FurnitureFormData>) => {
-    setFormData((prev: FurnitureFormData) => ({ ...prev, ...data }));
+  const handleFormDataChange = (data: Partial<BondRentFormData>) => {
+    setFormData(prev => ({ ...prev, ...data }));
   };
 
   const resetForm = () => {
     setFormData({
       clientId: null,
-      whyNeedFurniture: '',
-      furnitureType: '',
+      whyNeedAccommodation: '',
+      newAddress: '',
+      asZone: 0,
+      weeklyRent: 0,
+      tenancyStartDate: '',
+      bondAmount: 0,
+      rentInAdvanceAmount: 0,
       reasonableSteps: '',
+      tenancyAffordable: '',
       supplierName: '',
       supplierId: '',
-      amount: 0,
+      bondPaymentAmount: 0,
+      rentAdvancePaymentAmount: 0,
       recoveryRate: 0,
       directCredit: '',
       paymentReference: '',
@@ -86,7 +100,7 @@ const FurniturePage: React.FC<FurniturePageProps> = ({ currentTheme, onThemeChan
       <div className="header">
         <div className="header-top">
           <div className="greeting-section">
-            <h1 className="greeting">Furniture</h1>
+            <h1 className="greeting">Bond/Rent in Advance</h1>
             <p className="date">{getCurrentDate()}</p>
           </div>
           <ThemeSelector currentTheme={currentTheme} onThemeChange={onThemeChange} />
@@ -98,17 +112,22 @@ const FurniturePage: React.FC<FurniturePageProps> = ({ currentTheme, onThemeChan
           ← Back to Services
         </button>
       </div>
+
       <div className="food-layout">
-        <FurnitureQuestions 
-          formData={formData} 
+        <BondRentQuestions
+          formData={formData}
           onFormDataChange={handleFormDataChange}
         />
         <div className="note-section">
-          <NoteOutput formData={formData} service="furniture" onReset={resetForm} />
+          <NoteOutput
+            formData={formData}
+            service="bond-rent"
+            onReset={resetForm}
+          />
         </div>
       </div>
     </div>
   );
 };
 
-export default FurniturePage;
+export default BondRentPage;

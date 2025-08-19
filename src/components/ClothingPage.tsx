@@ -15,7 +15,6 @@ const ClothingPage: React.FC<ClothingPageProps> = ({ currentTheme, onThemeChange
   const [formData, setFormData] = useState<ClothingFormData>({
     clientId: null,
     whyNeedClothing: '',
-    canMeetNeedOtherWay: '',
     reasonableSteps: '',
     supplierName: '',
     supplierId: '',
@@ -44,7 +43,6 @@ const ClothingPage: React.FC<ClothingPageProps> = ({ currentTheme, onThemeChange
     setFormData({
       clientId: null,
       whyNeedClothing: '',
-      canMeetNeedOtherWay: '',
       reasonableSteps: '',
       supplierName: '',
       supplierId: '',

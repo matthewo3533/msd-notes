@@ -47,7 +47,9 @@ const Calendar: React.FC<CalendarProps> = ({ value, onChange, placeholder = "Sel
   };
 
   const getFirstDayOfMonth = (date: Date) => {
-    return new Date(date.getFullYear(), date.getMonth(), 1).getDay();
+    const day = new Date(date.getFullYear(), date.getMonth(), 1).getDay();
+    // Convert Sunday (0) to 6, Monday (1) to 0, etc.
+    return day === 0 ? 6 : day - 1;
   };
 
   const formatDate = (date: Date) => {
@@ -169,13 +171,13 @@ const Calendar: React.FC<CalendarProps> = ({ value, onChange, placeholder = "Sel
         </div>
         
         <div className="calendar-weekdays">
-          <div className="calendar-weekday">Sun</div>
           <div className="calendar-weekday">Mon</div>
           <div className="calendar-weekday">Tue</div>
           <div className="calendar-weekday">Wed</div>
           <div className="calendar-weekday">Thu</div>
           <div className="calendar-weekday">Fri</div>
           <div className="calendar-weekday">Sat</div>
+          <div className="calendar-weekday">Sun</div>
         </div>
         
         <div className="calendar-days">

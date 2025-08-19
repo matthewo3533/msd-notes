@@ -15,7 +15,6 @@ const WashingMachinePage: React.FC<WashingMachinePageProps> = ({ currentTheme, o
   const [formData, setFormData] = useState<WashingMachineFormData>({
     clientId: null,
     whyNeedWashingMachine: '',
-    canMeetNeedOtherWay: '',
     reasonableSteps: '',
     supplierName: '',
     supplierId: '',
@@ -51,7 +50,6 @@ const WashingMachinePage: React.FC<WashingMachinePageProps> = ({ currentTheme, o
     setFormData({
       clientId: null,
       whyNeedWashingMachine: '',
-      canMeetNeedOtherWay: '',
       reasonableSteps: '',
       supplierName: '',
       supplierId: '',

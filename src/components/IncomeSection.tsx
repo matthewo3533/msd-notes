@@ -35,6 +35,7 @@ interface IncomeSectionProps {
   onRemoveCost: (index: number) => void;
   sectionNumber?: number;
   isVisible?: boolean;
+  sectionTitle?: string;
 }
 
 const IncomeSection: React.FC<IncomeSectionProps> = ({
@@ -47,7 +48,8 @@ const IncomeSection: React.FC<IncomeSectionProps> = ({
   onAddCost,
   onRemoveCost,
   sectionNumber = 2,
-  isVisible = false
+  isVisible = false,
+  sectionTitle
 }) => {
   const [editingField, setEditingField] = useState<keyof IncomeLabels | null>(null);
   const [editValue, setEditValue] = useState('');
@@ -190,7 +192,7 @@ const IncomeSection: React.FC<IncomeSectionProps> = ({
       className={`form-section-card ${isVisible ? 'section-visible' : ''}`}
     >
       <div className="section-header">
-        <h3>Income</h3>
+        <h3>{sectionTitle || 'Income'}</h3>
         <div className="section-number">{sectionNumber}</div>
       </div>
       <div className="income-section">

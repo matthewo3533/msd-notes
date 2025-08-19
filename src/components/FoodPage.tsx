@@ -15,7 +15,6 @@ const FoodPage: React.FC<FoodPageProps> = ({ currentTheme, onThemeChange }) => {
   const [formData, setFormData] = useState<FoodFormData>({
     clientId: null,
     whyNeedFood: '',
-    canMeetNeedOtherWay: '',
     currentFoodBalance: 0,
     foodAmountRequested: 0,
     hardshipUnforeseen: '',
@@ -42,7 +41,6 @@ const FoodPage: React.FC<FoodPageProps> = ({ currentTheme, onThemeChange }) => {
     setFormData({
       clientId: null,
       whyNeedFood: '',
-      canMeetNeedOtherWay: '',
       currentFoodBalance: 0,
       foodAmountRequested: 0,
       hardshipUnforeseen: '',

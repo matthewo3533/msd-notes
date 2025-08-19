@@ -60,6 +60,7 @@ const Home: React.FC<HomeProps> = ({ currentTheme, onThemeChange }) => {
   };
 
   useEffect(() => {
+
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {

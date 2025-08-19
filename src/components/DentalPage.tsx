@@ -7,7 +7,6 @@ import ThemeSelector from './ThemeSelector';
 interface DentalFormData {
   clientId: boolean | null;
   whyNeedDental: string;
-  canMeetNeedOtherWay: string;
   reasonableSteps: string;
   sngEligible: string;
   sngBalance: number;
@@ -43,7 +42,6 @@ const DentalPage: React.FC<DentalPageProps> = ({ currentTheme, onThemeChange }) 
   const [formData, setFormData] = useState<DentalFormData>({
     clientId: null,
     whyNeedDental: '',
-    canMeetNeedOtherWay: '',
     reasonableSteps: '',
     sngEligible: '',
     sngBalance: 1000,
@@ -74,7 +72,6 @@ const DentalPage: React.FC<DentalPageProps> = ({ currentTheme, onThemeChange }) 
     setFormData({
       clientId: null,
       whyNeedDental: '',
-      canMeetNeedOtherWay: '',
       reasonableSteps: '',
       sngEligible: '',
       sngBalance: 1000,

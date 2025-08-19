@@ -15,7 +15,6 @@ const FridgePage: React.FC<FridgePageProps> = ({ currentTheme, onThemeChange }) 
   const [formData, setFormData] = useState<FridgeFormData>({
     clientId: null,
     whyNeedFridge: '',
-    canMeetNeedOtherWay: '',
     reasonableSteps: '',
     supplierName: '',
     supplierId: '',
@@ -51,7 +50,6 @@ const FridgePage: React.FC<FridgePageProps> = ({ currentTheme, onThemeChange }) 
     setFormData({
       clientId: null,
       whyNeedFridge: '',
-      canMeetNeedOtherWay: '',
       reasonableSteps: '',
       supplierName: '',
       supplierId: '',

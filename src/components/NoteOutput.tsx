@@ -3,7 +3,7 @@ import { FoodFormData, ClothingFormData, TASGrantFormData, DeclareIncomeFormData
 
 interface NoteOutputProps {
   formData: any;
-  service?: 'food' | 'clothing' | 'electricity' | 'dental' | 'beds' | 'bedding' | 'furniture' | 'glasses' | 'fridge' | 'washing' | 'tas-grant' | 'declare-income';
+  service?: 'food' | 'clothing' | 'electricity' | 'dental' | 'beds' | 'bedding' | 'furniture' | 'glasses' | 'fridge' | 'washing' | 'tas-grant' | 'declare-income' | 'bond-rent';
   onReset: () => void;
 }
 
@@ -132,9 +132,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       if (c.whyNeedClothing) {
         note += `Why is the client needing clothing?\n${c.whyNeedClothing}\n`;
       }
-      if (c.canMeetNeedOtherWay) {
-        note += `Can client meet this need in any other way?\n${c.canMeetNeedOtherWay}\n`;
-      }
+
       note += '\n~~~ Payment ~~~\n';
       note += `Supplier Name: ${c.supplierName || '-'}\n`;
       note += `Supplier ID: ${c.supplierId || '-'}\n`;
@@ -165,6 +163,69 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       else if (c.decision === 'declined') note += 'APPLICATION DECLINED\n';
       if (c.decisionReason) note += `${c.decisionReason}\n`;
       return note;
+    } else if (service === 'bond-rent') {
+      // Bond/Rent in Advance note output
+      const b = formData;
+      let note = '';
+      note += `CCID: ${b.clientId === false ? 'No' : 'Yes'}\n\n`;
+      note += '~~~ Need ~~~\n';
+      if (b.whyNeedAccommodation) note += `Why is the client needing accommodation assistance?\n${b.whyNeedAccommodation}\n`;
+      if (b.newAddress) note += `What's the client's new address?\n${b.newAddress}\n`;
+      if (b.asZone) note += `AS Zone: ${b.asZone}\n`;
+      if (b.weeklyRent) note += `Weekly Rent: $${b.weeklyRent.toFixed(2)}\n`;
+      if (b.bondAmount) note += `How much bond does the client need help with?\n$${b.bondAmount.toFixed(2)}\n`;
+      if (b.rentInAdvanceAmount) note += `How much rent in advance does the client need help with?\n$${b.rentInAdvanceAmount.toFixed(2)}\n`;
+      if (b.tenancyAffordable) note += `Will this tenancy leave the client with enough leftover money to meet their weekly living costs?\n${b.tenancyAffordable}\n`;
+
+      
+      note += '\n~~~ Tenancy Details ~~~\n';
+      if (b.newAddress) note += `Address: ${b.newAddress}\n`;
+      if (b.asZone) note += `AS Zone: ${b.asZone}\n`;
+      if (b.weeklyRent) note += `Weekly Rent: $${b.weeklyRent.toFixed(2)}\n`;
+      if (b.tenancyStartDate) {
+        const date = new Date(b.tenancyStartDate);
+        const day = date.getDate().toString().padStart(2, '0');
+        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+        const year = date.getFullYear();
+        note += `Tenancy Start Date: ${day}/${month}/${year}\n`;
+      }
+      
+      note += '\n~~~ Payment ~~~\n';
+      note += `Supplier Name: ${b.supplierName || '-'}\n`;
+      note += `Supplier ID: ${b.supplierId || '-'}\n`;
+      note += `Bond Amount: $${b.bondAmount?.toFixed(2) || '0.00'}\n`;
+      note += `Rent in Advance Amount: $${b.rentInAdvanceAmount?.toFixed(2) || '0.00'}\n`;
+      note += `Total Amount: $${((b.bondAmount || 0) + (b.rentInAdvanceAmount || 0)).toFixed(2)}\n`;
+      note += `Recovery rate: $${b.recoveryRate?.toFixed(2) || '0.00'}\n`;
+      if (b.directCredit === 'yes' && b.paymentReference) {
+        note += `Reference number: ${b.paymentReference}\n`;
+      }
+      
+      note += '\n~~~ Tenancy Affordability ~~~\n';
+      if (b.income.benefit > 0) note += `$${b.income.benefit.toFixed(2)} Benefit\n`;
+      if (b.income.employment > 0) note += `$${b.income.employment.toFixed(2)} Employment\n`;
+      if (b.income.familyTaxCredit > 0) note += `$${b.income.familyTaxCredit.toFixed(2)} Family Tax Credit\n`;
+      if (b.income.childSupport > 0) note += `$${b.income.childSupport.toFixed(2)} Child Support\n`;
+      if (b.income.childDisabilityAllowance > 0) note += `$${b.income.childDisabilityAllowance.toFixed(2)} Child Disability Allowance\n`;
+      if (b.income.otherIncome > 0) note += `$${b.income.otherIncome.toFixed(2)} Other Income\n`;
+      b.costs.forEach((cost: { amount: number; cost: string }) => {
+        if (cost.amount > 0) note += `-$${cost.amount.toFixed(2)} ${cost.cost}\n`;
+      });
+      if (b.costs.length > 0) {
+        const totalIncome = (Object.values(b.income) as number[]).reduce((sum: number, value: number) => sum + (value || 0), 0);
+        const totalCosts = b.costs.reduce((sum: number, cost: { amount: number; cost: string }) => sum + (cost.amount || 0), 0);
+        const remainingIncome = totalIncome - totalCosts;
+        note += '--------------\n';
+        note += `Client is left with $${remainingIncome.toFixed(2)}\n`;
+      }
+      
+      note += '\n~~~ Reasonable Steps ~~~\n';
+      if (b.reasonableSteps) note += `${b.reasonableSteps}\n`;
+      note += '\n~~~ Outcome ~~~\n';
+      if (b.decision === 'approved') note += 'APPLICATION APPROVED\n';
+      else if (b.decision === 'declined') note += 'APPLICATION DECLINED\n';
+      if (b.decisionReason) note += `${b.decisionReason}\n`;
+      return note;
     } else if (service === 'electricity') {
       // Electricity note output (similar to clothing)
       const e = formData;
@@ -172,7 +233,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       note += `CCID: ${e.clientId === false ? 'No' : 'Yes'}\n\n`;
       note += '~~~ Need ~~~\n';
       if (e.whyNeedPower) note += `Why is the client needing power assistance?\n${e.whyNeedPower}\n`;
-      if (e.canMeetNeedOtherWay) note += `Can client meet this need in any other way?\n${e.canMeetNeedOtherWay}\n`;
+
       note += `Power Account Number: ${e.powerAccountNumber || '-'}\n`;
       note += '\n~~~ Payment ~~~\n';
       note += `Supplier Name: ${e.supplierName || '-'}\n`;
@@ -213,7 +274,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       note += `CCID: ${d.clientId === false ? 'No' : 'Yes'}\n\n`;
       note += '~~~ Need ~~~\n';
       if (d.whyNeedDental) note += `Why is the client needing dental assistance?\n${d.whyNeedDental}\n`;
-      if (d.canMeetNeedOtherWay) note += `Can client meet this need in any other way?\n${d.canMeetNeedOtherWay}\n`;
+
       note += '\n~~~ Payment ~~~\n';
       note += `Supplier Name: ${d.supplierName || '-'}\n`;
       note += `Supplier ID: ${d.supplierId || '-'}\n`;
@@ -259,7 +320,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       note += `CCID: ${b.clientId === false ? 'No' : 'Yes'}\n\n`;
       note += '~~~ Need ~~~\n';
       if (b.whyNeedBeds) note += `Why is the client needing beds?\n${b.whyNeedBeds}\n`;
-      if (b.canMeetNeedOtherWay) note += `Can client meet this need in any other way?\n${b.canMeetNeedOtherWay}\n`;
+
       note += '\n~~~ Payment ~~~\n';
       note += `Supplier Name: ${b.supplierName || '-'}\n`;
       note += `Supplier ID: ${b.supplierId || '-'}\n`;
@@ -300,7 +361,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       note += '~~~ Need ~~~\n';
       if (f.whyNeedFurniture) note += `Why is the client needing furniture?\n${f.whyNeedFurniture}\n`;
       if (f.furnitureType) note += `Client is requesting help with a ${f.furnitureType}\n`;
-      if (f.canMeetNeedOtherWay) note += `Can client meet this need in any other way?\n${f.canMeetNeedOtherWay}\n`;
+
       note += '\n~~~ Payment ~~~\n';
       note += `Supplier Name: ${f.supplierName || '-'}\n`;
       note += `Supplier ID: ${f.supplierId || '-'}\n`;
@@ -340,7 +401,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       note += `CCID: ${b.clientId === false ? 'No' : 'Yes'}\n\n`;
       note += '~~~ Need ~~~\n';
       if (b.whyNeedBedding) note += `Why is the client needing bedding?\n${b.whyNeedBedding}\n`;
-      if (b.canMeetNeedOtherWay) note += `Can client meet this need in any other way?\n${b.canMeetNeedOtherWay}\n`;
+
       if (b.beddingSngEligible === 'yes') {
         note += '\nClient qualifies for bedding SNG\n';
         if (b.beddingSngReason) note += `Reason: ${b.beddingSngReason}\n`;
@@ -384,7 +445,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       note += `CCID: ${g.clientId === false ? 'No' : 'Yes'}\n\n`;
       note += '~~~ Need ~~~\n';
       if (g.whyNeedGlasses) note += `Why is the client needing glasses?\n${g.whyNeedGlasses}\n`;
-      if (g.canMeetNeedOtherWay) note += `Can client meet this need in any other way?\n${g.canMeetNeedOtherWay}\n`;
+
       note += '\n~~~ Payment ~~~\n';
       note += `Supplier Name: ${g.supplierName || '-'}\n`;
       note += `Supplier ID: ${g.supplierId || '-'}\n`;
@@ -422,7 +483,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       note += `CCID: ${f.clientId === false ? 'No' : 'Yes'}\n\n`;
       note += '~~~ Need ~~~\n';
       if (f.whyNeedFridge) note += `Why is the client needing a fridge?\n${f.whyNeedFridge}\n`;
-      if (f.canMeetNeedOtherWay) note += `Can client meet this need in any other way?\n${f.canMeetNeedOtherWay}\n`;
+
       if (f.reasonableSteps) note += `What reasonable steps is the client taken to improve their situation?\n${f.reasonableSteps}\n`;
       
       // Whiteware Info section
@@ -477,7 +538,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       note += `CCID: ${w.clientId === false ? 'No' : 'Yes'}\n\n`;
       note += '~~~ Need ~~~\n';
       if (w.whyNeedWashingMachine) note += `Why is the client needing a washing machine?\n${w.whyNeedWashingMachine}\n`;
-      if (w.canMeetNeedOtherWay) note += `Can client meet this need in any other way?\n${w.canMeetNeedOtherWay}\n`;
+
       if (w.reasonableSteps) note += `What reasonable steps is the client taken to improve their situation?\n${w.reasonableSteps}\n`;
       
       // Whiteware Info section
@@ -535,7 +596,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       note += `CCID: ${f.clientId === false ? 'No' : 'Yes'}\n\n`;
       note += '~~~ Need ~~~\n';
       if (f.whyNeedFood) note += `Why is client needing food?\n${f.whyNeedFood}\n`;
-      if (f.canMeetNeedOtherWay) note += `Can client meet this need in any other way?\n${f.canMeetNeedOtherWay}\n`;
+
       if (f.currentFoodBalance > 0) {
         note += `Food balance: $${f.currentFoodBalance.toFixed(2)}\n`;
         if (f.hardshipUnforeseen === 'yes' && f.unforeseenCircumstance) {

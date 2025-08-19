@@ -7,7 +7,6 @@ import ThemeSelector from './ThemeSelector';
 interface BedsFormData {
   clientId: boolean | null;
   whyNeedBeds: string;
-  canMeetNeedOtherWay: string;
   reasonableSteps: string;
   supplierName: string;
   supplierId: string;
@@ -49,7 +48,6 @@ const BedsPage: React.FC<BedsPageProps> = ({ currentTheme, onThemeChange }) => {
   const [formData, setFormData] = useState<BedsFormData>({
     clientId: null,
     whyNeedBeds: '',
-    canMeetNeedOtherWay: '',
     reasonableSteps: '',
     supplierName: '',
     supplierId: '',
@@ -86,7 +84,7 @@ const BedsPage: React.FC<BedsPageProps> = ({ currentTheme, onThemeChange }) => {
     setFormData({
       clientId: null,
       whyNeedBeds: '',
-      canMeetNeedOtherWay: '',
+
       reasonableSteps: '',
       supplierName: '',
       supplierId: '',

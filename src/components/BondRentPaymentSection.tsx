@@ -1,83 +1,65 @@
 import React, { useEffect, useRef, useState } from 'react';
 
-interface PaymentSectionProps {
+interface BondRentPaymentSectionProps {
   supplierName: string;
   supplierId: string;
-  amount: number;
+  bondAmount: number;
+  rentAdvanceAmount: number;
   recoveryRate: number;
   directCredit: string;
   paymentReference: string;
   onSupplierNameChange: (name: string) => void;
   onSupplierIdChange: (id: string) => void;
-  onAmountChange: (amount: number) => void;
+  onBondAmountChange: (amount: number) => void;
+  onRentAdvanceAmountChange: (amount: number) => void;
   onRecoveryRateChange: (rate: number) => void;
   onDirectCreditChange: (credit: string) => void;
   onPaymentReferenceChange: (reference: string) => void;
   sectionNumber?: number;
   isVisible?: boolean;
-  totalAmount?: number;
-  showBondRentInputs?: boolean;
-  bondAmount?: number;
-  rentAdvanceAmount?: number;
-  onBondAmountChange?: (amount: number) => void;
-  onRentAdvanceAmountChange?: (amount: number) => void;
 }
 
 function roundToNearest50Cents(value: number) {
   return Math.round(value * 2) / 2;
 }
 
-const PaymentSection: React.FC<PaymentSectionProps> = ({
+const BondRentPaymentSection: React.FC<BondRentPaymentSectionProps> = ({
   supplierName,
   supplierId,
-  amount,
+  bondAmount,
+  rentAdvanceAmount,
   recoveryRate,
   directCredit,
   paymentReference,
   onSupplierNameChange,
   onSupplierIdChange,
-  onAmountChange,
+  onBondAmountChange,
+  onRentAdvanceAmountChange,
   onRecoveryRateChange,
   onDirectCreditChange,
   onPaymentReferenceChange,
   sectionNumber = 3,
-  isVisible = false,
-  totalAmount,
-  showBondRentInputs = false,
-  bondAmount = 0,
-  rentAdvanceAmount = 0,
-  onBondAmountChange,
-  onRentAdvanceAmountChange
+  isVisible = false
 }) => {
   // Track if user has manually changed recovery rate
   const [userOverridden, setUserOverridden] = useState(false);
-  const prevAmount = useRef(amount);
+  const prevBondAmount = useRef(bondAmount);
+  const prevRentAmount = useRef(rentAdvanceAmount);
+
+  const totalAmount = bondAmount + rentAdvanceAmount;
 
   useEffect(() => {
-    // If amount changes and user hasn't overridden, auto-calculate recovery rate
-    if (!userOverridden && amount > 0) {
-      const calculated = roundToNearest50Cents(amount / 104);
+    // If amounts change and user hasn't overridden, auto-calculate recovery rate
+    if (!userOverridden && totalAmount > 0) {
+      const calculated = roundToNearest50Cents(totalAmount / 104);
       if (calculated !== recoveryRate) {
         onRecoveryRateChange(calculated);
       }
     }
-    prevAmount.current = amount;
+    prevBondAmount.current = bondAmount;
+    prevRentAmount.current = rentAdvanceAmount;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [amount]);
-
-  // For bond/rent, calculate recovery rate based on combined amount
-  useEffect(() => {
-    if (showBondRentInputs && !userOverridden) {
-      const combinedAmount = bondAmount + rentAdvanceAmount;
-      if (combinedAmount > 0) {
-        const calculated = roundToNearest50Cents(combinedAmount / 104);
-        if (calculated !== recoveryRate) {
-          onRecoveryRateChange(calculated);
-        }
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [bondAmount, rentAdvanceAmount, showBondRentInputs]);
+  }, [bondAmount, rentAdvanceAmount]);
 
   // If user manually changes recovery rate, set override flag
   const handleRecoveryRateChange = (value: number) => {
@@ -97,9 +79,6 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
     recoveryRate === 0 || recoveryRate === undefined || isNaN(recoveryRate)
       ? ''
       : recoveryRate.toFixed(2);
-
-  // Use totalAmount for input if provided, otherwise fallback to amount
-  const displayAmount = typeof totalAmount === 'number' ? totalAmount : amount;
 
   return (
     <div className={`form-section-card ${isVisible ? 'section-visible' : ''}`} data-section="payment">
@@ -128,69 +107,46 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
             placeholder="Supplier ID"
           />
         </div>
-        {showBondRentInputs ? (
-          <>
-            <div className="form-group">
-              <label>Bond Amount</label>
-              <div className="dollar-input">
-                <input
-                  type="number"
-                  className="form-control"
-                  value={bondAmount || ''}
-                  onChange={(e) => onBondAmountChange?.(parseFloat(e.target.value) || 0)}
-                  placeholder="0.00"
-                  step="0.01"
-                  min="0"
-                />
-              </div>
-            </div>
-            <div className="form-group">
-              <label>Rent in Advance Amount</label>
-              <div className="dollar-input">
-                <input
-                  type="number"
-                  className="form-control"
-                  value={rentAdvanceAmount || ''}
-                  onChange={(e) => onRentAdvanceAmountChange?.(parseFloat(e.target.value) || 0)}
-                  placeholder="0.00"
-                  step="0.01"
-                  min="0"
-                />
-              </div>
-            </div>
-            <div className="form-group">
-              <label>Total Amount (Bond + Rent Advance)</label>
-              <div className="dollar-input">
-                <input
-                  type="number"
-                  className="form-control"
-                  value={displayAmount || ''}
-                  onChange={(e) => onAmountChange(parseFloat(e.target.value) || 0)}
-                  placeholder="0.00"
-                  step="0.01"
-                  min="0"
-                />
-              </div>
-            </div>
-          </>
-        ) : (
-          <div className="form-group">
-            <label>
-              Amount{typeof totalAmount === 'number' ? ` (Total Cost: $${totalAmount.toFixed(2)})` : ''}
-            </label>
-            <div className="dollar-input">
-              <input
-                type="number"
-                className="form-control"
-                value={displayAmount || ''}
-                onChange={(e) => onAmountChange(parseFloat(e.target.value) || 0)}
-                placeholder="0.00"
-                step="0.01"
-                min="0"
-              />
-            </div>
+        <div className="form-group">
+          <label>Bond Amount</label>
+          <div className="dollar-input">
+            <input
+              type="number"
+              className="form-control"
+              value={bondAmount || ''}
+              onChange={(e) => onBondAmountChange(parseFloat(e.target.value) || 0)}
+              placeholder="0.00"
+              step="0.01"
+              min="0"
+            />
           </div>
-        )}
+        </div>
+        <div className="form-group">
+          <label>Rent in Advance Amount</label>
+          <div className="dollar-input">
+            <input
+              type="number"
+              className="form-control"
+              value={rentAdvanceAmount || ''}
+              onChange={(e) => onRentAdvanceAmountChange(parseFloat(e.target.value) || 0)}
+              placeholder="0.00"
+              step="0.01"
+              min="0"
+            />
+          </div>
+        </div>
+        <div className="form-group">
+          <label>Total Amount (Bond + Rent Advance)</label>
+          <div className="dollar-input">
+            <input
+              type="number"
+              className="form-control"
+              value={totalAmount || ''}
+              disabled
+              style={{ backgroundColor: 'var(--background-secondary)', color: 'var(--text-secondary)' }}
+            />
+          </div>
+        </div>
         <div className="form-group">
           <label>Recovery rate</label>
           <div className="dollar-input">
@@ -245,4 +201,4 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
   );
 };
 
-export default PaymentSection; 
+export default BondRentPaymentSection;

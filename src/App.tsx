@@ -11,6 +11,7 @@ import FurniturePage from './components/FurniturePage';
 import GlassesPage from './components/GlassesPage';
 import FridgePage from './components/FridgePage';
 import WashingMachinePage from './components/WashingMachinePage';
+import BondRentPage from './components/BondRentPage';
 import TASGrantPage from './components/TASGrantPage';
 import DeclareIncomePage from './components/DeclareIncomePage';
 import PetrolCalculator from './components/PetrolCalculator';
@@ -25,7 +26,6 @@ export interface Service {
 export interface FoodFormData {
   clientId: boolean | null;
   whyNeedFood: string;
-  canMeetNeedOtherWay: string;
   currentFoodBalance: number;
   foodAmountRequested: number;
   hardshipUnforeseen: string;
@@ -50,7 +50,6 @@ export interface FoodFormData {
 export interface ClothingFormData {
   clientId: boolean | null;
   whyNeedClothing: string;
-  canMeetNeedOtherWay: string;
   reasonableSteps: string;
   supplierName: string;
   supplierId: string;
@@ -74,10 +73,43 @@ export interface ClothingFormData {
   decisionReason: string;
 }
 
+export interface BondRentFormData {
+  clientId: boolean | null;
+  whyNeedAccommodation: string;
+  newAddress: string;
+  asZone: number;
+  weeklyRent: number;
+  tenancyStartDate: string;
+  bondAmount: number;
+  rentInAdvanceAmount: number;
+  reasonableSteps: string;
+  tenancyAffordable: string;
+  supplierName: string;
+  supplierId: string;
+  bondPaymentAmount: number;
+  rentAdvancePaymentAmount: number;
+  recoveryRate: number;
+  directCredit: string;
+  paymentReference: string;
+  income: {
+    benefit: number;
+    employment: number;
+    familyTaxCredit: number;
+    childSupport: number;
+    childDisabilityAllowance: number;
+    otherIncome: number;
+  };
+  costs: Array<{
+    amount: number;
+    cost: string;
+  }>;
+  decision: string;
+  decisionReason: string;
+}
+
 export interface GlassesFormData {
   clientId: boolean | null;
   whyNeedGlasses: string;
-  canMeetNeedOtherWay: string;
   reasonableSteps: string;
   supplierName: string;
   supplierId: string;
@@ -104,7 +136,6 @@ export interface GlassesFormData {
 export interface FridgeFormData {
   clientId: boolean | null;
   whyNeedFridge: string;
-  canMeetNeedOtherWay: string;
   reasonableSteps: string;
   supplierName: string;
   supplierId: string;
@@ -139,7 +170,6 @@ export interface FridgeFormData {
 export interface WashingMachineFormData {
   clientId: boolean | null;
   whyNeedWashingMachine: string;
-  canMeetNeedOtherWay: string;
   reasonableSteps: string;
   supplierName: string;
   supplierId: string;
@@ -281,6 +311,10 @@ function App() {
       <Route 
         path="/washing" 
         element={<WashingMachinePage currentTheme={currentTheme} onThemeChange={setCurrentTheme} />} 
+      />
+      <Route 
+        path="/bond" 
+        element={<BondRentPage currentTheme={currentTheme} onThemeChange={setCurrentTheme} />} 
       />
       <Route 
         path="/tas-grant" 

@@ -7,7 +7,6 @@ import ThemeSelector from './ThemeSelector';
 interface BeddingFormData {
   clientId: boolean | null;
   whyNeedBedding: string;
-  canMeetNeedOtherWay: string;
   reasonableSteps: string;
   supplierName: string;
   supplierId: string;
@@ -41,7 +40,6 @@ const BeddingPage: React.FC<BeddingPageProps> = ({ currentTheme, onThemeChange }
   const [formData, setFormData] = useState<BeddingFormData>({
     clientId: null,
     whyNeedBedding: '',
-    canMeetNeedOtherWay: '',
     reasonableSteps: '',
     supplierName: '',
     supplierId: '',
@@ -70,7 +68,6 @@ const BeddingPage: React.FC<BeddingPageProps> = ({ currentTheme, onThemeChange }
     setFormData({
       clientId: null,
       whyNeedBedding: '',
-      canMeetNeedOtherWay: '',
       reasonableSteps: '',
       supplierName: '',
       supplierId: '',
