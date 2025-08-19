@@ -1,41 +1,9 @@
 import React, { useEffect, useState } from 'react';
+import { BondRentFormData } from '../App';
 import IncomeSection, { IncomeLabels } from './IncomeSection';
 import BondRentPaymentSection from './BondRentPaymentSection';
 import DecisionSection from './DecisionSection';
 import Calendar from './Calendar';
-
-interface BondRentFormData {
-  clientId: boolean | null;
-  newAddress: string;
-  asZone: number;
-  weeklyRent: number;
-  bondAmount: number;
-  rentInAdvanceAmount: number;
-  canMeetNeedOtherWay: string;
-  reasonableSteps: string;
-  tenancyAffordable: string;
-  supplierName: string;
-  supplierId: string;
-  bondPaymentAmount: number;
-  rentAdvancePaymentAmount: number;
-  recoveryRate: number;
-  directCredit: string; // 'yes' | 'no' | ''
-  paymentReference: string;
-  income: {
-    benefit: number;
-    employment: number;
-    familyTaxCredit: number;
-    childSupport: number;
-    childDisabilityAllowance: number;
-    otherIncome: number;
-  };
-  costs: Array<{
-    amount: number;
-    cost: string;
-  }>;
-  decision: string;
-  decisionReason: string;
-}
 
 interface BondRentQuestionsProps {
   formData: BondRentFormData;
@@ -266,29 +234,7 @@ const BondRentQuestions: React.FC<BondRentQuestionsProps> = ({ formData, onFormD
             </label>
           </div>
         </div>
-        <div className="form-group">
-          <label>Can client meet this need in any other way?</label>
-          <div className="radio-group">
-            <label className={`radio-btn ${formData.canMeetNeedOtherWay === 'yes' ? 'selected' : ''}`}>Yes
-              <input
-                type="checkbox"
-                name="canMeetNeedOtherWayYes"
-                checked={formData.canMeetNeedOtherWay === 'yes'}
-                onChange={() => handleInputChange('canMeetNeedOtherWay', formData.canMeetNeedOtherWay === 'yes' ? '' : 'yes')}
-                className="visually-hidden"
-              />
-            </label>
-            <label className={`radio-btn ${formData.canMeetNeedOtherWay === 'no' ? 'selected' : ''}`}>No
-              <input
-                type="checkbox"
-                name="canMeetNeedOtherWayNo"
-                checked={formData.canMeetNeedOtherWay === 'no'}
-                onChange={() => handleInputChange('canMeetNeedOtherWay', formData.canMeetNeedOtherWay === 'no' ? '' : 'no')}
-                className="visually-hidden"
-              />
-            </label>
-          </div>
-        </div>
+
         <div className="form-group">
           <label>What reasonable steps is the client taking to improve their situation?</label>
           <textarea
