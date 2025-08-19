@@ -8,6 +8,7 @@ interface BeddingFormData {
   clientId: boolean | null;
   whyNeedBedding: string;
   reasonableSteps: string;
+  canMeetNeedOtherWay: string;
   supplierName: string;
   supplierId: string;
   amount: number;
@@ -41,6 +42,7 @@ const BeddingPage: React.FC<BeddingPageProps> = ({ currentTheme, onThemeChange }
     clientId: null,
     whyNeedBedding: '',
     reasonableSteps: '',
+    canMeetNeedOtherWay: '',
     supplierName: '',
     supplierId: '',
     amount: 0,
@@ -69,6 +71,7 @@ const BeddingPage: React.FC<BeddingPageProps> = ({ currentTheme, onThemeChange }
       clientId: null,
       whyNeedBedding: '',
       reasonableSteps: '',
+      canMeetNeedOtherWay: '',
       supplierName: '',
       supplierId: '',
       amount: 0,

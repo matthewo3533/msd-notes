@@ -16,6 +16,7 @@ const GlassesPage: React.FC<GlassesPageProps> = ({ currentTheme, onThemeChange }
     clientId: null,
     whyNeedGlasses: '',
     reasonableSteps: '',
+    canMeetNeedOtherWay: '',
     supplierName: '',
     supplierId: '',
     amount: 280, // Default amount for glasses
@@ -44,6 +45,7 @@ const GlassesPage: React.FC<GlassesPageProps> = ({ currentTheme, onThemeChange }
       clientId: null,
       whyNeedGlasses: '',
       reasonableSteps: '',
+      canMeetNeedOtherWay: '',
       supplierName: '',
       supplierId: '',
       amount: 280, // Default amount for glasses

@@ -51,6 +51,7 @@ export interface ClothingFormData {
   clientId: boolean | null;
   whyNeedClothing: string;
   reasonableSteps: string;
+  canMeetNeedOtherWay: string;
   supplierName: string;
   supplierId: string;
   amount: number;
@@ -111,6 +112,7 @@ export interface GlassesFormData {
   clientId: boolean | null;
   whyNeedGlasses: string;
   reasonableSteps: string;
+  canMeetNeedOtherWay: string;
   supplierName: string;
   supplierId: string;
   amount: number;
@@ -137,6 +139,7 @@ export interface FridgeFormData {
   clientId: boolean | null;
   whyNeedFridge: string;
   reasonableSteps: string;
+  canMeetNeedOtherWay: string;
   supplierName: string;
   supplierId: string;
   amount: number;
@@ -171,6 +174,7 @@ export interface WashingMachineFormData {
   clientId: boolean | null;
   whyNeedWashingMachine: string;
   reasonableSteps: string;
+  canMeetNeedOtherWay: string;
   supplierName: string;
   supplierId: string;
   amount: number;
@@ -205,6 +209,7 @@ export interface BedsFormData {
   clientId: boolean | null;
   whyNeedBeds: string;
   reasonableSteps: string;
+  canMeetNeedOtherWay: string;
   supplierName: string;
   supplierId: string;
   amount: number;
@@ -231,6 +236,7 @@ export interface BeddingFormData {
   clientId: boolean | null;
   whyNeedBedding: string;
   reasonableSteps: string;
+  canMeetNeedOtherWay: string;
   supplierName: string;
   supplierId: string;
   amount: number;
@@ -257,6 +263,7 @@ export interface FurnitureFormData {
   clientId: boolean | null;
   whyNeedFurniture: string;
   reasonableSteps: string;
+  canMeetNeedOtherWay: string;
   supplierName: string;
   supplierId: string;
   amount: number;
@@ -283,6 +290,7 @@ export interface DentalFormData {
   clientId: boolean | null;
   whyNeedDental: string;
   reasonableSteps: string;
+  canMeetNeedOtherWay: string;
   sngEligible: string;
   sngBalance: number;
   supplierName: string;
@@ -311,6 +319,7 @@ export interface ElectricityFormData {
   clientId: boolean | null;
   whyNeedPower: string;
   reasonableSteps: string;
+  canMeetNeedOtherWay: string;
   supplierName: string;
   supplierId: string;
   amount: number;

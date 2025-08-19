@@ -8,6 +8,7 @@ export interface FurnitureFormData {
   whyNeedFurniture: string;
   furnitureType: string;
   reasonableSteps: string;
+  canMeetNeedOtherWay: string;
   supplierName: string;
   supplierId: string;
   amount: number;
