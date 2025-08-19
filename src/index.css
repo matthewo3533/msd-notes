@@ -1200,6 +1200,39 @@ input[type="number"] {
   background-clip: text;
 }
 
+/* Enhanced section headers for petrol calculator */
+.form-section-card .section-header {
+  margin-top: 2rem;
+  margin-bottom: 1.5rem;
+  padding: 1rem 0;
+  border-bottom: 3px solid var(--border-secondary);
+  position: relative;
+}
+
+.form-section-card .section-header:first-child {
+  margin-top: 0;
+}
+
+.form-section-card .section-header h3 {
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  position: relative;
+  padding-left: 1rem;
+}
+
+.form-section-card .section-header h3::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 70%;
+  background: var(--accent-gradient);
+  border-radius: 2px;
+}
+
 .section-number {
   background: var(--accent-gradient);
   color: white;
@@ -2306,6 +2339,114 @@ input[type="number"] {
   }
 }
 
+/* Location Input Styles */
+.location-input-container {
+  position: relative;
+  z-index: 1;
+  margin-bottom: 1rem;
+}
+
+.location-suggestions {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-secondary);
+  border-radius: 8px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 9999;
+  margin-top: 2px;
+  backdrop-filter: blur(10px);
+}
+
+/* Ensure form sections can scroll when suggestions appear */
+.form-section-card {
+  overflow: visible;
+  position: relative;
+}
+
+/* Add spacing below location inputs to prevent overlap */
+.form-group:has(.location-input-container) {
+  margin-bottom: 2rem;
+}
+
+/* Ensure the form container can handle dynamic content */
+.form-sections-container {
+  overflow: visible;
+}
+
+/* Dynamic spacer for suggestions */
+.suggestions-spacer {
+  transition: height 0.3s ease;
+  margin-bottom: 0.5rem;
+}
+
+.distance-note {
+  margin-top: 0.75rem;
+  padding: 0.75rem;
+  background: var(--bg-tertiary);
+  border-radius: 8px;
+  border-left: 3px solid var(--accent-gradient);
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.distance-note small {
+  display: block;
+}
+
+.location-suggestion {
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  border-bottom: 1px solid var(--border-secondary);
+  transition: background-color 0.2s ease;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+}
+
+.location-suggestion:last-child {
+  border-bottom: none;
+}
+
+.location-suggestion:hover {
+  background: var(--bg-tertiary);
+}
+
+.location-suggestion:active {
+  background: var(--border-secondary);
+}
+
+.loading-message {
+  text-align: center;
+  padding: 0.75rem;
+  color: var(--text-secondary);
+  font-style: italic;
+  background: var(--bg-tertiary);
+  border-radius: 8px;
+  margin: 0.5rem 0;
+}
+
+.error-message {
+  text-align: center;
+  padding: 0.75rem;
+  color: #dc2626;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  margin: 0.5rem 0;
+  font-size: 0.9rem;
+}
+
+.dark-mode .error-message {
+  background: #1f1f1f;
+  border-color: #dc2626;
+  color: #fca5a5;
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .quick-copy-section {
@@ -2321,6 +2462,177 @@ input[type="number"] {
     padding: 1rem;
     font-size: 1rem;
   }
+  
+  .location-suggestions {
+    max-height: 150px;
+  }
+  
+  .location-suggestion {
+    padding: 1rem;
+    font-size: 1rem;
+  }
+  
+  /* Mobile-specific location input improvements */
+  .location-input-container {
+    margin-bottom: 1.5rem;
+  }
+  
+  .suggestions-spacer {
+    margin-bottom: 1rem;
+  }
 } 
+
+/* What's New Section Styles */
+.whats-new-section {
+  margin-top: 3rem;
+  padding: 2rem;
+  background: var(--bg-secondary);
+  border-radius: 16px;
+  border: 2px solid var(--border-secondary);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.whats-new-section h2 {
+  text-align: center;
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 2rem;
+  color: var(--text-primary);
+  position: relative;
+}
+
+.whats-new-section h2::after {
+  content: '';
+  position: absolute;
+  bottom: -0.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 3px;
+  background: var(--accent-gradient);
+  border-radius: 2px;
+}
+
+.whats-new-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.whats-new-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1.5rem;
+  background: var(--bg-primary);
+  border-radius: 12px;
+  border: 1px solid var(--border-secondary);
+  transition: all 0.3s ease;
+}
+
+.whats-new-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  border-color: var(--accent-gradient);
+}
+
+.whats-new-icon {
+  font-size: 2rem;
+  flex-shrink: 0;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-tertiary);
+  border-radius: 12px;
+  border: 2px solid var(--border-secondary);
+}
+
+.whats-new-text {
+  flex: 1;
+}
+
+.whats-new-text strong {
+  display: block;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.whats-new-text p {
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  font-size: 0.95rem;
+}
+
+/* Responsive design for What's New section */
+@media (max-width: 768px) {
+  .whats-new-section {
+    margin-top: 2rem;
+    padding: 1.5rem;
+  }
+  
+  .whats-new-section h2 {
+    font-size: 1.75rem;
+  }
+  
+  .whats-new-item {
+    flex-direction: column;
+    text-align: center;
+    padding: 1.25rem;
+  }
+  
+  .whats-new-icon {
+    align-self: center;
+    width: 50px;
+    height: 50px;
+    font-size: 1.5rem;
+  }
+  
+  .whats-new-text strong {
+    font-size: 1rem;
+  }
+  
+  .whats-new-text p {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .whats-new-section {
+    padding: 1rem;
+  }
+  
+  .whats-new-section h2 {
+    font-size: 1.5rem;
+  }
+  
+  .whats-new-item {
+    padding: 1rem;
+  }
+}
+
+/* Override tip-box styling for petrol calculator to make it less bright */
+.petrol-calculator .tip-box {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-secondary);
+  box-shadow: var(--shadow-primary);
+}
+
+.petrol-calculator .tip-box::before {
+  content: '💡';
+  margin-right: 0.5rem;
+  font-size: 1rem;
+  opacity: 0.7;
+}
+
+.petrol-calculator .tip-box strong {
+  font-weight: 600;
+  color: var(--text-primary);
+}
 
  

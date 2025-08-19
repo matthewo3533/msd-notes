@@ -2,9 +2,48 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ThemeSelector from './ThemeSelector';
 
+// Google Maps API TypeScript declarations
+declare global {
+  interface Window {
+    google: {
+      maps: {
+        places: {
+          AutocompleteService: new () => any;
+          PlacesService: new (div: HTMLElement) => any;
+          PlacesServiceStatus: {
+            OK: string;
+          };
+        };
+        Geocoder: new () => any;
+        GeocoderStatus: {
+          OK: string;
+        };
+        DistanceMatrixService: new () => any;
+        DistanceMatrixStatus: {
+          OK: string;
+          NOT_FOUND: string;
+          ZERO_RESULTS: string;
+        };
+        TravelMode: {
+          DRIVING: string;
+        };
+        UnitSystem: {
+          METRIC: string;
+        };
+      };
+    };
+  }
+}
+
 interface CarData {
   Model: string;
   'L/100km': number;
+}
+
+interface Location {
+  placeId: string;
+  description: string;
+  coordinates?: { lat: number; lng: number };
 }
 
 interface PetrolCalculatorProps {
@@ -25,7 +64,12 @@ const PetrolCalculator: React.FC<PetrolCalculatorProps> = ({
     petrolCost: '',
     vehicleMileage: '',
     selectedCar: '',
-    carSearchTerm: ''
+    carSearchTerm: '',
+    fromLocation: '',
+    toLocation: '',
+    fromLocationData: null as Location | null,
+    toLocationData: null as Location | null,
+    useLocationCalculation: false
   });
   const [carData, setCarData] = useState<CarData[]>([]);
   const [filteredCars, setFilteredCars] = useState<CarData[]>([]);
@@ -33,6 +77,65 @@ const PetrolCalculator: React.FC<PetrolCalculatorProps> = ({
   const [calculatedCost, setCalculatedCost] = useState<number | null>(null);
   const [visibleSections, setVisibleSections] = useState<Set<string>>(new Set());
   const sectionRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
+  
+  // Google Places API state
+  const [fromLocationSuggestions, setFromLocationSuggestions] = useState<Location[]>([]);
+  const [toLocationSuggestions, setToLocationSuggestions] = useState<Location[]>([]);
+  const [showFromSuggestions, setShowFromSuggestions] = useState(false);
+  const [showToSuggestions, setShowToSuggestions] = useState(false);
+  const [isCalculatingDistance, setIsCalculatingDistance] = useState(false);
+  const [distanceCalculationError, setDistanceCalculationError] = useState<string>('');
+  const [showDistanceError, setShowDistanceError] = useState(false);
+  
+  // Layout management for suggestions
+  const [suggestionsHeight, setSuggestionsHeight] = useState(0);
+  
+  // Cache for distance calculations to minimize API calls
+  const distanceCache = useRef<Map<string, number>>(new Map());
+  
+  // Google Places API configuration
+  const GOOGLE_API_KEY = (import.meta as any).env?.VITE_GOOGLE_API_KEY || '';
+  
+  // Google Places service references
+  const placesService = useRef<any>(null);
+  const autocompleteService = useRef<any>(null);
+  const geocoder = useRef<any>(null);
+  const distanceMatrixService = useRef<any>(null);
+
+  // Load Google Places API
+  useEffect(() => {
+    if (!GOOGLE_API_KEY) {
+      console.error('Google Places API key not found. Please set VITE_GOOGLE_API_KEY in your .env file');
+      return;
+    }
+
+    const loadGooglePlacesAPI = () => {
+      if (window.google && window.google.maps) {
+        autocompleteService.current = new window.google.maps.places.AutocompleteService();
+        placesService.current = new window.google.maps.places.PlacesService(document.createElement('div'));
+        geocoder.current = new window.google.maps.Geocoder();
+        distanceMatrixService.current = new window.google.maps.DistanceMatrixService();
+        return;
+      }
+      
+      // If Google Maps API is not loaded, load it
+      const script = document.createElement('script');
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_API_KEY}&libraries=places`;
+      script.async = true;
+      script.defer = true;
+      script.onload = () => {
+        if (window.google && window.google.maps) {
+          autocompleteService.current = new window.google.maps.places.AutocompleteService();
+          placesService.current = new window.google.maps.places.PlacesService(document.createElement('div'));
+          geocoder.current = new window.google.maps.Geocoder();
+          distanceMatrixService.current = new window.google.maps.DistanceMatrixService();
+        }
+      };
+      document.head.appendChild(script);
+    };
+
+    loadGooglePlacesAPI();
+  }, [GOOGLE_API_KEY]);
 
   // Intersection Observer for scroll animations
   useEffect(() => {
@@ -137,6 +240,30 @@ const PetrolCalculator: React.FC<PetrolCalculatorProps> = ({
     }
   }, [showCarDropdown]);
 
+  // Close location suggestions when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Element;
+      if (!target.closest('.location-input-container')) {
+        setShowFromSuggestions(false);
+        setShowToSuggestions(false);
+        setFromLocationSuggestions([]);
+        setToLocationSuggestions([]);
+        // Only reset height if no suggestions are visible
+        if (!showFromSuggestions && !showToSuggestions) {
+          setSuggestionsHeight(0);
+        }
+      }
+    };
+
+    if (showFromSuggestions || showToSuggestions) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => {
+        document.removeEventListener('mousedown', handleClickOutside);
+      };
+    }
+  }, [showFromSuggestions, showToSuggestions]);
+
   // Calculate cost when form data changes
   useEffect(() => {
     if (formData.distance && formData.petrolCost && (formData.vehicleMileage || formData.selectedCar)) {
@@ -196,9 +323,223 @@ const PetrolCalculator: React.FC<PetrolCalculatorProps> = ({
       petrolCost: '',
       vehicleMileage: '',
       selectedCar: '',
-      carSearchTerm: ''
+      carSearchTerm: '',
+      fromLocation: '',
+      toLocation: '',
+      fromLocationData: null,
+      toLocationData: null,
+      useLocationCalculation: false
     });
     setCalculatedCost(null);
+    setDistanceCalculationError('');
+    setShowDistanceError(false);
+    setFromLocationSuggestions([]);
+    setToLocationSuggestions([]);
+  };
+
+  // Google Places API functions
+  const searchPlaces = async (query: string): Promise<Location[]> => {
+    if (!query.trim() || query.length < 3) return [];
+    
+    if (!autocompleteService.current) {
+      console.error('Google Places API not loaded yet');
+      return [];
+    }
+    
+    return new Promise((resolve) => {
+      autocompleteService.current.getPlacePredictions(
+        {
+          input: query,
+          // Don't restrict types - this allows searching for addresses, businesses, and POIs
+          componentRestrictions: { country: 'nz' } // Restrict to New Zealand only
+        },
+        (predictions: any[], status: string) => {
+          if (status === window.google.maps.places.PlacesServiceStatus.OK && predictions) {
+            const locations = predictions.map((prediction) => ({
+              placeId: prediction.place_id,
+              description: prediction.description
+            }));
+            resolve(locations);
+          } else {
+            resolve([]);
+          }
+        }
+      );
+    });
+  };
+
+  const calculateDistance = async (fromPlaceId: string, toPlaceId: string): Promise<number | null> => {
+    // Check cache first
+    const cacheKey = `${fromPlaceId}-${toPlaceId}`;
+    if (distanceCache.current.has(cacheKey)) {
+      return distanceCache.current.get(cacheKey)!;
+    }
+
+    if (!distanceMatrixService.current) {
+      console.error('Google Distance Matrix API not loaded yet');
+      return null;
+    }
+
+    return new Promise((resolve) => {
+      distanceMatrixService.current.getDistanceMatrix(
+        {
+          origins: [{ placeId: fromPlaceId }],
+          destinations: [{ placeId: toPlaceId }],
+          travelMode: window.google.maps.TravelMode.DRIVING,
+          unitSystem: window.google.maps.UnitSystem.METRIC
+        },
+        (response: any, status: string) => {
+          if (status === window.google.maps.DistanceMatrixStatus.OK && 
+              response && 
+              response.rows && 
+              response.rows[0] && 
+              response.rows[0].elements && 
+              response.rows[0].elements[0]) {
+            
+            const element = response.rows[0].elements[0];
+            if (element.status === window.google.maps.DistanceMatrixStatus.OK) {
+              // Distance is returned in meters, convert to kilometers
+              const distanceInKm = element.distance.value / 1000;
+              
+              // Cache the result
+              distanceCache.current.set(cacheKey, distanceInKm);
+              resolve(distanceInKm);
+            } else {
+              console.error('Distance Matrix element status:', element.status);
+              resolve(null);
+            }
+          } else {
+            console.error('Distance Matrix API error:', status);
+            resolve(null);
+          }
+        }
+      );
+    });
+  };
+
+  // Debounce function to reduce API calls
+  const debounce = (func: Function, delay: number) => {
+    let timeoutId: ReturnType<typeof setTimeout>;
+    return (...args: any[]) => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => func.apply(null, args), delay);
+    };
+  };
+
+  const handleLocationSearch = async (query: string, type: 'from' | 'to') => {
+    if (query.length < 3) {
+      if (type === 'from') {
+        setFromLocationSuggestions([]);
+        setShowFromSuggestions(false);
+      } else {
+        setToLocationSuggestions([]);
+        setShowToSuggestions(false);
+      }
+      // Only reset suggestions height if no suggestions are visible from either field
+      if (!showFromSuggestions && !showToSuggestions) {
+        setSuggestionsHeight(0);
+      }
+      return;
+    }
+
+    const suggestions = await searchPlaces(query);
+    
+    if (type === 'from') {
+      setFromLocationSuggestions(suggestions);
+      setShowFromSuggestions(suggestions.length > 0);
+      // Adjust layout height based on suggestions
+      if (suggestions.length > 0) {
+        setSuggestionsHeight(Math.min(suggestions.length * 50, 200)); // 50px per suggestion, max 200px
+        // Scroll the input into view to show suggestions
+        setTimeout(() => {
+          const fromInput = document.querySelector('.location-input-container input[placeholder="Enter starting location"]');
+          if (fromInput) {
+            fromInput.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          }
+        }, 100);
+      }
+    } else {
+      setToLocationSuggestions(suggestions);
+      setShowToSuggestions(suggestions.length > 0);
+      // Adjust layout height based on suggestions
+      if (suggestions.length > 0) {
+        setSuggestionsHeight(Math.min(suggestions.length * 50, 200)); // 50px per suggestion, max 200px
+        // Scroll the input into view to show suggestions
+        setTimeout(() => {
+          const toInput = document.querySelector('.location-input-container input[placeholder="Enter destination location"]');
+          if (toInput) {
+            toInput.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          }
+        }, 100);
+      }
+    }
+  };
+
+  // Debounced version of location search
+  const debouncedLocationSearch = debounce(handleLocationSearch, 300);
+
+  const handleLocationSelect = async (location: Location, type: 'from' | 'to') => {
+    const locationField = type === 'from' ? 'fromLocation' : 'toLocation';
+    const locationDataField = type === 'from' ? 'fromLocationData' : 'toLocationData';
+    
+    setFormData(prev => ({
+      ...prev,
+      [locationField]: location.description,
+      [locationDataField]: location
+    }));
+
+    if (type === 'from') {
+      setShowFromSuggestions(false);
+      setFromLocationSuggestions([]);
+    } else {
+      setShowToSuggestions(false);
+      setToLocationSuggestions([]);
+    }
+
+    // Reset suggestions height when hiding suggestions
+    if (!showFromSuggestions && !showToSuggestions) {
+      setSuggestionsHeight(0);
+    }
+
+    // Auto-calculate distance if both locations are set
+    if (formData.fromLocation && (type === 'to' ? location.description : formData.toLocation)) {
+      await calculateDistanceFromLocations();
+    }
+  };
+
+  const calculateDistanceFromLocations = async () => {
+    if (!formData.fromLocation || !formData.toLocation) return;
+    
+    setIsCalculatingDistance(true);
+    setDistanceCalculationError('');
+    setShowDistanceError(false); // Reset error display
+    
+    try {
+      // Use the stored location data instead of searching through suggestions
+      const fromLocation = formData.fromLocationData;
+      const toLocation = formData.toLocationData;
+      
+      if (!fromLocation || !toLocation) {
+        throw new Error('Please select locations from the suggestions');
+      }
+
+      const distance = await calculateDistance(fromLocation.placeId, toLocation.placeId);
+      
+      if (distance !== null) {
+        setFormData(prev => ({
+          ...prev,
+          distance: distance.toFixed(1),
+          useLocationCalculation: true
+        }));
+      } else {
+        throw new Error('Could not calculate distance');
+      }
+    } catch (error) {
+      setDistanceCalculationError(error instanceof Error ? error.message : 'Error calculating distance');
+      setShowDistanceError(true); // Show error when calculation fails
+    } finally {
+      setIsCalculatingDistance(false);
+    }
   };
 
   const formatCurrency = (amount: number) => {
@@ -209,7 +550,7 @@ const PetrolCalculator: React.FC<PetrolCalculatorProps> = ({
   };
 
   return (
-    <div className="container">
+    <div className="container petrol-calculator">
       {isStandalone && (
         <div className="header">
           <div className="header-top">
@@ -227,11 +568,125 @@ const PetrolCalculator: React.FC<PetrolCalculatorProps> = ({
           data-section="calculator"
           className={`form-section-card ${visibleSections.has('calculator') ? 'section-visible' : ''}`}
         >
+          {/* Distance Section */}
           <div className="section-header">
-            <h3>Petrol Cost Calculator</h3>
-            <div className="section-number">1</div>
+            <h3>Distance</h3>
           </div>
           
+          {/* Location-based Distance Calculation */}
+          <div className="form-group">
+            <label className="checkbox-label">
+              <input
+                type="checkbox"
+                checked={formData.useLocationCalculation}
+                onChange={(e) => handleInputChange('useLocationCalculation', e.target.checked)}
+              />
+              <span>Calculate distance from locations</span>
+            </label>
+          </div>
+
+          {formData.useLocationCalculation && (
+            <>
+              <div className="form-group">
+                <label>From Location</label>
+                <div className="location-input-container">
+                  <input
+                    type="text"
+                    className="form-control"
+                    value={formData.fromLocation}
+                    onChange={(e) => {
+                      handleInputChange('fromLocation', e.target.value);
+                      debouncedLocationSearch(e.target.value, 'from');
+                    }}
+                    placeholder="Enter starting location"
+                  />
+                  {showFromSuggestions && fromLocationSuggestions.length > 0 && (
+                    <div className="location-suggestions">
+                      {fromLocationSuggestions.map((location, index) => (
+                        <div
+                          key={index}
+                          className="location-suggestion"
+                          onClick={() => handleLocationSelect(location, 'from')}
+                        >
+                          {location.description}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+              
+              {/* Dynamic spacer to push content down when suggestions appear */}
+              {suggestionsHeight > 0 && showFromSuggestions && (
+                <div 
+                  className="suggestions-spacer" 
+                  style={{ height: `${suggestionsHeight}px` }}
+                />
+              )}
+
+              <div className="form-group">
+                <label>To Location</label>
+                <div className="location-input-container">
+                  <input
+                    type="text"
+                    className="form-control"
+                    value={formData.toLocation}
+                    onChange={(e) => {
+                      handleInputChange('toLocation', e.target.value);
+                      debouncedLocationSearch(e.target.value, 'to');
+                    }}
+                    placeholder="Enter destination location"
+                  />
+                  {showToSuggestions && toLocationSuggestions.length > 0 && (
+                    <div className="location-suggestions">
+                      {toLocationSuggestions.map((location, index) => (
+                        <div
+                          key={index}
+                          className="location-suggestion"
+                          onClick={() => handleLocationSelect(location, 'to')}
+                        >
+                          {location.description}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Dynamic spacer for To Location suggestions */}
+              {suggestionsHeight > 0 && showToSuggestions && (
+                <div 
+                  className="suggestions-spacer" 
+                  style={{ height: `${suggestionsHeight}px` }}
+                />
+              )}
+
+              {isCalculatingDistance && (
+                <div className="loading-message">
+                  Calculating distance...
+                </div>
+              )}
+
+               {showDistanceError && distanceCalculationError && (
+                 <div className="error-message">
+                   {distanceCalculationError}
+                 </div>
+               )}
+
+              <div className="form-group">
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={calculateDistanceFromLocations}
+                  disabled={!formData.fromLocation || !formData.toLocation || isCalculatingDistance}
+                >
+                  Calculate Distance
+                </button>
+                
+              </div>
+            </>
+          )}
+
           <div className="form-group">
             <label>Distance (km)</label>
             <input
@@ -256,6 +711,11 @@ const PetrolCalculator: React.FC<PetrolCalculatorProps> = ({
             </label>
           </div>
 
+          {/* Petrol Section */}
+          <div className="section-header">
+            <h3>Petrol</h3>
+          </div>
+
           <div className="form-group">
             <label>Petrol cost per litre ($)</label>
             <input
@@ -275,6 +735,11 @@ const PetrolCalculator: React.FC<PetrolCalculatorProps> = ({
             >
               Check current fuel costs
             </a>
+          </div>
+
+          {/* Fuel Economy Section */}
+          <div className="section-header">
+            <h3>Fuel Economy</h3>
           </div>
 
           <div className="form-group">
@@ -337,6 +802,18 @@ const PetrolCalculator: React.FC<PetrolCalculatorProps> = ({
               </div>
             </div>
           )}
+
+          {/* Tip Box */}
+          <div className="tip-box">
+            <strong>Please note:</strong> These values are based on distance travelled and fuel economy. They don't account for the fact that:
+            <ul style={{ margin: '0.5rem 0 0 1.5rem', padding: 0 }}>
+              <li>Our clients may be stopping/starting. They are not travelling in a straight line</li>
+              <li>Unexpected events happen. The client may encounter detours or road closures</li>
+              <li>Fuel economy is based around a perfectly functioning vehicle. Wear and tear can reduce fuel economy over time.</li>
+            </ul>
+            <br />
+            With this in mind, use these numbers only as a guideline. Have a conversation with the client to determine what is realistic based on their situation and vehicle condition.
+          </div>
 
           <div className="form-actions">
             <button 

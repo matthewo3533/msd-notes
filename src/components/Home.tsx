@@ -133,6 +133,35 @@ const Home: React.FC<HomeProps> = ({ currentTheme, onThemeChange }) => {
           </div>
         ))}
       </div>
+      
+      <div className="whats-new-section">
+        <h2>What's New</h2>
+        <div className="whats-new-content">
+          <div className="whats-new-item">
+            <span className="whats-new-icon">📍</span>
+            <div className="whats-new-text">
+              <strong>Location Search in Petrol Calculator</strong>
+              <p>Added Google Places API integration for automatic distance calculation between locations</p>
+            </div>
+          </div>
+          
+          <div className="whats-new-item">
+            <span className="whats-new-icon">🏠</span>
+            <div className="whats-new-text">
+              <strong>Bond/Rent in Advance Notes</strong>
+              <p>Generate comprehensive notes for bond and rent in advance applications</p>
+            </div>
+          </div>
+          
+          <div className="whats-new-item">
+            <span className="whats-new-icon">📋</span>
+            <div className="whats-new-text">
+              <strong>Quick Copy Functionality</strong>
+              <p>Easily copy Supplier CURs, reference numbers, and other CMS application data</p>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
