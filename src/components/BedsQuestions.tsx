@@ -1,26 +1,10 @@
 import React, { useEffect, useState } from 'react';
+import { BedsFormData } from '../App';
 import IncomeSection, { IncomeLabels } from './IncomeSection';
 import PaymentSection from './PaymentSection';
 import DecisionSection from './DecisionSection';
 
-export interface BedsFormData {
-  clientId: boolean | null;
-  whyNeedBeds: string;
-  reasonableSteps: string;
-  supplierName: string;
-  supplierId: string;
-  amount: number;
-  recoveryRate: number;
-  directCredit: string;
-  paymentReference: string;
-  income: {
-    benefit: number;
-    employment: number;
-    familyTaxCredit: number;
-    childSupport: number;
-    childDisabilityAllowance: number;
-    otherIncome: number;
-  };
+interface BedsFormDataWithLabels extends BedsFormData {
   incomeLabels?: {
     benefit: string;
     employment: string;
@@ -29,17 +13,11 @@ export interface BedsFormData {
     familyTaxCredit: string;
     childDisabilityAllowance: string;
   };
-  costs: Array<{
-    amount: number;
-    cost: string;
-  }>;
-  decision: string;
-  decisionReason: string;
 }
 
 interface BedsQuestionsProps {
-  formData: BedsFormData;
-  onFormDataChange: (data: Partial<BedsFormData>) => void;
+  formData: BedsFormDataWithLabels;
+  onFormDataChange: (data: Partial<BedsFormDataWithLabels>) => void;
 }
 
 function autoResizeTextarea(el: HTMLTextAreaElement | null) {
@@ -94,7 +72,7 @@ const BedsQuestions: React.FC<BedsQuestionsProps> = ({ formData, onFormDataChang
     };
   }, []);
 
-  const handleInputChange = (field: keyof BedsFormData, value: any) => {
+  const handleInputChange = (field: keyof BedsFormDataWithLabels, value: any) => {
     onFormDataChange({ [field]: value });
   };
 

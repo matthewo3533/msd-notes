@@ -201,6 +201,138 @@ export interface WashingMachineFormData {
   decisionReason: string;
 }
 
+export interface BedsFormData {
+  clientId: boolean | null;
+  whyNeedBeds: string;
+  reasonableSteps: string;
+  supplierName: string;
+  supplierId: string;
+  amount: number;
+  recoveryRate: number;
+  directCredit: string;
+  paymentReference: string;
+  income: {
+    benefit: number;
+    employment: number;
+    familyTaxCredit: number;
+    childSupport: number;
+    childDisabilityAllowance: number;
+    otherIncome: number;
+  };
+  costs: Array<{
+    amount: number;
+    cost: string;
+  }>;
+  decision: string;
+  decisionReason: string;
+}
+
+export interface BeddingFormData {
+  clientId: boolean | null;
+  whyNeedBedding: string;
+  reasonableSteps: string;
+  supplierName: string;
+  supplierId: string;
+  amount: number;
+  recoveryRate: number;
+  directCredit: string;
+  paymentReference: string;
+  income: {
+    benefit: number;
+    employment: number;
+    familyTaxCredit: number;
+    childSupport: number;
+    childDisabilityAllowance: number;
+    otherIncome: number;
+  };
+  costs: Array<{
+    amount: number;
+    cost: string;
+  }>;
+  decision: string;
+  decisionReason: string;
+}
+
+export interface FurnitureFormData {
+  clientId: boolean | null;
+  whyNeedFurniture: string;
+  reasonableSteps: string;
+  supplierName: string;
+  supplierId: string;
+  amount: number;
+  recoveryRate: number;
+  directCredit: string;
+  paymentReference: string;
+  income: {
+    benefit: number;
+    employment: number;
+    familyTaxCredit: number;
+    childSupport: number;
+    childDisabilityAllowance: number;
+    otherIncome: number;
+  };
+  costs: Array<{
+    amount: number;
+    cost: string;
+  }>;
+  decision: string;
+  decisionReason: string;
+}
+
+export interface DentalFormData {
+  clientId: boolean | null;
+  whyNeedDental: string;
+  reasonableSteps: string;
+  sngEligible: string;
+  sngBalance: number;
+  supplierName: string;
+  supplierId: string;
+  amount: number;
+  recoveryRate: number;
+  directCredit: string;
+  paymentReference: string;
+  income: {
+    benefit: number;
+    employment: number;
+    familyTaxCredit: number;
+    childSupport: number;
+    childDisabilityAllowance: number;
+    otherIncome: number;
+  };
+  costs: Array<{
+    amount: number;
+    cost: string;
+  }>;
+  decision: string;
+  decisionReason: string;
+}
+
+export interface ElectricityFormData {
+  clientId: boolean | null;
+  whyNeedPower: string;
+  reasonableSteps: string;
+  supplierName: string;
+  supplierId: string;
+  amount: number;
+  recoveryRate: number;
+  directCredit: string;
+  paymentReference: string;
+  income: {
+    benefit: number;
+    employment: number;
+    familyTaxCredit: number;
+    childSupport: number;
+    childDisabilityAllowance: number;
+    otherIncome: number;
+  };
+  costs: Array<{
+    amount: number;
+    cost: string;
+  }>;
+  decision: string;
+  decisionReason: string;
+}
+
 export interface TASGrantFormData {
   dateOfFirstContact: string;
   clientConsent: string;

@@ -1,39 +1,25 @@
 import React, { useEffect, useState } from 'react';
+import { BeddingFormData } from '../App';
 import IncomeSection, { IncomeLabels } from './IncomeSection';
 import PaymentSection from './PaymentSection';
 import DecisionSection from './DecisionSection';
 
-export interface BeddingFormData {
-  clientId: boolean | null;
-  whyNeedBedding: string;
-  reasonableSteps: string;
-  supplierName: string;
-  supplierId: string;
-  amount: number;
-  recoveryRate: number;
-  directCredit: string;
-  paymentReference: string;
-  income: {
-    benefit: number;
-    employment: number;
-    familyTaxCredit: number;
-    childSupport: number;
-    childDisabilityAllowance: number;
-    otherIncome: number;
+interface BeddingFormDataWithLabels extends BeddingFormData {
+  incomeLabels?: {
+    benefit: string;
+    employment: string;
+    childSupport: string;
+    otherIncome: string;
+    familyTaxCredit: string;
+    childDisabilityAllowance: string;
   };
-  costs: Array<{
-    amount: number;
-    cost: string;
-  }>;
-  decision: string;
-  decisionReason: string;
   beddingSngEligible?: string; // 'yes' | 'no' | ''
   beddingSngReason?: string; // 'Disability/Illness' | 'Child born/adopted' | ''
 }
 
 interface BeddingQuestionsProps {
-  formData: BeddingFormData;
-  onFormDataChange: (data: Partial<BeddingFormData>) => void;
+  formData: BeddingFormDataWithLabels;
+  onFormDataChange: (data: Partial<BeddingFormDataWithLabels>) => void;
 }
 
 function autoResizeTextarea(el: HTMLTextAreaElement | null) {
@@ -88,7 +74,7 @@ const BeddingQuestions: React.FC<BeddingQuestionsProps> = ({ formData, onFormDat
     };
   }, []);
 
-  const handleInputChange = (field: keyof BeddingFormData, value: any) => {
+  const handleInputChange = (field: keyof BeddingFormDataWithLabels, value: any) => {
     onFormDataChange({ [field]: value });
   };
 

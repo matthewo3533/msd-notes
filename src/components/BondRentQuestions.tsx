@@ -126,8 +126,7 @@ const BondRentQuestions: React.FC<BondRentQuestionsProps> = ({ formData, onFormD
     onFormDataChange({ costs: newCosts });
   };
 
-  // Calculate total amount for recovery rate
-  const totalAmount = formData.bondAmount + formData.rentInAdvanceAmount;
+
 
   return (
     <div className="form-sections-container">
