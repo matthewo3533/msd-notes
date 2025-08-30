@@ -1,9 +1,9 @@
 import React from 'react';
-import { FoodFormData, ClothingFormData, TASGrantFormData, DeclareIncomeFormData } from '../App';
+import { FoodFormData, ClothingFormData, RentArrearsFormData, CarRepairsFormData, FuneralAssistanceFormData, TASGrantFormData, DeclareIncomeFormData } from '../App';
 
 interface NoteOutputProps {
   formData: any;
-  service?: 'food' | 'clothing' | 'electricity' | 'dental' | 'beds' | 'bedding' | 'furniture' | 'glasses' | 'fridge' | 'washing' | 'tas-grant' | 'declare-income' | 'bond-rent';
+  service?: 'food' | 'clothing' | 'electricity' | 'dental' | 'beds' | 'bedding' | 'furniture' | 'glasses' | 'fridge' | 'washing' | 'tas-grant' | 'declare-income' | 'bond-rent' | 'rent-arrears' | 'car-repairs' | 'funeral-assistance';
   onReset: () => void;
 }
 
@@ -163,31 +163,182 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       else if (c.decision === 'declined') note += 'APPLICATION DECLINED\n';
       if (c.decisionReason) note += `${c.decisionReason}\n`;
       return note;
+    } else if (service === 'rent-arrears') {
+      // Rent Arrears note output
+      const r: RentArrearsFormData = formData;
+      let note = '';
+      note += `CCID: ${r.clientId === false ? 'No' : 'Yes'}\n\n`;
+      note += '~~~ Need ~~~\n';
+      if (r.whyNeedRentArrears) {
+        note += `Why is the client needing rent arrears assistance?\n${r.whyNeedRentArrears}\n`;
+      }
+      if (r.rentArrearsVerification === 'yes') {
+        note += 'Rent arrears verification provided\n';
+      }
+
+      note += '\n~~~ Payment ~~~\n';
+      note += `Supplier Name: ${r.supplierName || '-'}\n`;
+      note += `Supplier ID: ${r.supplierId || '-'}\n`;
+      note += `Amount: $${r.amount?.toFixed(2) || '0.00'}\n`;
+      note += `Recovery rate: $${r.recoveryRate?.toFixed(2) || '0.00'}\n`;
+      if (r.directCredit === 'yes' && r.paymentReference) {
+        note += `Reference number: ${r.paymentReference}\n`;
+      }
+      note += '\n~~~ Tenancy Affordability ~~~\n';
+      if (r.income.benefit > 0) note += `$${r.income.benefit.toFixed(2)} Benefit\n`;
+      if (r.income.employment > 0) note += `$${r.income.employment.toFixed(2)} Employment\n`;
+      if (r.income.familyTaxCredit > 0) note += `$${r.income.familyTaxCredit.toFixed(2)} Family Tax Credit\n`;
+      if (r.income.childSupport > 0) note += `$${r.income.childSupport.toFixed(2)} Child Support\n`;
+      if (r.income.childDisabilityAllowance > 0) note += `$${r.income.childDisabilityAllowance.toFixed(2)} Child Disability Allowance\n`;
+      if (r.income.otherIncome > 0) note += `$${r.income.otherIncome.toFixed(2)} Other Income\n`;
+      r.costs.forEach((cost: { amount: number; cost: string }) => {
+        if (cost.amount > 0) note += `-$${cost.amount.toFixed(2)} ${cost.cost}\n`;
+      });
+      if (r.costs.length > 0) {
+        const totalIncome = (Object.values(r.income) as number[]).reduce((sum: number, value: number) => sum + (value || 0), 0);
+        const totalCosts = r.costs.reduce((sum: number, cost: { amount: number; cost: string }) => sum + (cost.amount || 0), 0);
+        const remainingIncome = totalIncome - totalCosts;
+        note += '--------------\n';
+        note += `Client is left with $${remainingIncome.toFixed(2)}\n`;
+      }
+      
+      note += '\n~~~ Reasonable Steps ~~~\n';
+      if (r.reasonableSteps) note += `${r.reasonableSteps}\n`;
+      note += '\n~~~ Outcome ~~~\n';
+      if (r.decision === 'approved') note += 'APPLICATION APPROVED\n';
+      else if (r.decision === 'declined') note += 'APPLICATION DECLINED\n';
+      if (r.decisionReason) note += `${r.decisionReason}\n`;
+      return note;
+    } else if (service === 'car-repairs') {
+      // Car Repairs note output
+      const c: CarRepairsFormData = formData;
+      let note = '';
+      note += `CCID: ${c.clientId === false ? 'No' : 'Yes'}\n\n`;
+      note += '~~~ Need ~~~\n';
+      if (c.whyNeedCarRepairs) {
+        note += `Why is the client needing car repairs?\n${c.whyNeedCarRepairs}\n`;
+      }
+
+      note += '\n~~~ Car Details ~~~\n';
+      if (c.vehicleMakeModel) note += `Vehicle: ${c.vehicleMakeModel}\n`;
+      if (c.licensePlate) note += `License plate: ${c.licensePlate}\n`;
+      if (c.odometer) note += `Odometer: ${c.odometer}\n`;
+      if (c.vehicleOwner) note += `Vehicle owner: ${c.vehicleOwner}\n`;
+      if (c.nztaVerification) {
+        note += '\nOwnership verification:\n';
+        note += `${c.nztaVerification}\n`;
+      }
+
+      note += '\n~~~ Payment ~~~\n';
+      note += `Supplier Name: ${c.supplierName || '-'}\n`;
+      note += `Supplier ID: ${c.supplierId || '-'}\n`;
+      note += `Amount: $${c.amount?.toFixed(2) || '0.00'}\n`;
+      note += `Recovery rate: $${c.recoveryRate?.toFixed(2) || '0.00'}\n`;
+      if (c.directCredit === 'yes' && c.paymentReference) {
+        note += `Reference number: ${c.paymentReference}\n`;
+      }
+      note += '\n~~~ Income ~~~\n';
+      if (c.income.benefit > 0) note += `$${c.income.benefit.toFixed(2)} Benefit\n`;
+      if (c.income.employment > 0) note += `$${c.income.employment.toFixed(2)} Employment\n`;
+      if (c.income.familyTaxCredit > 0) note += `$${c.income.familyTaxCredit.toFixed(2)} Family Tax Credit\n`;
+      if (c.income.childSupport > 0) note += `$${c.income.childSupport.toFixed(2)} Child Support\n`;
+      if (c.income.childDisabilityAllowance > 0) note += `$${c.income.childDisabilityAllowance.toFixed(2)} Child Disability Allowance\n`;
+      if (c.income.otherIncome > 0) note += `$${c.income.otherIncome.toFixed(2)} Other Income\n`;
+      c.costs.forEach((cost: { amount: number; cost: string }) => {
+        if (cost.amount > 0) note += `-$${cost.amount.toFixed(2)} ${cost.cost}\n`;
+      });
+      if (c.costs.length > 0) {
+        const totalIncome = (Object.values(c.income) as number[]).reduce((sum: number, value: number) => sum + (value || 0), 0);
+        const totalCosts = c.costs.reduce((sum: number, cost: { amount: number; cost: string }) => sum + (cost.amount || 0), 0);
+        const remainingIncome = totalIncome - totalCosts;
+        note += '--------------\n';
+        note += `Client is left with $${remainingIncome.toFixed(2)}\n`;
+      }
+      
+      note += '\n~~~ Reasonable Steps ~~~\n';
+      if (c.reasonableSteps) note += `${c.reasonableSteps}\n`;
+      note += '\n~~~ Outcome ~~~\n';
+      if (c.decision === 'approved') note += 'APPLICATION APPROVED\n';
+      else if (c.decision === 'declined') note += 'APPLICATION DECLINED\n';
+      if (c.decisionReason) note += `${c.decisionReason}\n`;
+      return note;
+    } else if (service === 'funeral-assistance') {
+      // Funeral Assistance note output
+      const f: FuneralAssistanceFormData = formData;
+      let note = '';
+      note += `CCID: ${f.clientId === false ? 'No' : 'Yes'}\n\n`;
+      note += '~~~ Need ~~~\n';
+      if (f.whyNeedFuneralAssistance) {
+        note += `Why is the client needing funeral assistance?\n${f.whyNeedFuneralAssistance}\n`;
+      }
+
+      if (f.petrolAssistance === 'yes') {
+        note += '\n~~~ Travel Details ~~~\n';
+        if (f.startLocation && f.destination) {
+          note += `Travelling from: ${f.startLocation} to ${f.destination}\n`;
+        }
+        if (f.returnTrip) {
+          note += `Return trip: ${f.returnTrip === 'yes' ? 'Yes' : 'No'}\n`;
+        }
+        if (f.distance > 0) {
+          note += `Distance: ${f.distance.toFixed(1)} km\n`;
+        }
+        if (f.travelCost > 0) {
+          note += `Calculated Cost of travel: $${f.travelCost.toFixed(2)}\n`;
+        }
+      }
+
+      note += '\n~~~ Payment ~~~\n';
+      note += `Supplier Name: ${f.supplierName || '-'}\n`;
+      note += `Supplier ID: ${f.supplierId || '-'}\n`;
+      note += `Amount: $${f.amount?.toFixed(2) || '0.00'}\n`;
+      note += `Recovery rate: $${f.recoveryRate?.toFixed(2) || '0.00'}\n`;
+      if (f.directCredit === 'yes' && f.paymentReference) {
+        note += `Reference number: ${f.paymentReference}\n`;
+      }
+      note += '\n~~~ Income ~~~\n';
+      if (f.income.benefit > 0) note += `$${f.income.benefit.toFixed(2)} Benefit\n`;
+      if (f.income.employment > 0) note += `$${f.income.employment.toFixed(2)} Employment\n`;
+      if (f.income.familyTaxCredit > 0) note += `$${f.income.familyTaxCredit.toFixed(2)} Family Tax Credit\n`;
+      if (f.income.childSupport > 0) note += `$${f.income.childSupport.toFixed(2)} Child Support\n`;
+      if (f.income.childDisabilityAllowance > 0) note += `$${f.income.childDisabilityAllowance.toFixed(2)} Child Disability Allowance\n`;
+      if (f.income.otherIncome > 0) note += `$${f.income.otherIncome.toFixed(2)} Other Income\n`;
+      f.costs.forEach((cost: { amount: number; cost: string }) => {
+        if (cost.amount > 0) note += `-$${cost.amount.toFixed(2)} ${cost.cost}\n`;
+      });
+      if (f.costs.length > 0) {
+        const totalIncome = (Object.values(f.income) as number[]).reduce((sum: number, value: number) => sum + (value || 0), 0);
+        const totalCosts = f.costs.reduce((sum: number, cost: { amount: number; cost: string }) => sum + (cost.amount || 0), 0);
+        const remainingIncome = totalIncome - totalCosts;
+        note += '--------------\n';
+        note += `Client is left with $${remainingIncome.toFixed(2)}\n`;
+      }
+      
+      note += '\n~~~ Reasonable Steps ~~~\n';
+      if (f.reasonableSteps) note += `${f.reasonableSteps}\n`;
+      note += '\n~~~ Outcome ~~~\n';
+      if (f.decision === 'approved') note += 'APPLICATION APPROVED\n';
+      else if (f.decision === 'declined') note += 'APPLICATION DECLINED\n';
+      if (f.decisionReason) note += `${f.decisionReason}\n`;
+      return note;
     } else if (service === 'bond-rent') {
       // Bond/Rent in Advance note output
       const b = formData;
       let note = '';
       note += `CCID: ${b.clientId === false ? 'No' : 'Yes'}\n\n`;
       note += '~~~ Need ~~~\n';
-      if (b.whyNeedAccommodation) note += `Why is the client needing accommodation assistance?\n${b.whyNeedAccommodation}\n`;
-      if (b.newAddress) note += `What's the client's new address?\n${b.newAddress}\n`;
-      if (b.asZone) note += `AS Zone: ${b.asZone}\n`;
-      if (b.weeklyRent) note += `Weekly Rent: $${b.weeklyRent.toFixed(2)}\n`;
-      if (b.bondAmount) note += `How much bond does the client need help with?\n$${b.bondAmount.toFixed(2)}\n`;
-      if (b.rentInAdvanceAmount) note += `How much rent in advance does the client need help with?\n$${b.rentInAdvanceAmount.toFixed(2)}\n`;
-      if (b.tenancyAffordable) note += `Will this tenancy leave the client with enough leftover money to meet their weekly living costs?\n${b.tenancyAffordable}\n`;
+      if (b.whyNeedAccommodation) note += `${b.whyNeedAccommodation}\n`;
 
-      
       note += '\n~~~ Tenancy Details ~~~\n';
-      if (b.newAddress) note += `Address: ${b.newAddress}\n`;
       if (b.asZone) note += `AS Zone: ${b.asZone}\n`;
-      if (b.weeklyRent) note += `Weekly Rent: $${b.weeklyRent.toFixed(2)}\n`;
+      if (b.newAddress) note += `Address: ${b.newAddress}\n`;
+      if (b.weeklyRent) note += `Weekly Rent: ${b.weeklyRent.toFixed(2)}\n`;
       if (b.tenancyStartDate) {
         const date = new Date(b.tenancyStartDate);
         const day = date.getDate().toString().padStart(2, '0');
         const month = (date.getMonth() + 1).toString().padStart(2, '0');
         const year = date.getFullYear();
-        note += `Tenancy Start Date: ${day}/${month}/${year}\n`;
+        note += `Tenancy start date: ${day}/${month}/${year}\n`;
       }
       
       note += '\n~~~ Payment ~~~\n';

@@ -89,6 +89,7 @@ const PetrolCalculator: React.FC<PetrolCalculatorProps> = ({
   
   // Layout management for suggestions
   const [suggestionsHeight, setSuggestionsHeight] = useState(0);
+  const [carDropdownHeight, setCarDropdownHeight] = useState(0);
   
   // Cache for distance calculations to minimize API calls
   const distanceCache = useRef<Map<string, number>>(new Map());
@@ -222,6 +223,16 @@ const PetrolCalculator: React.FC<PetrolCalculatorProps> = ({
       setFilteredCars(carData);
     }
   }, [formData.carSearchTerm, carData]);
+
+  // Calculate car dropdown height when filtered cars change
+  useEffect(() => {
+    if (showCarDropdown && filteredCars.length > 0) {
+      const height = Math.min(filteredCars.length * 50, 200); // 50px per car option, max 200px
+      setCarDropdownHeight(height);
+    } else {
+      setCarDropdownHeight(0);
+    }
+  }, [showCarDropdown, filteredCars]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -778,6 +789,11 @@ const PetrolCalculator: React.FC<PetrolCalculatorProps> = ({
                   </div>
                 )}
               </div>
+              {/* Dynamic spacer for car dropdown */}
+              <div 
+                className="suggestions-spacer" 
+                style={{ height: `${carDropdownHeight}px` }}
+              />
             </div>
           </div>
 

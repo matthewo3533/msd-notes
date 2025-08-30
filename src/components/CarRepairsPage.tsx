@@ -1,33 +1,30 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import BondRentQuestions from './BondRentQuestions';
+import CarRepairsQuestions from './CarRepairsQuestions';
 import NoteOutput from './NoteOutput';
 import ThemeSelector from './ThemeSelector';
-import { BondRentFormData } from '../App';
+import { CarRepairsFormData } from '../App';
 
-interface BondRentPageProps {
+interface CarRepairsPageProps {
   currentTheme: string;
   onThemeChange: (themeId: string) => void;
 }
 
-const BondRentPage: React.FC<BondRentPageProps> = ({ currentTheme, onThemeChange }) => {
+const CarRepairsPage: React.FC<CarRepairsPageProps> = ({ currentTheme, onThemeChange }) => {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState<BondRentFormData>({
+  const [formData, setFormData] = useState<CarRepairsFormData>({
     clientId: null,
-    whyNeedAccommodation: '',
-    newAddress: '',
-    newAddressData: undefined,
-    asZone: 0,
-    weeklyRent: 0,
-    tenancyStartDate: '',
-    bondAmount: 0,
-    rentInAdvanceAmount: 0,
+    whyNeedCarRepairs: '',
     reasonableSteps: '',
-    tenancyAffordable: '',
+    canMeetNeedOtherWay: '',
+    vehicleMakeModel: '',
+    licensePlate: '',
+    odometer: '',
+    vehicleOwner: '',
+    nztaVerification: '',
     supplierName: '',
     supplierId: '',
-    bondPaymentAmount: 0,
-    rentAdvancePaymentAmount: 0,
+    amount: 0,
     recoveryRate: 0,
     directCredit: '',
     paymentReference: '',
@@ -44,27 +41,24 @@ const BondRentPage: React.FC<BondRentPageProps> = ({ currentTheme, onThemeChange
     decisionReason: '',
   });
 
-  const handleFormDataChange = (data: Partial<BondRentFormData>) => {
+  const handleFormDataChange = (data: Partial<CarRepairsFormData>) => {
     setFormData(prev => ({ ...prev, ...data }));
   };
 
   const resetForm = () => {
     setFormData({
       clientId: null,
-      whyNeedAccommodation: '',
-      newAddress: '',
-      newAddressData: undefined,
-      asZone: 0,
-      weeklyRent: 0,
-      tenancyStartDate: '',
-      bondAmount: 0,
-      rentInAdvanceAmount: 0,
+      whyNeedCarRepairs: '',
       reasonableSteps: '',
-      tenancyAffordable: '',
+      canMeetNeedOtherWay: '',
+      vehicleMakeModel: '',
+      licensePlate: '',
+      odometer: '',
+      vehicleOwner: '',
+      nztaVerification: '',
       supplierName: '',
       supplierId: '',
-      bondPaymentAmount: 0,
-      rentAdvancePaymentAmount: 0,
+      amount: 0,
       recoveryRate: 0,
       directCredit: '',
       paymentReference: '',
@@ -102,7 +96,7 @@ const BondRentPage: React.FC<BondRentPageProps> = ({ currentTheme, onThemeChange
       <div className="header">
         <div className="header-top">
           <div className="greeting-section">
-            <h1 className="greeting">Bond/Rent in Advance</h1>
+            <h1 className="greeting">Car Repairs</h1>
             <p className="date">{getCurrentDate()}</p>
           </div>
           <ThemeSelector currentTheme={currentTheme} onThemeChange={onThemeChange} />
@@ -114,22 +108,17 @@ const BondRentPage: React.FC<BondRentPageProps> = ({ currentTheme, onThemeChange
           ← Back to Services
         </button>
       </div>
-
       <div className="food-layout">
-        <BondRentQuestions
-          formData={formData}
+        <CarRepairsQuestions 
+          formData={formData} 
           onFormDataChange={handleFormDataChange}
         />
         <div className="note-section">
-          <NoteOutput
-            formData={formData}
-            service="bond-rent"
-            onReset={resetForm}
-          />
+          <NoteOutput formData={formData} service="car-repairs" onReset={resetForm} />
         </div>
       </div>
     </div>
   );
 };
 
-export default BondRentPage;
+export default CarRepairsPage;

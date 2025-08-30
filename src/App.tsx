@@ -3,6 +3,9 @@ import { Routes, Route } from 'react-router-dom';
 import Home from './components/Home';
 import FoodPage from './components/FoodPage';
 import ClothingPage from './components/ClothingPage';
+import RentArrearsPage from './components/RentArrearsPage';
+import CarRepairsPage from './components/CarRepairsPage';
+import FuneralAssistancePage from './components/FuneralAssistancePage';
 import ElectricityPage from './components/ElectricityPage';
 import DentalPage from './components/DentalPage';
 import BedsPage from './components/BedsPage';
@@ -74,10 +77,134 @@ export interface ClothingFormData {
   decisionReason: string;
 }
 
+export interface ADSDFormData {
+  clientId: boolean | null;
+  whyNeedADSD: string;
+  reasonableSteps: string;
+  canMeetNeedOtherWay: string;
+  bankAccount: string;
+  amount: number;
+  recoveryRate: number;
+  directCredit: string;
+  paymentReference: string;
+  income: {
+    benefit: number;
+    employment: number;
+    familyTaxCredit: number;
+    childSupport: number;
+    childDisabilityAllowance: number;
+    otherIncome: number;
+  };
+  costs: Array<{
+    amount: number;
+    cost: string;
+  }>;
+  decision: string;
+  decisionReason: string;
+}
+
+export interface RentArrearsFormData {
+  clientId: boolean | null;
+  whyNeedRentArrears: string;
+  reasonableSteps: string;
+  canMeetNeedOtherWay: string;
+  rentArrearsVerification: string;
+  supplierName: string;
+  supplierId: string;
+  amount: number;
+  recoveryRate: number;
+  directCredit: string;
+  paymentReference: string;
+  income: {
+    benefit: number;
+    employment: number;
+    familyTaxCredit: number;
+    childSupport: number;
+    childDisabilityAllowance: number;
+    otherIncome: number;
+  };
+  costs: Array<{
+    amount: number;
+    cost: string;
+  }>;
+  decision: string;
+  decisionReason: string;
+}
+
+export interface CarRepairsFormData {
+  clientId: boolean | null;
+  whyNeedCarRepairs: string;
+  reasonableSteps: string;
+  canMeetNeedOtherWay: string;
+  vehicleMakeModel: string;
+  licensePlate: string;
+  odometer: string;
+  vehicleOwner: string;
+  nztaVerification: string;
+  supplierName: string;
+  supplierId: string;
+  amount: number;
+  recoveryRate: number;
+  directCredit: string;
+  paymentReference: string;
+  income: {
+    benefit: number;
+    employment: number;
+    familyTaxCredit: number;
+    childSupport: number;
+    childDisabilityAllowance: number;
+    otherIncome: number;
+  };
+  costs: Array<{
+    amount: number;
+    cost: string;
+  }>;
+  decision: string;
+  decisionReason: string;
+}
+
+export interface FuneralAssistanceFormData {
+  clientId: boolean | null;
+  whyNeedFuneralAssistance: string;
+  reasonableSteps: string;
+  canMeetNeedOtherWay: string;
+  petrolAssistance: string;
+  // Travel details (from petrol calculator)
+  startLocation: string;
+  destination: string;
+  returnTrip: string;
+  distance: number;
+  travelCost: number;
+  supplierName: string;
+  supplierId: string;
+  amount: number;
+  recoveryRate: number;
+  directCredit: string;
+  paymentReference: string;
+  income: {
+    benefit: number;
+    employment: number;
+    familyTaxCredit: number;
+    childSupport: number;
+    childDisabilityAllowance: number;
+    otherIncome: number;
+  };
+  costs: Array<{
+    amount: number;
+    cost: string;
+  }>;
+  decision: string;
+  decisionReason: string;
+}
+
 export interface BondRentFormData {
   clientId: boolean | null;
   whyNeedAccommodation: string;
   newAddress: string;
+  newAddressData?: {
+    placeId: string;
+    description: string;
+  };
   asZone: number;
   weeklyRent: number;
   tenancyStartDate: string;
@@ -420,6 +547,18 @@ function App() {
       <Route 
         path="/clothing" 
         element={<ClothingPage currentTheme={currentTheme} onThemeChange={setCurrentTheme} />} 
+      />
+      <Route 
+        path="/rent-arrears" 
+        element={<RentArrearsPage currentTheme={currentTheme} onThemeChange={setCurrentTheme} />} 
+      />
+      <Route 
+        path="/car" 
+        element={<CarRepairsPage currentTheme={currentTheme} onThemeChange={setCurrentTheme} />} 
+      />
+      <Route 
+        path="/funeral" 
+        element={<FuneralAssistancePage currentTheme={currentTheme} onThemeChange={setCurrentTheme} />} 
       />
       <Route 
         path="/electricity" 

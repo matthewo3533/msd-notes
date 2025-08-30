@@ -1,33 +1,26 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import BondRentQuestions from './BondRentQuestions';
+import RentArrearsQuestions from './RentArrearsQuestions';
 import NoteOutput from './NoteOutput';
 import ThemeSelector from './ThemeSelector';
-import { BondRentFormData } from '../App';
+import { RentArrearsFormData } from '../App';
 
-interface BondRentPageProps {
+interface RentArrearsPageProps {
   currentTheme: string;
   onThemeChange: (themeId: string) => void;
 }
 
-const BondRentPage: React.FC<BondRentPageProps> = ({ currentTheme, onThemeChange }) => {
+const RentArrearsPage: React.FC<RentArrearsPageProps> = ({ currentTheme, onThemeChange }) => {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState<BondRentFormData>({
+  const [formData, setFormData] = useState<RentArrearsFormData>({
     clientId: null,
-    whyNeedAccommodation: '',
-    newAddress: '',
-    newAddressData: undefined,
-    asZone: 0,
-    weeklyRent: 0,
-    tenancyStartDate: '',
-    bondAmount: 0,
-    rentInAdvanceAmount: 0,
+    whyNeedRentArrears: '',
     reasonableSteps: '',
-    tenancyAffordable: '',
+    canMeetNeedOtherWay: '',
+    rentArrearsVerification: '',
     supplierName: '',
     supplierId: '',
-    bondPaymentAmount: 0,
-    rentAdvancePaymentAmount: 0,
+    amount: 0,
     recoveryRate: 0,
     directCredit: '',
     paymentReference: '',
@@ -44,27 +37,20 @@ const BondRentPage: React.FC<BondRentPageProps> = ({ currentTheme, onThemeChange
     decisionReason: '',
   });
 
-  const handleFormDataChange = (data: Partial<BondRentFormData>) => {
+  const handleFormDataChange = (data: Partial<RentArrearsFormData>) => {
     setFormData(prev => ({ ...prev, ...data }));
   };
 
   const resetForm = () => {
     setFormData({
       clientId: null,
-      whyNeedAccommodation: '',
-      newAddress: '',
-      newAddressData: undefined,
-      asZone: 0,
-      weeklyRent: 0,
-      tenancyStartDate: '',
-      bondAmount: 0,
-      rentInAdvanceAmount: 0,
+      whyNeedRentArrears: '',
       reasonableSteps: '',
-      tenancyAffordable: '',
+      canMeetNeedOtherWay: '',
+      rentArrearsVerification: '',
       supplierName: '',
       supplierId: '',
-      bondPaymentAmount: 0,
-      rentAdvancePaymentAmount: 0,
+      amount: 0,
       recoveryRate: 0,
       directCredit: '',
       paymentReference: '',
@@ -102,7 +88,7 @@ const BondRentPage: React.FC<BondRentPageProps> = ({ currentTheme, onThemeChange
       <div className="header">
         <div className="header-top">
           <div className="greeting-section">
-            <h1 className="greeting">Bond/Rent in Advance</h1>
+            <h1 className="greeting">Rent Arrears</h1>
             <p className="date">{getCurrentDate()}</p>
           </div>
           <ThemeSelector currentTheme={currentTheme} onThemeChange={onThemeChange} />
@@ -114,22 +100,17 @@ const BondRentPage: React.FC<BondRentPageProps> = ({ currentTheme, onThemeChange
           ← Back to Services
         </button>
       </div>
-
       <div className="food-layout">
-        <BondRentQuestions
-          formData={formData}
+        <RentArrearsQuestions 
+          formData={formData} 
           onFormDataChange={handleFormDataChange}
         />
         <div className="note-section">
-          <NoteOutput
-            formData={formData}
-            service="bond-rent"
-            onReset={resetForm}
-          />
+          <NoteOutput formData={formData} service="rent-arrears" onReset={resetForm} />
         </div>
       </div>
     </div>
   );
 };
 
-export default BondRentPage;
+export default RentArrearsPage;

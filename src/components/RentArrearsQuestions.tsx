@@ -1,14 +1,39 @@
 import React, { useEffect, useState } from 'react';
-import { BondRentFormData } from '../App';
 import IncomeSection, { IncomeLabels } from './IncomeSection';
-import BondRentPaymentSection from './BondRentPaymentSection';
+import PaymentSection from './PaymentSection';
 import DecisionSection from './DecisionSection';
-import Calendar from './Calendar';
-import AddressInput from './AddressInput';
 
-interface BondRentQuestionsProps {
-  formData: BondRentFormData;
-  onFormDataChange: (data: Partial<BondRentFormData>) => void;
+interface RentArrearsFormData {
+  clientId: boolean | null;
+  whyNeedRentArrears: string;
+  canMeetNeedOtherWay: string;
+  reasonableSteps: string;
+  rentArrearsVerification: string;
+  supplierName: string;
+  supplierId: string;
+  amount: number;
+  recoveryRate: number;
+  directCredit: string; // 'yes' | 'no' | ''
+  paymentReference: string;
+  income: {
+    benefit: number;
+    employment: number;
+    familyTaxCredit: number;
+    childSupport: number;
+    childDisabilityAllowance: number;
+    otherIncome: number;
+  };
+  costs: Array<{
+    amount: number;
+    cost: string;
+  }>;
+  decision: string;
+  decisionReason: string;
+}
+
+interface RentArrearsQuestionsProps {
+  formData: RentArrearsFormData;
+  onFormDataChange: (data: Partial<RentArrearsFormData>) => void;
 }
 
 function autoResizeTextarea(el: HTMLTextAreaElement | null) {
@@ -23,7 +48,7 @@ function autoResizeTextarea(el: HTMLTextAreaElement | null) {
   }
 }
 
-const BondRentQuestions: React.FC<BondRentQuestionsProps> = ({ formData, onFormDataChange }) => {
+const RentArrearsQuestions: React.FC<RentArrearsQuestionsProps> = ({ formData, onFormDataChange }) => {
   const [visibleSections, setVisibleSections] = useState<Set<string>>(new Set(['client']));
   const [incomeLabels, setIncomeLabels] = useState<IncomeLabels>({
     benefit: 'Benefit',
@@ -63,11 +88,11 @@ const BondRentQuestions: React.FC<BondRentQuestionsProps> = ({ formData, onFormD
     };
   }, []);
 
-  const handleInputChange = (field: keyof BondRentFormData, value: any) => {
+  const handleInputChange = (field: keyof RentArrearsFormData, value: any) => {
     onFormDataChange({ [field]: value });
   };
 
-  const handleIncomeChange = (field: keyof BondRentFormData['income'], value: number) => {
+  const handleIncomeChange = (field: keyof RentArrearsFormData['income'], value: number) => {
     onFormDataChange({
       income: {
         ...formData.income,
@@ -94,8 +119,6 @@ const BondRentQuestions: React.FC<BondRentQuestionsProps> = ({ formData, onFormD
     const newCosts = formData.costs.filter((_, i) => i !== index);
     onFormDataChange({ costs: newCosts });
   };
-
-
 
   return (
     <div className="form-sections-container">
@@ -129,118 +152,19 @@ const BondRentQuestions: React.FC<BondRentQuestionsProps> = ({ formData, onFormD
           </div>
         </div>
         <div className="form-group">
-          <label>Why is the client needing accommodation assistance?</label>
+          <label>1. Why is the client needing rent arrears assistance?</label>
           <textarea
             className="form-control"
-            value={formData.whyNeedAccommodation}
-            onChange={e => handleInputChange('whyNeedAccommodation', e.target.value)}
-            placeholder="Explain why the client needs accommodation assistance"
-            rows={3}
+            value={formData.whyNeedRentArrears}
+            onChange={e => handleInputChange('whyNeedRentArrears', e.target.value)}
+            placeholder="Please describe the client's situation..."
+            ref={el => autoResizeTextarea(el)}
+            onInput={e => autoResizeTextarea(e.currentTarget)}
           />
-        </div>
-        <div className="form-group">
-          <AddressInput
-            value={formData.newAddress}
-            onChange={(address, locationData) => {
-              handleInputChange('newAddress', address);
-              if (locationData) {
-                handleInputChange('newAddressData', locationData);
-              }
-            }}
-            placeholder="Enter the client's new address"
-            label="What's the client's new address?"
-          />
-        </div>
-        <div className="form-group">
-          <label>AS Zone</label>
-          <select
-            className="form-control"
-            value={formData.asZone || ''}
-            onChange={e => handleInputChange('asZone', parseInt(e.target.value) || 0)}
-          >
-            <option value="">Select AS Zone</option>
-            <option value="1">Zone 1</option>
-            <option value="2">Zone 2</option>
-            <option value="3">Zone 3</option>
-            <option value="4">Zone 4</option>
-          </select>
-        </div>
-        <div className="form-group">
-          <label>Weekly Rent</label>
-          <div className="dollar-input">
-            <input
-              type="number"
-              className="form-control"
-              value={formData.weeklyRent || ''}
-              onChange={e => handleInputChange('weeklyRent', parseFloat(e.target.value) || 0)}
-              placeholder="0.00"
-              step="0.01"
-              min="0"
-            />
-          </div>
-        </div>
-        <div className="form-group">
-          <label>Date tenancy is starting</label>
-          <Calendar
-            value={formData.tenancyStartDate}
-            onChange={(date) => handleInputChange('tenancyStartDate', date)}
-            placeholder="Select tenancy start date"
-          />
-        </div>
-        <div className="form-group">
-          <label>How much bond does the client need help with?</label>
-          <div className="dollar-input">
-            <input
-              type="number"
-              className="form-control"
-              value={formData.bondAmount || ''}
-              onChange={e => handleInputChange('bondAmount', parseFloat(e.target.value) || 0)}
-              placeholder="0.00"
-              step="0.01"
-              min="0"
-            />
-          </div>
-        </div>
-        <div className="form-group">
-          <label>How much rent in advance does the client need help with?</label>
-          <div className="dollar-input">
-            <input
-              type="number"
-              className="form-control"
-              value={formData.rentInAdvanceAmount || ''}
-              onChange={e => handleInputChange('rentInAdvanceAmount', parseFloat(e.target.value) || 0)}
-              placeholder="0.00"
-              step="0.01"
-              min="0"
-            />
-          </div>
-        </div>
-        <div className="form-group">
-          <label>Will this tenancy leave the client with enough leftover money to meet their weekly living costs?</label>
-          <div className="radio-group">
-            <label className={`radio-btn ${formData.tenancyAffordable === 'yes' ? 'selected' : ''}`}>Yes
-              <input
-                type="checkbox"
-                name="tenancyAffordableYes"
-                checked={formData.tenancyAffordable === 'yes'}
-                onChange={() => handleInputChange('tenancyAffordable', formData.tenancyAffordable === 'yes' ? '' : 'yes')}
-                className="visually-hidden"
-              />
-            </label>
-            <label className={`radio-btn ${formData.tenancyAffordable === 'no' ? 'selected' : ''}`}>No
-              <input
-                type="checkbox"
-                name="tenancyAffordableNo"
-                checked={formData.tenancyAffordable === 'no'}
-                onChange={() => handleInputChange('tenancyAffordable', formData.tenancyAffordable === 'no' ? '' : 'no')}
-                className="visually-hidden"
-              />
-            </label>
-          </div>
         </div>
 
         <div className="form-group">
-          <label>What reasonable steps is the client taking to improve their situation?</label>
+          <label>2. What reasonable steps is the client taken to improve their situation?</label>
           <textarea
             className="form-control"
             value={formData.reasonableSteps}
@@ -249,6 +173,30 @@ const BondRentQuestions: React.FC<BondRentQuestionsProps> = ({ formData, onFormD
             ref={el => autoResizeTextarea(el)}
             onInput={e => autoResizeTextarea(e.currentTarget)}
           />
+        </div>
+
+        <div className="form-group">
+          <label>3. Rent arrears verification provided?</label>
+          <div className="radio-group">
+            <label className={`radio-btn ${formData.rentArrearsVerification === 'yes' ? 'selected' : ''}`}>Yes
+              <input
+                type="checkbox"
+                name="rentArrearsVerificationYes"
+                checked={formData.rentArrearsVerification === 'yes'}
+                onChange={() => handleInputChange('rentArrearsVerification', formData.rentArrearsVerification === 'yes' ? '' : 'yes')}
+                className="visually-hidden"
+              />
+            </label>
+            <label className={`radio-btn ${formData.rentArrearsVerification === 'no' ? 'selected' : ''}`}>No
+              <input
+                type="checkbox"
+                name="rentArrearsVerificationNo"
+                checked={formData.rentArrearsVerification === 'no'}
+                onChange={() => handleInputChange('rentArrearsVerification', formData.rentArrearsVerification === 'no' ? '' : 'no')}
+                className="visually-hidden"
+              />
+            </label>
+          </div>
         </div>
       </div>
 
@@ -268,18 +216,16 @@ const BondRentQuestions: React.FC<BondRentQuestionsProps> = ({ formData, onFormD
       />
 
       {/* Payment Section */}
-      <BondRentPaymentSection
+      <PaymentSection
         supplierName={formData.supplierName}
         supplierId={formData.supplierId}
-        bondAmount={formData.bondAmount}
-        rentAdvanceAmount={formData.rentInAdvanceAmount}
+        amount={formData.amount}
         recoveryRate={formData.recoveryRate}
         directCredit={formData.directCredit}
         paymentReference={formData.paymentReference}
         onSupplierNameChange={(name) => handleInputChange('supplierName', name)}
         onSupplierIdChange={(id) => handleInputChange('supplierId', id)}
-        onBondAmountChange={(amount) => handleInputChange('bondAmount', amount)}
-        onRentAdvanceAmountChange={(amount) => handleInputChange('rentInAdvanceAmount', amount)}
+        onAmountChange={(amount) => handleInputChange('amount', amount)}
         onRecoveryRateChange={(rate) => handleInputChange('recoveryRate', rate)}
         onDirectCreditChange={(credit) => handleInputChange('directCredit', credit)}
         onPaymentReferenceChange={(reference) => handleInputChange('paymentReference', reference)}
@@ -300,4 +246,4 @@ const BondRentQuestions: React.FC<BondRentQuestionsProps> = ({ formData, onFormD
   );
 };
 
-export default BondRentQuestions;
+export default RentArrearsQuestions;

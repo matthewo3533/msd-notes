@@ -21,6 +21,7 @@
   --accent-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   --success-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
   --danger-gradient: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  --accent-primary: #10b981;
 }
 
 .dark-mode {
@@ -391,6 +392,8 @@ body {
   color: var(--text-secondary);
   font-size: 1.05rem;
   letter-spacing: -0.01em;
+  width:fit-content;
+  padding: 5px 20px;
 }
 
 .form-control {
@@ -1996,6 +1999,11 @@ input[type="number"] {
 
 .car-selector {
   position: relative;
+  z-index: 1;
+}
+
+.car-selector:has(.car-dropdown) {
+  z-index: 10000;
 }
 
 .car-dropdown {
@@ -2009,8 +2017,9 @@ input[type="number"] {
   box-shadow: var(--shadow-primary);
   max-height: 200px;
   overflow-y: auto;
-  z-index: 1000;
+  z-index: 9999;
   margin-top: 0.25rem;
+  backdrop-filter: blur(10px);
 }
 
 .car-option {
@@ -2346,6 +2355,72 @@ input[type="number"] {
   margin-bottom: 1rem;
 }
 
+/* Address Input Styles */
+.address-input-container {
+  position: relative;
+  z-index: 1;
+  margin-bottom: 1rem;
+}
+
+.address-input-container:has(.address-suggestions) {
+  z-index: 10000;
+}
+
+.address-input-container label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+}
+
+.address-suggestions {
+  position: absolute;
+  left: 0;
+  right: 0;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-secondary);
+  border-radius: 8px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 9999;
+  margin-top: 2px;
+  backdrop-filter: blur(10px);
+}
+
+.address-suggestion {
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  border-bottom: 1px solid var(--border-secondary);
+  transition: background-color 0.2s ease;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+}
+
+.address-suggestion:last-child {
+  border-bottom: none;
+}
+
+.address-suggestion:hover {
+  background: var(--bg-tertiary);
+}
+
+.address-suggestion:active {
+  background: var(--border-secondary);
+}
+
+.address-loading {
+  text-align: center;
+  padding: 0.75rem;
+  color: var(--text-secondary);
+  font-style: italic;
+  background: var(--bg-tertiary);
+  border-radius: 8px;
+  margin: 0.5rem 0;
+  font-size: 0.9rem;
+}
+
 .location-suggestions {
   position: absolute;
   top: 100%;
@@ -2370,6 +2445,16 @@ input[type="number"] {
 
 /* Add spacing below location inputs to prevent overlap */
 .form-group:has(.location-input-container) {
+  margin-bottom: 2rem;
+}
+
+/* Add spacing below address inputs to prevent overlap */
+.form-group:has(.address-input-container) {
+  margin-bottom: 2rem;
+}
+
+/* Add spacing below car selectors to prevent overlap */
+.form-group:has(.car-selector) {
   margin-bottom: 2rem;
 }
 
@@ -2477,10 +2562,34 @@ input[type="number"] {
     margin-bottom: 1.5rem;
   }
   
+  /* Mobile-specific address input improvements */
+  .address-input-container {
+    margin-bottom: 1.5rem;
+  }
+  
+  .address-suggestions {
+    max-height: 150px;
+  }
+  
+  .address-suggestion {
+    padding: 1rem;
+    font-size: 1rem;
+  }
+  
   .suggestions-spacer {
     margin-bottom: 1rem;
   }
-} 
+  
+  /* Mobile-specific car dropdown improvements */
+  .car-dropdown {
+    max-height: 150px;
+  }
+  
+  .car-option {
+    padding: 1rem;
+    font-size: 1rem;
+  }
+}
 
 /* What's New Section Styles */
 .whats-new-section {
@@ -2633,6 +2742,57 @@ input[type="number"] {
 .petrol-calculator .tip-box strong {
   font-weight: 600;
   color: var(--text-primary);
+}
+
+/* Override tip-box styling for funeral assistance to match petrol calculator */
+.form-section-card .tip-box {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-secondary);
+  box-shadow: var(--shadow-primary);
+}
+
+.form-section-card .tip-box::before {
+  content: '💡';
+  margin-right: 0.5rem;
+  font-size: 1rem;
+  opacity: 0.7;
+}
+
+.form-section-card .tip-box strong {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* Distance input styling */
+.distance-input-container {
+  position: relative;
+}
+
+.distance-display {
+  margin-top: 0.5rem;
+  padding: 0.5rem;
+  background: var(--bg-tertiary);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  border-left: 3px solid var(--accent-primary);
+}
+
+/* Error message styling */
+.error-message {
+  background: #fee;
+  border: 1px solid #fcc;
+  color: #c33;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.error-message small {
+  color: #666;
+  font-style: italic;
 }
 
  
