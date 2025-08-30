@@ -785,16 +785,17 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       const remainingIncome = totalIncome - totalCosts;
       let note = '';
       note += `CCID: ${f.clientId === false ? 'No' : 'Yes'}\n\n`;
-      note += '~~~ Need ~~~\n';
-      if (f.whyNeedFood) note += `${f.whyNeedFood}\n`;
+             note += '~~~ Need ~~~\n';
+       if (f.whyNeedFood) note += `${f.whyNeedFood}\n`;
 
-      if (f.currentFoodBalance > 0) {
-        note += `Food balance: $${f.currentFoodBalance.toFixed(2)}\n`;
-        if (f.hardshipUnforeseen === 'yes' && f.unforeseenCircumstance) {
-          note += `Client is in hardship due to the following unforeseen circumstance: ${f.unforeseenCircumstance}\n`;
-        }
-      }
-      if (f.foodAmountRequested > 0) note += `Amount requesting: $${f.foodAmountRequested.toFixed(2)}\n`;
+       note += '\n';
+       if (f.currentFoodBalance > 0) {
+         note += `Food balance: $${f.currentFoodBalance.toFixed(2)}\n`;
+         if (f.hardshipUnforeseen === 'yes' && f.unforeseenCircumstance) {
+           note += `Client is in hardship due to the following unforeseen circumstance: ${f.unforeseenCircumstance}\n`;
+         }
+       }
+       if (f.foodAmountRequested > 0) note += `Amount requesting: $${f.foodAmountRequested.toFixed(2)}\n`;
       note += '\n~~~ Income ~~~\n';
       if (f.income.benefit > 0) note += `$${f.income.benefit.toFixed(2)} Benefit\n`;
       if (f.income.employment > 0) note += `$${f.income.employment.toFixed(2)} Employment\n`;
