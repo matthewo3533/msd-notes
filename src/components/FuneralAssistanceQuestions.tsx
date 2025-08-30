@@ -123,7 +123,6 @@ const FuneralAssistanceQuestions: React.FC<FuneralAssistanceQuestionsProps> = ({
   const [toLocationSuggestions, setToLocationSuggestions] = useState<Location[]>([]);
   const [showFromSuggestions, setShowFromSuggestions] = useState(false);
   const [showToSuggestions, setShowToSuggestions] = useState(false);
-  const [isCalculatingDistance, setIsCalculatingDistance] = useState(false);
   const [distanceCalculationError, setDistanceCalculationError] = useState<string>('');
   const [showDistanceError, setShowDistanceError] = useState(false);
   
@@ -464,7 +463,6 @@ const FuneralAssistanceQuestions: React.FC<FuneralAssistanceQuestionsProps> = ({
   };
 
   const calculateDistanceBetweenLocations = async (fromPlaceId: string, toPlaceId: string) => {
-    setIsCalculatingDistance(true);
     setDistanceCalculationError('');
     setShowDistanceError(false);
     
@@ -479,8 +477,6 @@ const FuneralAssistanceQuestions: React.FC<FuneralAssistanceQuestionsProps> = ({
     } catch (error) {
       setDistanceCalculationError('Error calculating distance. Please try again.');
       setShowDistanceError(true);
-    } finally {
-      setIsCalculatingDistance(false);
     }
   };
 

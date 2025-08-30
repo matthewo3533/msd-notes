@@ -12,6 +12,22 @@ declare global {
             OK: string;
           };
         };
+        Geocoder: new () => any;
+        GeocoderStatus: {
+          OK: string;
+        };
+        DistanceMatrixService: new () => any;
+        DistanceMatrixStatus: {
+          OK: string;
+          NOT_FOUND: string;
+          ZERO_RESULTS: string;
+        };
+        TravelMode: {
+          DRIVING: string;
+        };
+        UnitSystem: {
+          METRIC: string;
+        };
       };
     };
   }
@@ -98,35 +114,7 @@ const AddressInput: React.FC<AddressInputProps> = ({
     }
   }, [showSuggestions]);
 
-  // Search places using Google Places API
-  const searchPlaces = async (query: string): Promise<Location[]> => {
-    if (!query.trim() || query.length < 3) return [];
-    
-    if (!autocompleteService.current) {
-      console.error('Google Places API not loaded yet');
-      return [];
-    }
-    
-    return new Promise((resolve) => {
-      autocompleteService.current.getPlacePredictions(
-        {
-          input: query,
-          componentRestrictions: { country: 'nz' } // Restrict to New Zealand only
-        },
-        (predictions: any[], status: string) => {
-          if (status === window.google.maps.places.PlacesServiceStatus.OK && predictions) {
-            const locations = predictions.map((prediction) => ({
-              placeId: prediction.place_id,
-              description: prediction.description
-            }));
-            resolve(locations);
-          } else {
-            resolve([]);
-          }
-        }
-      );
-    });
-  };
+
 
   // Debounce function to reduce API calls
   const debounce = (func: Function, delay: number) => {
