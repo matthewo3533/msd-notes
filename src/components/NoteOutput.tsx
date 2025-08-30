@@ -1,5 +1,5 @@
 import React from 'react';
-import { FoodFormData, ClothingFormData, RentArrearsFormData, CarRepairsFormData, FuneralAssistanceFormData, TASGrantFormData, DeclareIncomeFormData } from '../App';
+import { FoodFormData, ClothingFormData, RentArrearsFormData, CarRepairsFormData, FuneralAssistanceFormData, TASGrantFormData, DeclareIncomeFormData, ADSDFormData } from '../App';
 
 interface NoteOutputProps {
   formData: any;
@@ -130,7 +130,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       note += `CCID: ${c.clientId === false ? 'No' : 'Yes'}\n\n`;
       note += '~~~ Need ~~~\n';
       if (c.whyNeedClothing) {
-        note += `Why is the client needing clothing?\n${c.whyNeedClothing}\n`;
+        note += `${c.whyNeedClothing}\n`;
       }
 
       note += '\n~~~ Payment ~~~\n';
@@ -163,6 +163,46 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       else if (c.decision === 'declined') note += 'APPLICATION DECLINED\n';
       if (c.decisionReason) note += `${c.decisionReason}\n`;
       return note;
+    } else if (service === 'adsd') {
+      // ADSD note output
+      const a: ADSDFormData = formData;
+      let note = '';
+      note += `CCID: ${a.clientId === false ? 'No' : 'Yes'}\n\n`;
+      note += '~~~ Need ~~~\n';
+      if (a.whyNeedADSD) {
+        note += `${a.whyNeedADSD}\n`;
+      }
+
+      note += '\n~~~ Payment ~~~\n';
+      note += `Amount: $${a.amount?.toFixed(2) || '0.00'}\n`;
+      note += `Recovery rate: $${a.recoveryRate?.toFixed(2) || '0.00'}\n`;
+      if (a.directCredit === 'yes' && a.paymentReference) {
+        note += `Reference number: ${a.paymentReference}\n`;
+      }
+      note += '\n~~~ Income ~~~\n';
+      if (a.income.benefit > 0) note += `$${a.income.benefit.toFixed(2)} Benefit\n`;
+      if (a.income.employment > 0) note += `$${a.income.employment.toFixed(2)} Employment\n`;
+      if (a.income.familyTaxCredit > 0) note += `$${a.income.familyTaxCredit.toFixed(2)} Family Tax Credit\n`;
+      if (a.income.childSupport > 0) note += `$${a.income.childSupport.toFixed(2)} Child Support\n`;
+      if (a.income.childDisabilityAllowance > 0) note += `$${a.income.childDisabilityAllowance.toFixed(2)} Child Disability Allowance\n`;
+      if (a.income.otherIncome > 0) note += `$${a.income.otherIncome.toFixed(2)} Other Income\n`;
+      a.costs.forEach((cost: { amount: number; cost: string }) => {
+        if (cost.amount > 0) note += `-$${cost.amount.toFixed(2)} ${cost.cost}\n`;
+      });
+      if (a.costs.length > 0) {
+        const totalIncome = (Object.values(a.income) as number[]).reduce((sum: number, value: number) => sum + (value || 0), 0);
+        const totalCosts = a.costs.reduce((sum: number, cost: { amount: number; cost: string }) => sum + (cost.amount || 0), 0);
+        const remainingIncome = totalIncome - totalCosts;
+        note += '--------------\n';
+        note += `Client is left with $${remainingIncome.toFixed(2)}\n`;
+      }
+      note += '\n~~~ Reasonable Steps ~~~\n';
+      if (a.reasonableSteps) note += `${a.reasonableSteps}\n`;
+      note += '\n~~~ Outcome ~~~\n';
+      if (a.decision === 'approved') note += 'APPLICATION APPROVED\n';
+      else if (a.decision === 'declined') note += 'APPLICATION DECLINED\n';
+      if (a.decisionReason) note += `${a.decisionReason}\n`;
+      return note;
     } else if (service === 'rent-arrears') {
       // Rent Arrears note output
       const r: RentArrearsFormData = formData;
@@ -170,7 +210,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       note += `CCID: ${r.clientId === false ? 'No' : 'Yes'}\n\n`;
       note += '~~~ Need ~~~\n';
       if (r.whyNeedRentArrears) {
-        note += `Why is the client needing rent arrears assistance?\n${r.whyNeedRentArrears}\n`;
+        note += `${r.whyNeedRentArrears}\n`;
       }
       if (r.rentArrearsVerification === 'yes') {
         note += 'Rent arrears verification provided\n';
@@ -216,7 +256,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       note += `CCID: ${c.clientId === false ? 'No' : 'Yes'}\n\n`;
       note += '~~~ Need ~~~\n';
       if (c.whyNeedCarRepairs) {
-        note += `Why is the client needing car repairs?\n${c.whyNeedCarRepairs}\n`;
+        note += `${c.whyNeedCarRepairs}\n`;
       }
 
       note += '\n~~~ Car Details ~~~\n';
@@ -269,7 +309,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       note += `CCID: ${f.clientId === false ? 'No' : 'Yes'}\n\n`;
       note += '~~~ Need ~~~\n';
       if (f.whyNeedFuneralAssistance) {
-        note += `Why is the client needing funeral assistance?\n${f.whyNeedFuneralAssistance}\n`;
+        note += `${f.whyNeedFuneralAssistance}\n`;
       }
 
       if (f.petrolAssistance === 'yes') {
@@ -383,7 +423,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       let note = '';
       note += `CCID: ${e.clientId === false ? 'No' : 'Yes'}\n\n`;
       note += '~~~ Need ~~~\n';
-      if (e.whyNeedPower) note += `Why is the client needing power assistance?\n${e.whyNeedPower}\n`;
+      if (e.whyNeedPower) note += `${e.whyNeedPower}\n`;
 
       note += `Power Account Number: ${e.powerAccountNumber || '-'}\n`;
       note += '\n~~~ Payment ~~~\n';
@@ -424,7 +464,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       let note = '';
       note += `CCID: ${d.clientId === false ? 'No' : 'Yes'}\n\n`;
       note += '~~~ Need ~~~\n';
-      if (d.whyNeedDental) note += `Why is the client needing dental assistance?\n${d.whyNeedDental}\n`;
+      if (d.whyNeedDental) note += `${d.whyNeedDental}\n`;
 
       note += '\n~~~ Payment ~~~\n';
       note += `Supplier Name: ${d.supplierName || '-'}\n`;
@@ -470,7 +510,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       let note = '';
       note += `CCID: ${b.clientId === false ? 'No' : 'Yes'}\n\n`;
       note += '~~~ Need ~~~\n';
-      if (b.whyNeedBeds) note += `Why is the client needing beds?\n${b.whyNeedBeds}\n`;
+      if (b.whyNeedBeds) note += `${b.whyNeedBeds}\n`;
 
       note += '\n~~~ Payment ~~~\n';
       note += `Supplier Name: ${b.supplierName || '-'}\n`;
@@ -510,7 +550,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       let note = '';
       note += `CCID: ${f.clientId === false ? 'No' : 'Yes'}\n\n`;
       note += '~~~ Need ~~~\n';
-      if (f.whyNeedFurniture) note += `Why is the client needing furniture?\n${f.whyNeedFurniture}\n`;
+      if (f.whyNeedFurniture) note += `${f.whyNeedFurniture}\n`;
       if (f.furnitureType) note += `Client is requesting help with a ${f.furnitureType}\n`;
 
       note += '\n~~~ Payment ~~~\n';
@@ -551,7 +591,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       let note = '';
       note += `CCID: ${b.clientId === false ? 'No' : 'Yes'}\n\n`;
       note += '~~~ Need ~~~\n';
-      if (b.whyNeedBedding) note += `Why is the client needing bedding?\n${b.whyNeedBedding}\n`;
+      if (b.whyNeedBedding) note += `${b.whyNeedBedding}\n`;
 
       if (b.beddingSngEligible === 'yes') {
         note += '\nClient qualifies for bedding SNG\n';
@@ -595,7 +635,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       let note = '';
       note += `CCID: ${g.clientId === false ? 'No' : 'Yes'}\n\n`;
       note += '~~~ Need ~~~\n';
-      if (g.whyNeedGlasses) note += `Why is the client needing glasses?\n${g.whyNeedGlasses}\n`;
+      if (g.whyNeedGlasses) note += `${g.whyNeedGlasses}\n`;
 
       note += '\n~~~ Payment ~~~\n';
       note += `Supplier Name: ${g.supplierName || '-'}\n`;
@@ -633,7 +673,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       let note = '';
       note += `CCID: ${f.clientId === false ? 'No' : 'Yes'}\n\n`;
       note += '~~~ Need ~~~\n';
-      if (f.whyNeedFridge) note += `Why is the client needing a fridge?\n${f.whyNeedFridge}\n`;
+      if (f.whyNeedFridge) note += `${f.whyNeedFridge}\n`;
 
       if (f.reasonableSteps) note += `What reasonable steps is the client taken to improve their situation?\n${f.reasonableSteps}\n`;
       
@@ -688,7 +728,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       let note = '';
       note += `CCID: ${w.clientId === false ? 'No' : 'Yes'}\n\n`;
       note += '~~~ Need ~~~\n';
-      if (w.whyNeedWashingMachine) note += `Why is the client needing a washing machine?\n${w.whyNeedWashingMachine}\n`;
+      if (w.whyNeedWashingMachine) note += `${w.whyNeedWashingMachine}\n`;
 
       if (w.reasonableSteps) note += `What reasonable steps is the client taken to improve their situation?\n${w.reasonableSteps}\n`;
       
@@ -746,7 +786,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       let note = '';
       note += `CCID: ${f.clientId === false ? 'No' : 'Yes'}\n\n`;
       note += '~~~ Need ~~~\n';
-      if (f.whyNeedFood) note += `Why is client needing food?\n${f.whyNeedFood}\n`;
+      if (f.whyNeedFood) note += `${f.whyNeedFood}\n`;
 
       if (f.currentFoodBalance > 0) {
         note += `Food balance: $${f.currentFoodBalance.toFixed(2)}\n`;
