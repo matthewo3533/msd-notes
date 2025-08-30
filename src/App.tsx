@@ -17,6 +17,7 @@ import WashingMachinePage from './components/WashingMachinePage';
 import BondRentPage from './components/BondRentPage';
 import TASGrantPage from './components/TASGrantPage';
 import DeclareIncomePage from './components/DeclareIncomePage';
+import ADSDPage from './components/ADSDPage';
 import PetrolCalculator from './components/PetrolCalculator';
 import NotFoundPage from './components/NotFoundPage';
 
@@ -603,6 +604,10 @@ function App() {
       <Route 
         path="/declare-income" 
         element={<DeclareIncomePage currentTheme={currentTheme} onThemeChange={setCurrentTheme} />} 
+      />
+      <Route 
+        path="/adsd" 
+        element={<ADSDPage currentTheme={currentTheme} onThemeChange={setCurrentTheme} />} 
       />
       <Route 
         path="/petrol-calculator" 
