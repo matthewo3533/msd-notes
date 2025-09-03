@@ -47,8 +47,6 @@ const IncomePieChart: React.FC<IncomePieChartProps> = ({
     childDisabilityAllowance: 'Child Disability Allowance'
   };
 
-  const labels = incomeLabels || defaultLabels;
-
   // Prepare data for the chart - show remaining income after expenses
   const totalIncome = Object.values(income).reduce((sum, value) => sum + (value || 0), 0);
   const totalExpenses = costs.reduce((sum, cost) => sum + (cost.amount || 0), 0);
@@ -65,15 +63,6 @@ const IncomePieChart: React.FC<IncomePieChartProps> = ({
   const chartColors = [];
 
   // Define color palettes
-  const greenShades = [
-    '#22c55e', // green-500
-    '#16a34a', // green-600
-    '#15803d', // green-700
-    '#166534', // green-800
-    '#14532d', // green-900
-    '#4ade80', // green-400
-  ];
-
   const redShades = [
     '#ef4444', // red-500
     '#dc2626', // red-600
@@ -83,7 +72,6 @@ const IncomePieChart: React.FC<IncomePieChartProps> = ({
     '#f87171', // red-400
   ];
 
-  let greenIndex = 0;
   let redIndex = 0;
 
   // Add remaining income as a single section (if positive)
