@@ -34,19 +34,8 @@ interface IncomePieChartProps {
 
 const IncomePieChart: React.FC<IncomePieChartProps> = ({
   income,
-  incomeLabels,
   costs
 }) => {
-  // Default labels if none provided
-  const defaultLabels = {
-    benefit: 'Benefit',
-    employment: 'Employment',
-    childSupport: 'Child Support',
-    otherIncome: 'Other Income',
-    familyTaxCredit: 'Family Tax Credit',
-    childDisabilityAllowance: 'Child Disability Allowance'
-  };
-
   // Prepare data for the chart - show remaining income after expenses
   const totalIncome = Object.values(income).reduce((sum, value) => sum + (value || 0), 0);
   const totalExpenses = costs.reduce((sum, cost) => sum + (cost.amount || 0), 0);
