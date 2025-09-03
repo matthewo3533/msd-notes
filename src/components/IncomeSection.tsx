@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import CostInput from './CostInput';
+import IncomePieChart from './IncomePieChart';
 
 export interface IncomeData {
   benefit: number;
@@ -300,6 +301,16 @@ const IncomeSection: React.FC<IncomeSectionProps> = ({
         <div className="income-summary-sticky">
           <div className="income-summary">
             <h4>Income Summary</h4>
+            
+            {/* Pie Chart - only show when there's income data */}
+            {totalIncome > 0 && (
+              <IncomePieChart
+                income={income}
+                incomeLabels={labels}
+                costs={costs}
+              />
+            )}
+            
             {Object.entries(income).map(([key, value]) => {
               const fieldKey = key as keyof IncomeData;
               const labelKey = key as keyof IncomeLabels;
