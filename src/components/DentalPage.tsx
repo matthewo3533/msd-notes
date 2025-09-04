@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DentalQuestions from './DentalQuestions';
 import NoteOutput from './NoteOutput';
-import ThemeSelector from './ThemeSelector';
 
 interface DentalFormData {
   clientId: boolean | null;
@@ -33,12 +32,7 @@ interface DentalFormData {
   decisionReason: string;
 }
 
-interface DentalPageProps {
-  currentTheme: string;
-  onThemeChange: (themeId: string) => void;
-}
-
-const DentalPage: React.FC<DentalPageProps> = ({ currentTheme, onThemeChange }) => {
+const DentalPage: React.FC = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState<DentalFormData>({
     clientId: null,
@@ -121,7 +115,6 @@ const DentalPage: React.FC<DentalPageProps> = ({ currentTheme, onThemeChange }) 
             <h1 className="greeting">Dental</h1>
             <p className="date">{getCurrentDate()}</p>
           </div>
-          <ThemeSelector currentTheme={currentTheme} onThemeChange={onThemeChange} />
         </div>
       </div>
       

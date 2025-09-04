@@ -1,13 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import ThemeSelector from './ThemeSelector';
 
-interface NotFoundPageProps {
-  currentTheme: string;
-  onThemeChange: (themeId: string) => void;
-}
-
-const NotFoundPage: React.FC<NotFoundPageProps> = ({ currentTheme, onThemeChange }) => {
+const NotFoundPage: React.FC = () => {
   const navigate = useNavigate();
 
   const handleBack = () => {
@@ -32,7 +26,6 @@ const NotFoundPage: React.FC<NotFoundPageProps> = ({ currentTheme, onThemeChange
             <h1 className="greeting">Page Not Found</h1>
             <p className="date">{getCurrentDate()}</p>
           </div>
-          <ThemeSelector currentTheme={currentTheme} onThemeChange={onThemeChange} />
         </div>
       </div>
       

@@ -3,14 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import FurnitureQuestions from './FurnitureQuestions';
 import type { FurnitureFormData } from './FurnitureQuestions';
 import NoteOutput from './NoteOutput';
-import ThemeSelector from './ThemeSelector';
 
-interface FurniturePageProps {
-  currentTheme: string;
-  onThemeChange: (themeId: string) => void;
-}
-
-const FurniturePage: React.FC<FurniturePageProps> = ({ currentTheme, onThemeChange }) => {
+const FurniturePage: React.FC = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState<FurnitureFormData>({
     clientId: null,
@@ -91,7 +85,6 @@ const FurniturePage: React.FC<FurniturePageProps> = ({ currentTheme, onThemeChan
             <h1 className="greeting">Furniture</h1>
             <p className="date">{getCurrentDate()}</p>
           </div>
-          <ThemeSelector currentTheme={currentTheme} onThemeChange={onThemeChange} />
         </div>
       </div>
       

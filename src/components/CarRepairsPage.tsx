@@ -2,15 +2,9 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import CarRepairsQuestions from './CarRepairsQuestions';
 import NoteOutput from './NoteOutput';
-import ThemeSelector from './ThemeSelector';
 import { CarRepairsFormData } from '../App';
 
-interface CarRepairsPageProps {
-  currentTheme: string;
-  onThemeChange: (themeId: string) => void;
-}
-
-const CarRepairsPage: React.FC<CarRepairsPageProps> = ({ currentTheme, onThemeChange }) => {
+const CarRepairsPage: React.FC = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState<CarRepairsFormData>({
     clientId: null,
@@ -99,7 +93,6 @@ const CarRepairsPage: React.FC<CarRepairsPageProps> = ({ currentTheme, onThemeCh
             <h1 className="greeting">Car Repairs</h1>
             <p className="date">{getCurrentDate()}</p>
           </div>
-          <ThemeSelector currentTheme={currentTheme} onThemeChange={onThemeChange} />
         </div>
       </div>
       

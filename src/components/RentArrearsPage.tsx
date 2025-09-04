@@ -2,15 +2,9 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import RentArrearsQuestions from './RentArrearsQuestions';
 import NoteOutput from './NoteOutput';
-import ThemeSelector from './ThemeSelector';
 import { RentArrearsFormData } from '../App';
 
-interface RentArrearsPageProps {
-  currentTheme: string;
-  onThemeChange: (themeId: string) => void;
-}
-
-const RentArrearsPage: React.FC<RentArrearsPageProps> = ({ currentTheme, onThemeChange }) => {
+const RentArrearsPage: React.FC = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState<RentArrearsFormData>({
     clientId: null,
@@ -91,7 +85,6 @@ const RentArrearsPage: React.FC<RentArrearsPageProps> = ({ currentTheme, onTheme
             <h1 className="greeting">Rent Arrears</h1>
             <p className="date">{getCurrentDate()}</p>
           </div>
-          <ThemeSelector currentTheme={currentTheme} onThemeChange={onThemeChange} />
         </div>
       </div>
       

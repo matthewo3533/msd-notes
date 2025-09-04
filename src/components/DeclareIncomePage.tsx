@@ -1,16 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import ThemeSelector from './ThemeSelector';
 import DeclareIncomeQuestions from './DeclareIncomeQuestions';
 import NoteOutput from './NoteOutput';
 import { DeclareIncomeFormData } from '../App';
 
-interface DeclareIncomePageProps {
-  currentTheme: string;
-  onThemeChange: (themeId: string) => void;
-}
-
-const DeclareIncomePage: React.FC<DeclareIncomePageProps> = ({ currentTheme, onThemeChange }) => {
+const DeclareIncomePage: React.FC = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState<DeclareIncomeFormData>({
     weeks: []
@@ -32,7 +26,6 @@ const DeclareIncomePage: React.FC<DeclareIncomePageProps> = ({ currentTheme, onT
           <div className="greeting-section">
             <h1 className="greeting">Declare Income</h1>
           </div>
-          <ThemeSelector currentTheme={currentTheme} onThemeChange={onThemeChange} />
         </div>
       </div>
       

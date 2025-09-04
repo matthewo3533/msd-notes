@@ -2,15 +2,9 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import FuneralAssistanceQuestions from './FuneralAssistanceQuestions';
 import NoteOutput from './NoteOutput';
-import ThemeSelector from './ThemeSelector';
 import { FuneralAssistanceFormData } from '../App';
 
-interface FuneralAssistancePageProps {
-  currentTheme: string;
-  onThemeChange: (themeId: string) => void;
-}
-
-const FuneralAssistancePage: React.FC<FuneralAssistancePageProps> = ({ currentTheme, onThemeChange }) => {
+const FuneralAssistancePage: React.FC = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState<FuneralAssistanceFormData>({
     clientId: null,
@@ -101,7 +95,6 @@ const FuneralAssistancePage: React.FC<FuneralAssistancePageProps> = ({ currentTh
             <h1 className="greeting">Assistance to Attend Funeral</h1>
             <p className="date">{getCurrentDate()}</p>
           </div>
-          <ThemeSelector currentTheme={currentTheme} onThemeChange={onThemeChange} />
         </div>
       </div>
       

@@ -2,15 +2,35 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ClothingQuestions from './ClothingQuestions';
 import NoteOutput from './NoteOutput';
-import ThemeSelector from './ThemeSelector';
-import { ClothingFormData } from '../App';
 
-interface ClothingPageProps {
-  currentTheme: string;
-  onThemeChange: (themeId: string) => void;
+interface ClothingFormData {
+  clientId: boolean | null;
+  whyNeedClothing: string;
+  reasonableSteps: string;
+  canMeetNeedOtherWay: string;
+  supplierName: string;
+  supplierId: string;
+  amount: number;
+  recoveryRate: number;
+  directCredit: string;
+  paymentReference: string;
+  income: {
+    benefit: number;
+    employment: number;
+    familyTaxCredit: number;
+    childSupport: number;
+    childDisabilityAllowance: number;
+    otherIncome: number;
+  };
+  costs: Array<{
+    amount: number;
+    cost: string;
+  }>;
+  decision: string;
+  decisionReason: string;
 }
 
-const ClothingPage: React.FC<ClothingPageProps> = ({ currentTheme, onThemeChange }) => {
+const ClothingPage: React.FC = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState<ClothingFormData>({
     clientId: null,
@@ -89,7 +109,6 @@ const ClothingPage: React.FC<ClothingPageProps> = ({ currentTheme, onThemeChange
             <h1 className="greeting">Clothing</h1>
             <p className="date">{getCurrentDate()}</p>
           </div>
-          <ThemeSelector currentTheme={currentTheme} onThemeChange={onThemeChange} />
         </div>
       </div>
       

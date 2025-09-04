@@ -2,15 +2,9 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import WashingMachineQuestions from './WashingMachineQuestions';
 import NoteOutput from './NoteOutput';
-import ThemeSelector from './ThemeSelector';
 import { WashingMachineFormData } from '../App';
 
-interface WashingMachinePageProps {
-  currentTheme: string;
-  onThemeChange: (themeId: string) => void;
-}
-
-const WashingMachinePage: React.FC<WashingMachinePageProps> = ({ currentTheme, onThemeChange }) => {
+const WashingMachinePage: React.FC = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState<WashingMachineFormData>({
     clientId: null,
@@ -103,7 +97,6 @@ const WashingMachinePage: React.FC<WashingMachinePageProps> = ({ currentTheme, o
             <h1 className="greeting">Washing Machine</h1>
             <p className="date">{getCurrentDate()}</p>
           </div>
-          <ThemeSelector currentTheme={currentTheme} onThemeChange={onThemeChange} />
         </div>
       </div>
       

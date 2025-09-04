@@ -2,15 +2,9 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import GlassesQuestions from './GlassesQuestions';
 import NoteOutput from './NoteOutput';
-import ThemeSelector from './ThemeSelector';
 import { GlassesFormData } from '../App';
 
-interface GlassesPageProps {
-  currentTheme: string;
-  onThemeChange: (themeId: string) => void;
-}
-
-const GlassesPage: React.FC<GlassesPageProps> = ({ currentTheme, onThemeChange }) => {
+const GlassesPage: React.FC = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState<GlassesFormData>({
     clientId: null,
@@ -89,7 +83,6 @@ const GlassesPage: React.FC<GlassesPageProps> = ({ currentTheme, onThemeChange }
             <h1 className="greeting">Glasses</h1>
             <p className="date">{getCurrentDate()}</p>
           </div>
-          <ThemeSelector currentTheme={currentTheme} onThemeChange={onThemeChange} />
         </div>
       </div>
       

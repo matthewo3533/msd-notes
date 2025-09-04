@@ -2,15 +2,9 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import FoodQuestions from './FoodQuestions';
 import NoteOutput from './NoteOutput';
-import ThemeSelector from './ThemeSelector';
 import { FoodFormData } from '../App';
 
-interface FoodPageProps {
-  currentTheme: string;
-  onThemeChange: (themeId: string) => void;
-}
-
-const FoodPage: React.FC<FoodPageProps> = ({ currentTheme, onThemeChange }) => {
+const FoodPage: React.FC = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState<FoodFormData>({
     clientId: null,
@@ -83,7 +77,6 @@ const FoodPage: React.FC<FoodPageProps> = ({ currentTheme, onThemeChange }) => {
             <h1 className="greeting">Food</h1>
             <p className="date">{getCurrentDate()}</p>
           </div>
-          <ThemeSelector currentTheme={currentTheme} onThemeChange={onThemeChange} />
         </div>
       </div>
       

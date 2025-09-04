@@ -2,15 +2,9 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import TASGrantQuestions from './TASGrantQuestions';
 import NoteOutput from './NoteOutput';
-import ThemeSelector from './ThemeSelector';
 import { TASGrantFormData } from '../App';
 
-interface TASGrantPageProps {
-  currentTheme: string;
-  onThemeChange: (themeId: string) => void;
-}
-
-const TASGrantPage: React.FC<TASGrantPageProps> = ({ currentTheme, onThemeChange }) => {
+const TASGrantPage: React.FC = () => {
   const navigate = useNavigate();
   
   const getTodayDate = () => {
@@ -106,7 +100,6 @@ const TASGrantPage: React.FC<TASGrantPageProps> = ({ currentTheme, onThemeChange
             <h1 className="greeting">TAS Grant/Reapplication</h1>
             <p className="date">{getCurrentDate()}</p>
           </div>
-          <ThemeSelector currentTheme={currentTheme} onThemeChange={onThemeChange} />
         </div>
       </div>
       

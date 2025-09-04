@@ -2,15 +2,9 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ADSDQuestions from './ADSDQuestions';
 import NoteOutput from './NoteOutput';
-import ThemeSelector from './ThemeSelector';
 import { ADSDFormData } from '../App';
 
-interface ADSDPageProps {
-  currentTheme: string;
-  onThemeChange: (themeId: string) => void;
-}
-
-const ADSDPage: React.FC<ADSDPageProps> = ({ currentTheme, onThemeChange }) => {
+const ADSDPage: React.FC = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState<ADSDFormData>({
     clientId: null,
@@ -87,7 +81,6 @@ const ADSDPage: React.FC<ADSDPageProps> = ({ currentTheme, onThemeChange }) => {
             <h1 className="greeting">ADSD</h1>
             <p className="date">{getCurrentDate()}</p>
           </div>
-          <ThemeSelector currentTheme={currentTheme} onThemeChange={onThemeChange} />
         </div>
       </div>
       

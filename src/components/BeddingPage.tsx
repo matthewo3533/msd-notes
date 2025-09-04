@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import BeddingQuestions from './BeddingQuestions';
 import NoteOutput from './NoteOutput';
-import ThemeSelector from './ThemeSelector';
 
 interface BeddingFormData {
   clientId: boolean | null;
@@ -31,12 +30,7 @@ interface BeddingFormData {
   decisionReason: string;
 }
 
-interface BeddingPageProps {
-  currentTheme: string;
-  onThemeChange: (themeId: string) => void;
-}
-
-const BeddingPage: React.FC<BeddingPageProps> = ({ currentTheme, onThemeChange }) => {
+const BeddingPage: React.FC = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState<BeddingFormData>({
     clientId: null,
@@ -115,7 +109,6 @@ const BeddingPage: React.FC<BeddingPageProps> = ({ currentTheme, onThemeChange }
             <h1 className="greeting">Bedding</h1>
             <p className="date">{getCurrentDate()}</p>
           </div>
-          <ThemeSelector currentTheme={currentTheme} onThemeChange={onThemeChange} />
         </div>
       </div>
       

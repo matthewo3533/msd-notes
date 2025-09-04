@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import ThemeSelector from './ThemeSelector';
 
 // Google Maps API TypeScript declarations
 declare global {
@@ -47,14 +46,10 @@ interface Location {
 }
 
 interface PetrolCalculatorProps {
-  currentTheme?: string;
-  onThemeChange?: (themeId: string) => void;
   isStandalone?: boolean;
 }
 
 const PetrolCalculator: React.FC<PetrolCalculatorProps> = ({ 
-  currentTheme = 'dark-blue', 
-  onThemeChange = () => {}, 
   isStandalone = true 
 }) => {
   const navigate = useNavigate();
@@ -568,7 +563,6 @@ const PetrolCalculator: React.FC<PetrolCalculatorProps> = ({
             <div className="greeting-section">
               <h1 className="greeting">Petrol Cost Calculator</h1>
             </div>
-            <ThemeSelector currentTheme={currentTheme} onThemeChange={onThemeChange} />
           </div>
         </div>
       )}

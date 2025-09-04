@@ -2,15 +2,9 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import BondRentQuestions from './BondRentQuestions';
 import NoteOutput from './NoteOutput';
-import ThemeSelector from './ThemeSelector';
 import { BondRentFormData } from '../App';
 
-interface BondRentPageProps {
-  currentTheme: string;
-  onThemeChange: (themeId: string) => void;
-}
-
-const BondRentPage: React.FC<BondRentPageProps> = ({ currentTheme, onThemeChange }) => {
+const BondRentPage: React.FC = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState<BondRentFormData>({
     clientId: null,
@@ -105,7 +99,6 @@ const BondRentPage: React.FC<BondRentPageProps> = ({ currentTheme, onThemeChange
             <h1 className="greeting">Bond/Rent in Advance</h1>
             <p className="date">{getCurrentDate()}</p>
           </div>
-          <ThemeSelector currentTheme={currentTheme} onThemeChange={onThemeChange} />
         </div>
       </div>
       

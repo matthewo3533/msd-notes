@@ -2,15 +2,9 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import FridgeQuestions from './FridgeQuestions';
 import NoteOutput from './NoteOutput';
-import ThemeSelector from './ThemeSelector';
 import { FridgeFormData } from '../App';
 
-interface FridgePageProps {
-  currentTheme: string;
-  onThemeChange: (themeId: string) => void;
-}
-
-const FridgePage: React.FC<FridgePageProps> = ({ currentTheme, onThemeChange }) => {
+const FridgePage: React.FC = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState<FridgeFormData>({
     clientId: null,
@@ -103,7 +97,6 @@ const FridgePage: React.FC<FridgePageProps> = ({ currentTheme, onThemeChange }) 
             <h1 className="greeting">Fridge</h1>
             <p className="date">{getCurrentDate()}</p>
           </div>
-          <ThemeSelector currentTheme={currentTheme} onThemeChange={onThemeChange} />
         </div>
       </div>
       

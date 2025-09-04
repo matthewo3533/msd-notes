@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import BedsQuestions from './BedsQuestions';
 import NoteOutput from './NoteOutput';
-import ThemeSelector from './ThemeSelector';
 
 interface BedsFormData {
   clientId: boolean | null;
@@ -39,12 +38,7 @@ interface BedsFormData {
   decisionReason: string;
 }
 
-interface BedsPageProps {
-  currentTheme: string;
-  onThemeChange: (themeId: string) => void;
-}
-
-const BedsPage: React.FC<BedsPageProps> = ({ currentTheme, onThemeChange }) => {
+const BedsPage: React.FC = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState<BedsFormData>({
     clientId: null,
@@ -139,7 +133,6 @@ const BedsPage: React.FC<BedsPageProps> = ({ currentTheme, onThemeChange }) => {
             <h1 className="greeting">Beds</h1>
             <p className="date">{getCurrentDate()}</p>
           </div>
-          <ThemeSelector currentTheme={currentTheme} onThemeChange={onThemeChange} />
         </div>
       </div>
       

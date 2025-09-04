@@ -1,16 +1,10 @@
 import React, { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import ThemeSelector from './ThemeSelector';
 
 export interface Service {
   id: string;
   title: string;
   emoji: string;
-}
-
-interface HomeProps {
-  currentTheme: string;
-  onThemeChange: (themeId: string) => void;
 }
 
 const services: Service[] = [
@@ -40,25 +34,13 @@ const generalNotes: Service[] = [
   { id: 'petrol-calculator', title: 'Petrol Cost Calculator', emoji: '⛽' },
 ];
 
-const Home: React.FC<HomeProps> = ({ currentTheme, onThemeChange }) => {
+const Home: React.FC = () => {
   const navigate = useNavigate();
   const servicesGridRef = useRef<HTMLDivElement>(null);
   const generalNotesRef = useRef<HTMLDivElement>(null);
 
   const handleServiceSelect = (serviceId: string) => {
     navigate(`/${serviceId}`);
-  };
-
-
-
-  const getCurrentDate = () => {
-    const now = new Date();
-    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-    const dayName = days[now.getDay()];
-    const day = now.getDate().toString().padStart(2, '0');
-    const month = (now.getMonth() + 1).toString().padStart(2, '0');
-    const year = now.getFullYear();
-    return `${dayName} ${day}/${month}/${year}`;
   };
 
   useEffect(() => {
@@ -92,16 +74,6 @@ const Home: React.FC<HomeProps> = ({ currentTheme, onThemeChange }) => {
 
   return (
     <div className="container">
-      <div className="header">
-        <div className="header-top">
-          <div className="greeting-section">
-            <h1 className="greeting">MSD Notes App</h1>
-            <p className="date">{getCurrentDate()}</p>
-          </div>
-          <ThemeSelector currentTheme={currentTheme} onThemeChange={onThemeChange} />
-        </div>
-      </div>
-      
       <div className="service-question">
         <h2>Hardship Assistance</h2>
       </div>

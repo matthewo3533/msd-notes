@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ElectricityQuestions from './ElectricityQuestions';
 import NoteOutput from './NoteOutput';
-import ThemeSelector from './ThemeSelector';
 
 interface ElectricityFormData {
   clientId: boolean | null;
@@ -32,12 +31,7 @@ interface ElectricityFormData {
   decisionReason: string;
 }
 
-interface ElectricityPageProps {
-  currentTheme: string;
-  onThemeChange: (themeId: string) => void;
-}
-
-const ElectricityPage: React.FC<ElectricityPageProps> = ({ currentTheme, onThemeChange }) => {
+const ElectricityPage: React.FC = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState<ElectricityFormData>({
     clientId: null,
@@ -118,7 +112,6 @@ const ElectricityPage: React.FC<ElectricityPageProps> = ({ currentTheme, onTheme
             <h1 className="greeting">Electricity Assistance</h1>
             <p className="date">{getCurrentDate()}</p>
           </div>
-          <ThemeSelector currentTheme={currentTheme} onThemeChange={onThemeChange} />
         </div>
       </div>
       

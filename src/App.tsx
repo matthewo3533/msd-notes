@@ -1,25 +1,27 @@
-import { useEffect, useState } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { useEffect, useState, lazy, Suspense } from 'react';
+import { Routes, Route, Navigate } from 'react-router-dom';
+import Navigation from './components/Navigation';
 import Home from './components/Home';
-import FoodPage from './components/FoodPage';
-import ClothingPage from './components/ClothingPage';
-import RentArrearsPage from './components/RentArrearsPage';
-import CarRepairsPage from './components/CarRepairsPage';
-import FuneralAssistancePage from './components/FuneralAssistancePage';
-import ElectricityPage from './components/ElectricityPage';
-import DentalPage from './components/DentalPage';
-import BedsPage from './components/BedsPage';
-import BeddingPage from './components/BeddingPage';
-import FurniturePage from './components/FurniturePage';
-import GlassesPage from './components/GlassesPage';
-import FridgePage from './components/FridgePage';
-import WashingMachinePage from './components/WashingMachinePage';
-import BondRentPage from './components/BondRentPage';
-import TASGrantPage from './components/TASGrantPage';
-import DeclareIncomePage from './components/DeclareIncomePage';
-import ADSDPage from './components/ADSDPage';
-import PetrolCalculator from './components/PetrolCalculator';
-import NotFoundPage from './components/NotFoundPage';
+
+// Lazy load components for better performance
+const FoodPage = lazy(() => import('./components/FoodPage'));
+const ClothingPage = lazy(() => import('./components/ClothingPage'));
+const RentArrearsPage = lazy(() => import('./components/RentArrearsPage'));
+const CarRepairsPage = lazy(() => import('./components/CarRepairsPage'));
+const FuneralAssistancePage = lazy(() => import('./components/FuneralAssistancePage'));
+const ElectricityPage = lazy(() => import('./components/ElectricityPage'));
+const DentalPage = lazy(() => import('./components/DentalPage'));
+const BedsPage = lazy(() => import('./components/BedsPage'));
+const BeddingPage = lazy(() => import('./components/BeddingPage'));
+const FurniturePage = lazy(() => import('./components/FurniturePage'));
+const GlassesPage = lazy(() => import('./components/GlassesPage'));
+const FridgePage = lazy(() => import('./components/FridgePage'));
+const WashingMachinePage = lazy(() => import('./components/WashingMachinePage'));
+const BondRentPage = lazy(() => import('./components/BondRentPage'));
+const TASGrantPage = lazy(() => import('./components/TASGrantPage'));
+const DeclareIncomePage = lazy(() => import('./components/DeclareIncomePage'));
+const ADSDPage = lazy(() => import('./components/ADSDPage'));
+const PetrolCalculator = lazy(() => import('./components/PetrolCalculator'));
 
 export interface Service {
   id: string;
@@ -514,6 +516,7 @@ export interface DeclareIncomeFormData {
 }
 
 function App() {
+  
   // Initialize theme from localStorage or default to 'dark-blue'
   const [currentTheme, setCurrentTheme] = useState(() => {
     const savedTheme = localStorage.getItem('msd-theme');
@@ -536,88 +539,33 @@ function App() {
   }, [currentTheme]);
 
   return (
-    <Routes>
-      <Route 
-        path="/" 
-        element={<Home currentTheme={currentTheme} onThemeChange={setCurrentTheme} />} 
-      />
-      <Route 
-        path="/food" 
-        element={<FoodPage currentTheme={currentTheme} onThemeChange={setCurrentTheme} />} 
-      />
-      <Route 
-        path="/clothing" 
-        element={<ClothingPage currentTheme={currentTheme} onThemeChange={setCurrentTheme} />} 
-      />
-      <Route 
-        path="/rent-arrears" 
-        element={<RentArrearsPage currentTheme={currentTheme} onThemeChange={setCurrentTheme} />} 
-      />
-      <Route 
-        path="/car" 
-        element={<CarRepairsPage currentTheme={currentTheme} onThemeChange={setCurrentTheme} />} 
-      />
-      <Route 
-        path="/funeral" 
-        element={<FuneralAssistancePage currentTheme={currentTheme} onThemeChange={setCurrentTheme} />} 
-      />
-      <Route 
-        path="/electricity" 
-        element={<ElectricityPage currentTheme={currentTheme} onThemeChange={setCurrentTheme} />} 
-      />
-      <Route 
-        path="/dental" 
-        element={<DentalPage currentTheme={currentTheme} onThemeChange={setCurrentTheme} />} 
-      />
-      <Route 
-        path="/beds" 
-        element={<BedsPage currentTheme={currentTheme} onThemeChange={setCurrentTheme} />} 
-      />
-      <Route 
-        path="/bedding" 
-        element={<BeddingPage currentTheme={currentTheme} onThemeChange={setCurrentTheme} />} 
-      />
-      <Route 
-        path="/furniture" 
-        element={<FurniturePage currentTheme={currentTheme} onThemeChange={setCurrentTheme} />} 
-      />
-      <Route 
-        path="/glasses" 
-        element={<GlassesPage currentTheme={currentTheme} onThemeChange={setCurrentTheme} />} 
-      />
-      <Route 
-        path="/fridge" 
-        element={<FridgePage currentTheme={currentTheme} onThemeChange={setCurrentTheme} />} 
-      />
-      <Route 
-        path="/washing" 
-        element={<WashingMachinePage currentTheme={currentTheme} onThemeChange={setCurrentTheme} />} 
-      />
-      <Route 
-        path="/bond" 
-        element={<BondRentPage currentTheme={currentTheme} onThemeChange={setCurrentTheme} />} 
-      />
-      <Route 
-        path="/tas-grant" 
-        element={<TASGrantPage currentTheme={currentTheme} onThemeChange={setCurrentTheme} />} 
-      />
-      <Route 
-        path="/declare-income" 
-        element={<DeclareIncomePage currentTheme={currentTheme} onThemeChange={setCurrentTheme} />} 
-      />
-      <Route 
-        path="/adsd" 
-        element={<ADSDPage currentTheme={currentTheme} onThemeChange={setCurrentTheme} />} 
-      />
-      <Route 
-        path="/petrol-calculator" 
-        element={<PetrolCalculator currentTheme={currentTheme} onThemeChange={setCurrentTheme} />} 
-      />
-      <Route 
-        path="/:serviceId" 
-        element={<NotFoundPage currentTheme={currentTheme} onThemeChange={setCurrentTheme} />} 
-      />
-    </Routes>
+    <>
+      <Navigation currentTheme={currentTheme} onThemeChange={setCurrentTheme} />
+      <Suspense fallback={<div className="loading">Loading...</div>}>
+        <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/food" element={<FoodPage />} />
+        <Route path="/clothing" element={<ClothingPage />} />
+        <Route path="/rent-arrears" element={<RentArrearsPage />} />
+        <Route path="/car" element={<CarRepairsPage />} />
+        <Route path="/funeral" element={<FuneralAssistancePage />} />
+        <Route path="/electricity" element={<ElectricityPage />} />
+        <Route path="/dental" element={<DentalPage />} />
+        <Route path="/beds" element={<BedsPage />} />
+        <Route path="/bedding" element={<BeddingPage />} />
+        <Route path="/furniture" element={<FurniturePage />} />
+        <Route path="/glasses" element={<GlassesPage />} />
+        <Route path="/fridge" element={<FridgePage />} />
+        <Route path="/washing" element={<WashingMachinePage />} />
+        <Route path="/bond" element={<BondRentPage />} />
+        <Route path="/tas-grant" element={<TASGrantPage />} />
+        <Route path="/declare-income" element={<DeclareIncomePage />} />
+        <Route path="/adsd" element={<ADSDPage />} />
+                  <Route path="/petrol-calculator" element={<PetrolCalculator />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </Suspense>
+    </>
   );
 }
 
