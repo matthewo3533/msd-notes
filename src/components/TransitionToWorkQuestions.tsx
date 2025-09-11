@@ -59,7 +59,6 @@ const TransitionToWorkQuestions: React.FC<TransitionToWorkQuestionsProps> = ({ f
   const [toLocationSuggestions, setToLocationSuggestions] = useState<Location[]>([]);
   const [showFromSuggestions, setShowFromSuggestions] = useState(false);
   const [showToSuggestions, setShowToSuggestions] = useState(false);
-  const [suggestionsHeight, setSuggestionsHeight] = useState(0);
   const [carDropdownHeight, setCarDropdownHeight] = useState(0);
 
   useEffect(() => {
@@ -159,9 +158,6 @@ const TransitionToWorkQuestions: React.FC<TransitionToWorkQuestionsProps> = ({ f
         setShowToSuggestions(false);
         setFromLocationSuggestions([]);
         setToLocationSuggestions([]);
-        if (!showFromSuggestions && !showToSuggestions) {
-          setSuggestionsHeight(0);
-        }
       }
     };
 
@@ -263,9 +259,9 @@ const TransitionToWorkQuestions: React.FC<TransitionToWorkQuestionsProps> = ({ f
           input: query,
           componentRestrictions: { country: 'nz' }
         },
-        (predictions, status) => {
+        (predictions: any, status: any) => {
           if (status === window.google.maps.places.PlacesServiceStatus.OK && predictions) {
-            const locations: Location[] = predictions.map(prediction => ({
+            const locations: Location[] = predictions.map((prediction: any) => ({
               placeId: prediction.place_id,
               description: prediction.description
             }));
@@ -307,7 +303,7 @@ const TransitionToWorkQuestions: React.FC<TransitionToWorkQuestionsProps> = ({ f
           travelMode: window.google.maps.TravelMode.DRIVING,
           unitSystem: window.google.maps.UnitSystem.METRIC
         },
-        (response, status) => {
+        (response: any, status: any) => {
           if (status === window.google.maps.DistanceMatrixStatus.OK && response) {
             const element = response.rows[0].elements[0];
             if (element.status === window.google.maps.DistanceMatrixStatus.OK) {
@@ -418,8 +414,8 @@ const TransitionToWorkQuestions: React.FC<TransitionToWorkQuestionsProps> = ({ f
           <div className="form-group">
             <label>When is client's first payday?</label>
             <Calendar
-              selectedDate={formData.firstPayday}
-              onDateChange={(date) => handleInputChange('firstPayday', date)}
+              value={formData.firstPayday}
+              onChange={(date: string) => handleInputChange('firstPayday', date)}
             />
           </div>
         )}
@@ -713,8 +709,8 @@ const TransitionToWorkQuestions: React.FC<TransitionToWorkQuestionsProps> = ({ f
         <div className="form-group">
           <label>Start Date</label>
           <Calendar
-            selectedDate={formData.startDate}
-            onDateChange={(date) => handleInputChange('startDate', date)}
+            value={formData.startDate}
+            onChange={(date: string) => handleInputChange('startDate', date)}
           />
         </div>
         <div className="form-group">
