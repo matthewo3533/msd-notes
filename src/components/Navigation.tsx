@@ -35,6 +35,7 @@ const navigationItems: NavItem[] = [
   { id: 'adsd', title: 'ADSD', path: '/adsd', emoji: '💵', category: 'hardships' },
   { id: 'car', title: 'Car Repairs', path: '/car', emoji: '🚗', category: 'hardships' },
   { id: 'funeral', title: 'Funeral Assistance', path: '/funeral', emoji: '⚰️', category: 'hardships' },
+  { id: 'stranded-travel', title: 'Stranded Travel', path: '/stranded-travel', emoji: '⛽', category: 'hardships' },
   
   // Tools
   { id: 'tas-grant', title: 'TAS Grant', path: '/tas-grant', emoji: '📋', category: 'tools' },
@@ -119,6 +120,29 @@ const Navigation: React.FC<NavigationProps> = ({ currentTheme, onThemeChange }) 
       document.body.classList.remove('nav-dropdown-open');
     };
   }, []);
+
+  // Handle tab visibility change to fix blur bug when switching tabs
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      // If the page becomes hidden (user switches tabs) and we have an active dropdown,
+      // clean up the blur effect to prevent it from staying stuck
+      if (document.hidden && activeDropdown) {
+        setActiveDropdown(null);
+        setIsNavHovered(false);
+        document.body.classList.remove('nav-dropdown-open');
+        // Clear any pending timeouts
+        if (timeoutRef.current) {
+          clearTimeout(timeoutRef.current);
+          timeoutRef.current = null;
+        }
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [activeDropdown]);
 
   // Close dropdown when clicking outside
   useEffect(() => {

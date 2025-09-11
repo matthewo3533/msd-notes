@@ -1,9 +1,9 @@
 import React from 'react';
-import { FoodFormData, ClothingFormData, RentArrearsFormData, CarRepairsFormData, FuneralAssistanceFormData, TASGrantFormData, DeclareIncomeFormData, ADSDFormData } from '../App';
+import { FoodFormData, ClothingFormData, RentArrearsFormData, CarRepairsFormData, FuneralAssistanceFormData, StrandedTravelFormData, TASGrantFormData, DeclareIncomeFormData, ADSDFormData, EmergencyFormData, TransitionToWorkFormData } from '../App';
 
 interface NoteOutputProps {
   formData: any;
-  service?: 'food' | 'clothing' | 'electricity' | 'dental' | 'beds' | 'bedding' | 'furniture' | 'glasses' | 'fridge' | 'washing' | 'tas-grant' | 'declare-income' | 'bond-rent' | 'rent-arrears' | 'car-repairs' | 'funeral-assistance' | 'adsd';
+  service?: 'food' | 'clothing' | 'electricity' | 'dental' | 'beds' | 'bedding' | 'furniture' | 'glasses' | 'fridge' | 'washing' | 'tas-grant' | 'declare-income' | 'bond-rent' | 'rent-arrears' | 'car-repairs' | 'funeral-assistance' | 'stranded-travel' | 'adsd' | 'emergency' | 'transition-to-work';
   onReset: () => void;
 }
 
@@ -45,7 +45,6 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
               note += `- Type: Lump Sum\n`;
               note += `- Amount: $${amount.toFixed(2)}\n`;
             }
-            note += '\n';
           });
           
           note += `Total weekly income: $${weekTotal.toFixed(2)}\n`;
@@ -54,22 +53,6 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
         note += '\n';
       });
 
-      // Calculate grand total
-      const grandTotal = d.weeks.reduce((total, week) => {
-        return total + week.incomeSources.reduce((weekTotal, source) => {
-          if (source.type === 'hourly' && source.hoursWorked && source.hourlyRate) {
-            return weekTotal + (source.hoursWorked * source.hourlyRate);
-          } else if (source.type === 'lump-sum' && source.lumpSumAmount) {
-            return weekTotal + source.lumpSumAmount;
-          }
-          return weekTotal;
-        }, 0);
-      }, 0);
-
-      if (d.weeks.length > 1) {
-        note += `=== GRAND TOTAL: $${grandTotal.toFixed(2)} ===\n`;
-      }
-      
       return note;
     } else if (service === 'tas-grant') {
       // TAS Grant/Reapplication note output
@@ -162,6 +145,125 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       if (c.decision === 'approved') note += 'APPLICATION APPROVED\n';
       else if (c.decision === 'declined') note += 'APPLICATION DECLINED\n';
       if (c.decisionReason) note += `${c.decisionReason}\n`;
+      return note;
+    } else if (service === 'emergency') {
+      // Emergency Payment note output (same template as clothing)
+      const e: EmergencyFormData = formData;
+      let note = '';
+      note += `CCID: ${e.clientId === false ? 'No' : 'Yes'}\n\n`;
+      note += '~~~ Need ~~~\n';
+      if (e.whyNeedEmergencyPayment) {
+        note += `${e.whyNeedEmergencyPayment}\n`;
+      }
+
+      note += '\n~~~ Payment ~~~\n';
+      note += `Supplier Name: ${e.supplierName || '-'}\n`;
+      note += `Supplier ID: ${e.supplierId || '-'}\n`;
+      note += `Amount: $${e.amount?.toFixed(2) || '0.00'}\n`;
+      note += `Recovery rate: $${e.recoveryRate?.toFixed(2) || '0.00'}\n`;
+      if (e.directCredit === 'yes' && e.paymentReference) {
+        note += `Reference number: ${e.paymentReference}\n`;
+      }
+      note += '\n~~~ Income ~~~\n';
+      if (e.income.benefit > 0) note += `$${e.income.benefit.toFixed(2)} Benefit\n`;
+      if (e.income.employment > 0) note += `$${e.income.employment.toFixed(2)} Employment\n`;
+      if (e.income.familyTaxCredit > 0) note += `$${e.income.familyTaxCredit.toFixed(2)} Family Tax Credit\n`;
+      if (e.income.childSupport > 0) note += `$${e.income.childSupport.toFixed(2)} Child Support\n`;
+      if (e.income.childDisabilityAllowance > 0) note += `$${e.income.childDisabilityAllowance.toFixed(2)} Child Disability Allowance\n`;
+      if (e.income.otherIncome > 0) note += `$${e.income.otherIncome.toFixed(2)} Other Income\n`;
+      e.costs.forEach((cost: { amount: number; cost: string }) => {
+        if (cost.amount > 0) note += `-$${cost.amount.toFixed(2)} ${cost.cost}\n`;
+      });
+      if (e.costs.length > 0) {
+        const totalIncome = (Object.values(e.income) as number[]).reduce((sum: number, value: number) => sum + (value || 0), 0);
+        const totalCosts = e.costs.reduce((sum: number, cost: { amount: number; cost: string }) => sum + (cost.amount || 0), 0);
+        const remainingIncome = totalIncome - totalCosts;
+        note += '--------------\n';
+        note += `Client is left with $${remainingIncome.toFixed(2)}\n`;
+      }
+      note += '\n~~~ Reasonable Steps ~~~\n';
+      if (e.reasonableSteps) note += `${e.reasonableSteps}\n`;
+      note += '\n~~~ Outcome ~~~\n';
+      if (e.decision === 'approved') note += 'APPLICATION APPROVED\n';
+      else if (e.decision === 'declined') note += 'APPLICATION DECLINED\n';
+      if (e.decisionReason) note += `${e.decisionReason}\n`;
+      return note;
+    } else if (service === 'transition-to-work') {
+      // Transition to Work Grant note output
+      const t: TransitionToWorkFormData = formData;
+      let note = '';
+      note += `CCID: ${t.clientId === false ? 'No' : 'Yes'}\n\n`;
+      
+      note += '~~~ Need ~~~\n';
+      if (t.helpType) {
+        note += `Client is requesting help with ${t.helpType}\n`;
+      }
+      
+      if (t.helpType.includes('Bridging costs') && t.firstPayday) {
+        note += `\nDate of first payday: ${t.firstPayday}\n`;
+      }
+      
+      if (t.whyNeedTransitionToWork) {
+        note += `\n${t.whyNeedTransitionToWork}\n`;
+      }
+      
+      if (t.contractUploaded) {
+        note += `\nContract uploaded: ${t.contractUploaded === 'yes' ? 'Yes' : 'No'}\n`;
+      }
+
+      if (t.employerName || t.startDate || t.hoursPerWeek > 0) {
+        note += '\n~~~ Employment Info ~~~\n';
+        if (t.employerName) note += `Employer: ${t.employerName}\n`;
+        if (t.startDate) note += `Start date: ${t.startDate}\n`;
+        if (t.hoursPerWeek > 0) note += `Hours per week: ${t.hoursPerWeek}\n`;
+      }
+
+      if (t.petrolAssistance === 'yes' && (t.startLocation || t.destination)) {
+        note += '\n~~~ Travel Details ~~~\n';
+        if (t.startLocation && t.destination) {
+          note += `Travelling from: ${t.startLocation} to ${t.destination}\n`;
+        }
+        if (t.returnTrip) {
+          note += `Return trip: ${t.returnTrip === 'yes' ? 'Yes' : 'No'}\n`;
+        }
+        if (t.distance > 0) {
+          note += `Distance: ${t.distance.toFixed(1)} km\n`;
+        }
+        if (t.travelCost > 0) {
+          note += `Calculated Cost of travel: $${t.travelCost.toFixed(2)}\n`;
+        }
+      }
+
+      note += '\n~~~ Payment ~~~\n';
+      note += `Supplier Name: ${t.supplierName || '-'}\n`;
+      note += `Supplier ID: ${t.supplierId || '-'}\n`;
+      note += `Amount: $${t.amount?.toFixed(2) || '0.00'}\n`;
+      note += `Recovery rate: $${t.recoveryRate?.toFixed(2) || '0.00'}\n`;
+      if (t.directCredit === 'yes' && t.paymentReference) {
+        note += `Reference number: ${t.paymentReference}\n`;
+      }
+      note += '\n~~~ Income ~~~\n';
+      if (t.income.benefit > 0) note += `$${t.income.benefit.toFixed(2)} Benefit\n`;
+      if (t.income.employment > 0) note += `$${t.income.employment.toFixed(2)} Employment\n`;
+      if (t.income.familyTaxCredit > 0) note += `$${t.income.familyTaxCredit.toFixed(2)} Family Tax Credit\n`;
+      if (t.income.childSupport > 0) note += `$${t.income.childSupport.toFixed(2)} Child Support\n`;
+      if (t.income.childDisabilityAllowance > 0) note += `$${t.income.childDisabilityAllowance.toFixed(2)} Child Disability Allowance\n`;
+      if (t.income.otherIncome > 0) note += `$${t.income.otherIncome.toFixed(2)} Other Income\n`;
+      t.costs.forEach((cost: { amount: number; cost: string }) => {
+        if (cost.amount > 0) note += `-$${cost.amount.toFixed(2)} ${cost.cost}\n`;
+      });
+      if (t.costs.length > 0) {
+        const totalIncome = (Object.values(t.income) as number[]).reduce((sum: number, value: number) => sum + (value || 0), 0);
+        const totalCosts = t.costs.reduce((sum: number, cost: { amount: number; cost: string }) => sum + (cost.amount || 0), 0);
+        const remainingIncome = totalIncome - totalCosts;
+        note += '--------------\n';
+        note += `Client is left with $${remainingIncome.toFixed(2)}\n`;
+      }
+      
+      note += '\n~~~ Outcome ~~~\n';
+      if (t.decision === 'approved') note += 'APPLICATION APPROVED\n';
+      else if (t.decision === 'declined') note += 'APPLICATION DECLINED\n';
+      if (t.decisionReason) note += `${t.decisionReason}\n`;
       return note;
     } else if (service === 'adsd') {
       // ADSD note output
@@ -360,6 +462,65 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       if (f.decision === 'approved') note += 'APPLICATION APPROVED\n';
       else if (f.decision === 'declined') note += 'APPLICATION DECLINED\n';
       if (f.decisionReason) note += `${f.decisionReason}\n`;
+      return note;
+    } else if (service === 'stranded-travel') {
+      // Stranded Travel note output (same template as funeral assistance)
+      const s: StrandedTravelFormData = formData;
+      let note = '';
+      note += `CCID: ${s.clientId === false ? 'No' : 'Yes'}\n\n`;
+      note += '~~~ Need ~~~\n';
+      if (s.whyNeedStrandedTravelAssistance) {
+        note += `${s.whyNeedStrandedTravelAssistance}\n`;
+      }
+
+      if (s.petrolAssistance === 'yes') {
+        note += '\n~~~ Travel Details ~~~\n';
+        if (s.startLocation && s.destination) {
+          note += `Travelling from: ${s.startLocation} to ${s.destination}\n`;
+        }
+        if (s.returnTrip) {
+          note += `Return trip: ${s.returnTrip === 'yes' ? 'Yes' : 'No'}\n`;
+        }
+        if (s.distance > 0) {
+          note += `Distance: ${s.distance.toFixed(1)} km\n`;
+        }
+        if (s.travelCost > 0) {
+          note += `Calculated Cost of travel: $${s.travelCost.toFixed(2)}\n`;
+        }
+      }
+
+      note += '\n~~~ Payment ~~~\n';
+      note += `Supplier Name: ${s.supplierName || '-'}\n`;
+      note += `Supplier ID: ${s.supplierId || '-'}\n`;
+      note += `Amount: $${s.amount?.toFixed(2) || '0.00'}\n`;
+      note += `Recovery rate: $${s.recoveryRate?.toFixed(2) || '0.00'}\n`;
+      if (s.directCredit === 'yes' && s.paymentReference) {
+        note += `Reference number: ${s.paymentReference}\n`;
+      }
+      note += '\n~~~ Income ~~~\n';
+      if (s.income.benefit > 0) note += `$${s.income.benefit.toFixed(2)} Benefit\n`;
+      if (s.income.employment > 0) note += `$${s.income.employment.toFixed(2)} Employment\n`;
+      if (s.income.familyTaxCredit > 0) note += `$${s.income.familyTaxCredit.toFixed(2)} Family Tax Credit\n`;
+      if (s.income.childSupport > 0) note += `$${s.income.childSupport.toFixed(2)} Child Support\n`;
+      if (s.income.childDisabilityAllowance > 0) note += `$${s.income.childDisabilityAllowance.toFixed(2)} Child Disability Allowance\n`;
+      if (s.income.otherIncome > 0) note += `$${s.income.otherIncome.toFixed(2)} Other Income\n`;
+      s.costs.forEach((cost: { amount: number; cost: string }) => {
+        if (cost.amount > 0) note += `-$${cost.amount.toFixed(2)} ${cost.cost}\n`;
+      });
+      if (s.costs.length > 0) {
+        const totalIncome = (Object.values(s.income) as number[]).reduce((sum: number, value: number) => sum + (value || 0), 0);
+        const totalCosts = s.costs.reduce((sum: number, cost: { amount: number; cost: string }) => sum + (cost.amount || 0), 0);
+        const remainingIncome = totalIncome - totalCosts;
+        note += '--------------\n';
+        note += `Client is left with $${remainingIncome.toFixed(2)}\n`;
+      }
+      
+      note += '\n~~~ Reasonable Steps ~~~\n';
+      if (s.reasonableSteps) note += `${s.reasonableSteps}\n`;
+      note += '\n~~~ Outcome ~~~\n';
+      if (s.decision === 'approved') note += 'APPLICATION APPROVED\n';
+      else if (s.decision === 'declined') note += 'APPLICATION DECLINED\n';
+      if (s.decisionReason) note += `${s.decisionReason}\n`;
       return note;
     } else if (service === 'bond-rent') {
       // Bond/Rent in Advance note output
@@ -824,7 +985,33 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(generateNote());
-      alert('Note copied to clipboard!');
+      // Show a subtle toast notification (same as Quick Copy)
+      const toast = document.createElement('div');
+      toast.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #10b981;
+        color: white;
+        padding: 12px 20px;
+        border-radius: 8px;
+        font-size: 14px;
+        z-index: 1000;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        transform: translateX(100%);
+        transition: transform 0.3s ease;
+      `;
+      toast.textContent = 'Note copied!';
+      document.body.appendChild(toast);
+      
+      // Animate in
+      setTimeout(() => toast.style.transform = 'translateX(0)', 100);
+      
+      // Remove after 2 seconds
+      setTimeout(() => {
+        toast.style.transform = 'translateX(100%)';
+        setTimeout(() => document.body.removeChild(toast), 300);
+      }, 2000);
     } catch (err) {
       console.error('Failed to copy: ', err);
       // Fallback for older browsers
@@ -834,7 +1021,33 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       textArea.select();
       document.execCommand('copy');
       document.body.removeChild(textArea);
-      alert('Note copied to clipboard!');
+      // Show toast for fallback too
+      const toast = document.createElement('div');
+      toast.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #10b981;
+        color: white;
+        padding: 12px 20px;
+        border-radius: 8px;
+        font-size: 14px;
+        z-index: 1000;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        transform: translateX(100%);
+        transition: transform 0.3s ease;
+      `;
+      toast.textContent = 'Note copied!';
+      document.body.appendChild(toast);
+      
+      // Animate in
+      setTimeout(() => toast.style.transform = 'translateX(0)', 100);
+      
+      // Remove after 2 seconds
+      setTimeout(() => {
+        toast.style.transform = 'translateX(100%)';
+        setTimeout(() => document.body.removeChild(toast), 300);
+      }, 2000);
     }
   };
 
@@ -915,14 +1128,24 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       <h3>Generated Note</h3>
       <pre>{note}</pre>
       <div className="note-actions">
-        <button className="copy-btn" onClick={handleCopy}>
+        <button className="copy-btn copy-btn-with-icon" onClick={handleCopy}>
+          <svg className="btn-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+          </svg>
           Copy to Clipboard
         </button>
         <button 
-          className="copy-btn" 
+          className="copy-btn copy-btn-with-icon" 
           onClick={onReset}
           style={{ marginTop: '0.5rem', background: '#6c757d', width: '100%' }}
         >
+          <svg className="btn-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path>
+            <path d="M21 3v5h-5"></path>
+            <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path>
+            <path d="M3 21v-5h5"></path>
+          </svg>
           Start New Application
         </button>
       </div>

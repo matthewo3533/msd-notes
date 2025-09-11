@@ -161,7 +161,7 @@ const DeclareIncomeQuestions: React.FC<DeclareIncomeQuestionsProps> = ({ formDat
         <div className="form-group">
           <p className="form-description">
             Use this form to declare income for multiple weeks. You can add multiple income sources per week, 
-            including hourly rates and lump sum payments.
+            including hourly rates and flat amount payments.
           </p>
         </div>
 
@@ -282,7 +282,7 @@ const DeclareIncomeQuestions: React.FC<DeclareIncomeQuestionsProps> = ({ formDat
                         />
                       </label>
                       <label className={`radio-btn ${incomeSource.type === 'lump-sum' ? 'selected' : ''}`}>
-                        Lump Sum
+                        Flat Amount
                         <input
                           type="radio"
                           name={`incomeType-${incomeSource.id}`}
@@ -327,7 +327,7 @@ const DeclareIncomeQuestions: React.FC<DeclareIncomeQuestionsProps> = ({ formDat
 
                   {incomeSource.type === 'lump-sum' && (
                     <div className="form-group">
-                      <label>Lump Sum Amount ($):</label>
+                      <label>Flat Amount ($):</label>
                       <div className="dollar-input">
                         <input
                           type="number"

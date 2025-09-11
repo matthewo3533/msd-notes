@@ -6,9 +6,12 @@ import Home from './components/Home';
 // Lazy load components for better performance
 const FoodPage = lazy(() => import('./components/FoodPage'));
 const ClothingPage = lazy(() => import('./components/ClothingPage'));
+const EmergencyPage = lazy(() => import('./components/EmergencyPage'));
+const TransitionToWorkPage = lazy(() => import('./components/TransitionToWorkPage'));
 const RentArrearsPage = lazy(() => import('./components/RentArrearsPage'));
 const CarRepairsPage = lazy(() => import('./components/CarRepairsPage'));
 const FuneralAssistancePage = lazy(() => import('./components/FuneralAssistancePage'));
+const StrandedTravelPage = lazy(() => import('./components/StrandedTravelPage'));
 const ElectricityPage = lazy(() => import('./components/ElectricityPage'));
 const DentalPage = lazy(() => import('./components/DentalPage'));
 const BedsPage = lazy(() => import('./components/BedsPage'));
@@ -58,6 +61,70 @@ export interface ClothingFormData {
   whyNeedClothing: string;
   reasonableSteps: string;
   canMeetNeedOtherWay: string;
+  supplierName: string;
+  supplierId: string;
+  amount: number;
+  recoveryRate: number;
+  directCredit: string;
+  paymentReference: string;
+  income: {
+    benefit: number;
+    employment: number;
+    familyTaxCredit: number;
+    childSupport: number;
+    childDisabilityAllowance: number;
+    otherIncome: number;
+  };
+  costs: Array<{
+    amount: number;
+    cost: string;
+  }>;
+  decision: string;
+  decisionReason: string;
+}
+
+export interface EmergencyFormData {
+  clientId: boolean | null;
+  whyNeedEmergencyPayment: string;
+  reasonableSteps: string;
+  canMeetNeedOtherWay: string;
+  supplierName: string;
+  supplierId: string;
+  amount: number;
+  recoveryRate: number;
+  directCredit: string;
+  paymentReference: string;
+  income: {
+    benefit: number;
+    employment: number;
+    familyTaxCredit: number;
+    childSupport: number;
+    childDisabilityAllowance: number;
+    otherIncome: number;
+  };
+  costs: Array<{
+    amount: number;
+    cost: string;
+  }>;
+  decision: string;
+  decisionReason: string;
+}
+
+export interface TransitionToWorkFormData {
+  clientId: boolean | null;
+  helpType: string;
+  firstPayday: string;
+  whyNeedTransitionToWork: string;
+  contractUploaded: string;
+  petrolAssistance: string;
+  startLocation: string;
+  destination: string;
+  returnTrip: string;
+  distance: number;
+  travelCost: number;
+  employerName: string;
+  startDate: string;
+  hoursPerWeek: number;
   supplierName: string;
   supplierId: string;
   amount: number;
@@ -169,6 +236,40 @@ export interface CarRepairsFormData {
 export interface FuneralAssistanceFormData {
   clientId: boolean | null;
   whyNeedFuneralAssistance: string;
+  reasonableSteps: string;
+  canMeetNeedOtherWay: string;
+  petrolAssistance: string;
+  // Travel details (from petrol calculator)
+  startLocation: string;
+  destination: string;
+  returnTrip: string;
+  distance: number;
+  travelCost: number;
+  supplierName: string;
+  supplierId: string;
+  amount: number;
+  recoveryRate: number;
+  directCredit: string;
+  paymentReference: string;
+  income: {
+    benefit: number;
+    employment: number;
+    familyTaxCredit: number;
+    childSupport: number;
+    childDisabilityAllowance: number;
+    otherIncome: number;
+  };
+  costs: Array<{
+    amount: number;
+    cost: string;
+  }>;
+  decision: string;
+  decisionReason: string;
+}
+
+export interface StrandedTravelFormData {
+  clientId: boolean | null;
+  whyNeedStrandedTravelAssistance: string;
   reasonableSteps: string;
   canMeetNeedOtherWay: string;
   petrolAssistance: string;
@@ -546,9 +647,12 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/food" element={<FoodPage />} />
         <Route path="/clothing" element={<ClothingPage />} />
+        <Route path="/emergency" element={<EmergencyPage />} />
+        <Route path="/work" element={<TransitionToWorkPage />} />
         <Route path="/rent-arrears" element={<RentArrearsPage />} />
         <Route path="/car" element={<CarRepairsPage />} />
         <Route path="/funeral" element={<FuneralAssistancePage />} />
+        <Route path="/stranded-travel" element={<StrandedTravelPage />} />
         <Route path="/electricity" element={<ElectricityPage />} />
         <Route path="/dental" element={<DentalPage />} />
         <Route path="/beds" element={<BedsPage />} />

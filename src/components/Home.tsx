@@ -24,7 +24,7 @@ const services: Service[] = [
   { id: 'car', title: 'Car repairs', emoji: '🚗' },
   { id: 'work', title: 'Transition to Work Grant', emoji: '💼' },
   { id: 'funeral', title: 'Assistance to Attend Funeral', emoji: '⚰️' },
-  { id: 'stranded', title: 'Stranded Travel', emoji: '⛽' },
+  { id: 'stranded-travel', title: 'Stranded Travel', emoji: '⛽' },
   { id: 'emergency', title: 'Other Emergency Payment', emoji: '🚨' },
 ];
 
