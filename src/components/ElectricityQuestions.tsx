@@ -221,12 +221,14 @@ const ElectricityQuestions: React.FC<ElectricityQuestionsProps> = ({ formData, o
         recoveryRate={formData.recoveryRate}
         directCredit={formData.directCredit}
         paymentReference={formData.paymentReference}
+        paymentCardNumber={formData.paymentCardNumber}
         onSupplierNameChange={name => handleInputChange('supplierName', name)}
         onSupplierIdChange={id => handleInputChange('supplierId', id)}
         onAmountChange={amount => handleInputChange('amount', amount)}
         onRecoveryRateChange={rate => handleInputChange('recoveryRate', rate)}
         onDirectCreditChange={credit => handleInputChange('directCredit', credit)}
         onPaymentReferenceChange={reference => handleInputChange('paymentReference', reference)}
+        onPaymentCardNumberChange={cardNumber => handleInputChange('paymentCardNumber', cardNumber)}
         sectionNumber={3}
         isVisible={visibleSections.has('payment')}
       />

@@ -17,6 +17,7 @@ const GlassesPage: React.FC = () => {
     recoveryRate: 0,
     directCredit: '',
     paymentReference: '',
+    paymentCardNumber: '',
     income: {
       benefit: 0,
       employment: 0,
@@ -46,6 +47,7 @@ const GlassesPage: React.FC = () => {
       recoveryRate: 0,
       directCredit: '',
       paymentReference: '',
+    paymentCardNumber: '',
       income: {
         benefit: 0,
         employment: 0,
