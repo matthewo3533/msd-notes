@@ -7,12 +7,14 @@ interface PaymentSectionProps {
   recoveryRate: number;
   directCredit: string;
   paymentReference: string;
+  paymentCardNumber: string;
   onSupplierNameChange: (name: string) => void;
   onSupplierIdChange: (id: string) => void;
   onAmountChange: (amount: number) => void;
   onRecoveryRateChange: (rate: number) => void;
   onDirectCreditChange: (credit: string) => void;
   onPaymentReferenceChange: (reference: string) => void;
+  onPaymentCardNumberChange: (cardNumber: string) => void;
   sectionNumber?: number;
   isVisible?: boolean;
   totalAmount?: number;
@@ -34,12 +36,14 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
   recoveryRate,
   directCredit,
   paymentReference,
+  paymentCardNumber,
   onSupplierNameChange,
   onSupplierIdChange,
   onAmountChange,
   onRecoveryRateChange,
   onDirectCreditChange,
   onPaymentReferenceChange,
+  onPaymentCardNumberChange,
   sectionNumber = 3,
   isVisible = false,
   totalAmount,
@@ -238,6 +242,18 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
             value={paymentReference}
             onChange={(e) => onPaymentReferenceChange(e.target.value)}
             placeholder="Payment reference"
+          />
+        </div>
+      )}
+      {directCredit !== 'yes' && (
+        <div className="form-group">
+          <label>Payment card number</label>
+          <input
+            type="text"
+            className="form-control"
+            value={paymentCardNumber}
+            onChange={(e) => onPaymentCardNumberChange(e.target.value)}
+            placeholder="Payment card number"
           />
         </div>
       )}

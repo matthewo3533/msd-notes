@@ -22,7 +22,7 @@ const navigationItems: NavItem[] = [
   // Hardships
   { id: 'food', title: 'Food', path: '/food', emoji: '🍽️', category: 'hardships' },
   { id: 'clothing', title: 'Clothing', path: '/clothing', emoji: '👕', category: 'hardships' },
-  { id: 'electricity', title: 'Electricity', path: '/electricity', emoji: '⚡', category: 'hardships' },
+  { id: 'electricity', title: 'Electricity Assistance', path: '/electricity', emoji: '⚡', category: 'hardships' },
   { id: 'dental', title: 'Dental', path: '/dental', emoji: '🦷', category: 'hardships' },
   { id: 'beds', title: 'Beds', path: '/beds', emoji: '🛏️', category: 'hardships' },
   { id: 'bedding', title: 'Bedding', path: '/bedding', emoji: '🛌', category: 'hardships' },
@@ -30,12 +30,14 @@ const navigationItems: NavItem[] = [
   { id: 'glasses', title: 'Glasses', path: '/glasses', emoji: '👓', category: 'hardships' },
   { id: 'fridge', title: 'Fridge', path: '/fridge', emoji: '❄️', category: 'hardships' },
   { id: 'washing', title: 'Washing Machine', path: '/washing', emoji: '🫧', category: 'hardships' },
-  { id: 'bond', title: 'Bond/Rent', path: '/bond', emoji: '🏠', category: 'hardships' },
+  { id: 'bond', title: 'Bond/Rent in Advance', path: '/bond', emoji: '🏠', category: 'hardships' },
   { id: 'rent-arrears', title: 'Rent Arrears', path: '/rent-arrears', emoji: '💰', category: 'hardships' },
   { id: 'adsd', title: 'ADSD', path: '/adsd', emoji: '💵', category: 'hardships' },
-  { id: 'car', title: 'Car Repairs', path: '/car', emoji: '🚗', category: 'hardships' },
-  { id: 'funeral', title: 'Funeral Assistance', path: '/funeral', emoji: '⚰️', category: 'hardships' },
+  { id: 'car', title: 'Car repairs', path: '/car', emoji: '🚗', category: 'hardships' },
+  { id: 'work', title: 'Transition to Work Grant', path: '/work', emoji: '💼', category: 'hardships' },
+  { id: 'funeral', title: 'Assistance to Attend Funeral', path: '/funeral', emoji: '⚰️', category: 'hardships' },
   { id: 'stranded-travel', title: 'Stranded Travel', path: '/stranded-travel', emoji: '⛽', category: 'hardships' },
+  { id: 'emergency', title: 'Other Emergency Payment', path: '/emergency', emoji: '🚨', category: 'hardships' },
   
   // Tools
   { id: 'tas-grant', title: 'TAS Grant', path: '/tas-grant', emoji: '📋', category: 'tools' },

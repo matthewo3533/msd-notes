@@ -14,6 +14,7 @@ interface ElectricityFormData {
   recoveryRate: number;
   directCredit: string;
   paymentReference: string;
+  paymentCardNumber: string;
   powerAccountNumber: string;
   income: {
     benefit: number;
@@ -44,6 +45,7 @@ const ElectricityPage: React.FC = () => {
     recoveryRate: 0,
     directCredit: '',
     paymentReference: '',
+    paymentCardNumber: '',
     powerAccountNumber: '',
     income: {
       benefit: 0,
@@ -74,6 +76,7 @@ const ElectricityPage: React.FC = () => {
       recoveryRate: 0,
       directCredit: '',
       paymentReference: '',
+    paymentCardNumber: '',
       powerAccountNumber: '',
       income: {
         benefit: 0,

@@ -14,6 +14,7 @@ interface BedsFormData {
   recoveryRate: number;
   directCredit: string;
   paymentReference: string;
+  paymentCardNumber: string;
   income: {
     benefit: number;
     employment: number;
@@ -51,6 +52,7 @@ const BedsPage: React.FC = () => {
     recoveryRate: 0,
     directCredit: '',
     paymentReference: '',
+    paymentCardNumber: '',
     income: {
       benefit: 0,
       employment: 0,
@@ -88,6 +90,7 @@ const BedsPage: React.FC = () => {
       recoveryRate: 0,
       directCredit: '',
       paymentReference: '',
+    paymentCardNumber: '',
       income: {
         benefit: 0,
         employment: 0,

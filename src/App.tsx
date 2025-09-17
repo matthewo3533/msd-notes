@@ -40,6 +40,13 @@ export interface FoodFormData {
   hardshipUnforeseen: string;
   unforeseenCircumstance: string;
   reasonableSteps: string;
+  supplierName: string;
+  supplierId: string;
+  amount: number;
+  recoveryRate: number;
+  directCredit: string;
+  paymentReference: string;
+  paymentCardNumber: string;
   income: {
     benefit: number;
     employment: number;
@@ -67,6 +74,7 @@ export interface ClothingFormData {
   recoveryRate: number;
   directCredit: string;
   paymentReference: string;
+  paymentCardNumber: string;
   income: {
     benefit: number;
     employment: number;
@@ -94,6 +102,7 @@ export interface EmergencyFormData {
   recoveryRate: number;
   directCredit: string;
   paymentReference: string;
+  paymentCardNumber: string;
   income: {
     benefit: number;
     employment: number;
@@ -131,6 +140,7 @@ export interface TransitionToWorkFormData {
   recoveryRate: number;
   directCredit: string;
   paymentReference: string;
+  paymentCardNumber: string;
   income: {
     benefit: number;
     employment: number;
@@ -157,6 +167,7 @@ export interface ADSDFormData {
   recoveryRate: number;
   directCredit: string;
   paymentReference: string;
+  paymentCardNumber: string;
   income: {
     benefit: number;
     employment: number;
@@ -185,6 +196,7 @@ export interface RentArrearsFormData {
   recoveryRate: number;
   directCredit: string;
   paymentReference: string;
+  paymentCardNumber: string;
   income: {
     benefit: number;
     employment: number;
@@ -217,6 +229,7 @@ export interface CarRepairsFormData {
   recoveryRate: number;
   directCredit: string;
   paymentReference: string;
+  paymentCardNumber: string;
   income: {
     benefit: number;
     employment: number;
@@ -251,6 +264,7 @@ export interface FuneralAssistanceFormData {
   recoveryRate: number;
   directCredit: string;
   paymentReference: string;
+  paymentCardNumber: string;
   income: {
     benefit: number;
     employment: number;
@@ -285,6 +299,7 @@ export interface StrandedTravelFormData {
   recoveryRate: number;
   directCredit: string;
   paymentReference: string;
+  paymentCardNumber: string;
   income: {
     benefit: number;
     employment: number;
@@ -323,6 +338,7 @@ export interface BondRentFormData {
   recoveryRate: number;
   directCredit: string;
   paymentReference: string;
+  paymentCardNumber: string;
   income: {
     benefit: number;
     employment: number;
@@ -350,6 +366,7 @@ export interface GlassesFormData {
   recoveryRate: number;
   directCredit: string;
   paymentReference: string;
+  paymentCardNumber: string;
   income: {
     benefit: number;
     employment: number;
@@ -377,6 +394,7 @@ export interface FridgeFormData {
   recoveryRate: number;
   directCredit: string;
   paymentReference: string;
+  paymentCardNumber: string;
   // Whiteware Info section
   householdSize: string;
   addressContactConfirmed: string;
@@ -412,6 +430,7 @@ export interface WashingMachineFormData {
   recoveryRate: number;
   directCredit: string;
   paymentReference: string;
+  paymentCardNumber: string;
   // Whiteware Info section
   householdSize: string;
   addressContactConfirmed: string;
@@ -447,6 +466,7 @@ export interface BedsFormData {
   recoveryRate: number;
   directCredit: string;
   paymentReference: string;
+  paymentCardNumber: string;
   income: {
     benefit: number;
     employment: number;
@@ -474,6 +494,7 @@ export interface BeddingFormData {
   recoveryRate: number;
   directCredit: string;
   paymentReference: string;
+  paymentCardNumber: string;
   income: {
     benefit: number;
     employment: number;
@@ -501,6 +522,7 @@ export interface FurnitureFormData {
   recoveryRate: number;
   directCredit: string;
   paymentReference: string;
+  paymentCardNumber: string;
   income: {
     benefit: number;
     employment: number;
@@ -530,6 +552,7 @@ export interface DentalFormData {
   recoveryRate: number;
   directCredit: string;
   paymentReference: string;
+  paymentCardNumber: string;
   income: {
     benefit: number;
     employment: number;
@@ -557,6 +580,7 @@ export interface ElectricityFormData {
   recoveryRate: number;
   directCredit: string;
   paymentReference: string;
+  paymentCardNumber: string;
   income: {
     benefit: number;
     employment: number;
@@ -669,6 +693,18 @@ function App() {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Suspense>
+      
+      {/* Footer */}
+      <footer className="page-footer">
+        <div className="page-footer-content">
+          <p className="page-footer-text">Designed by Matt O'Connor</p>
+          <p className="page-footer-email">
+            <a href="mailto:Matt.O'Connor012@msd.govt.nz" className="page-footer-link">
+              Email me
+            </a>
+          </p>
+        </div>
+      </footer>
     </>
   );
 }

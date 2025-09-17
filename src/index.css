@@ -403,6 +403,60 @@
   transform: scaleY(1.2);
 }
 
+/* Prevent scroll wheel from changing number input values */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+/* Additional CSS to help with scroll prevention */
+input[type="number"]:focus {
+  outline: none;
+}
+
+/* Apply dropdown scrollbar styling to Income Summary and Generated Note */
+.income-summary,
+.income-summary-sticky,
+.note-output pre {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-primary) transparent;
+}
+
+.income-summary::-webkit-scrollbar,
+.income-summary-sticky::-webkit-scrollbar,
+.note-output pre::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+  background: transparent;
+}
+
+.income-summary::-webkit-scrollbar-track,
+.income-summary-sticky::-webkit-scrollbar-track,
+.note-output pre::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 3px;
+}
+
+.income-summary::-webkit-scrollbar-thumb,
+.income-summary-sticky::-webkit-scrollbar-thumb,
+.note-output pre::-webkit-scrollbar-thumb {
+  background: var(--border-primary);
+  border-radius: 3px;
+  transition: background-color 0.2s ease;
+}
+
+.income-summary::-webkit-scrollbar-thumb:hover,
+.income-summary-sticky::-webkit-scrollbar-thumb:hover,
+.note-output pre::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+  transform: scaleY(1.2);
+}
+
 .tools-dropdown .dropdown-item {
   min-width: 140px;
   flex-direction: column;
@@ -884,6 +938,12 @@ body:not(.nav-dropdown-open) .container {
   box-sizing: border-box;
 }
 
+/* Ensure body scrolling is restored when dropdown is closed */
+body:not(.nav-dropdown-open) {
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+}
+
 /* Ensure navigation stays stable */
 .navigation {
   position: fixed;
@@ -927,6 +987,8 @@ body {
   color: var(--text-primary);
   line-height: 1.5;
   transition: background-color 0.3s ease, color 0.3s ease;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 #root {
@@ -3393,7 +3455,7 @@ input[type="number"] {
 .quick-copy-grid {
   display: grid;
   gap: 1rem;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(2, 1fr);
 }
 
 .quick-copy-item {
@@ -4303,4 +4365,42 @@ input[type="number"] {
   .global-search-item {
     padding: 0.75rem 1rem;
   }
+}
+
+/* Page Footer Styles */
+.page-footer {
+  background: var(--bg-secondary);
+  padding: 1rem 0;
+  margin-top: 2rem;
+}
+
+.page-footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  text-align: center;
+}
+
+.page-footer-text {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  margin: 0 0 0.25rem 0;
+  font-weight: 500;
+}
+
+.page-footer-email {
+  margin: 0;
+}
+
+.page-footer-link {
+  color: var(--accent-primary);
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.page-footer-link:hover {
+  color: var(--text-primary);
+  text-decoration: underline;
 }

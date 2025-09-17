@@ -117,10 +117,21 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       }
 
       note += '\n~~~ Payment ~~~\n';
-      note += `Supplier Name: ${c.supplierName || '-'}\n`;
-      note += `Supplier ID: ${c.supplierId || '-'}\n`;
-      note += `Amount: $${c.amount?.toFixed(2) || '0.00'}\n`;
-      note += `Recovery rate: $${c.recoveryRate?.toFixed(2) || '0.00'}\n`;
+      if (c.supplierName && c.supplierName.trim()) {
+        note += `Supplier Name: ${c.supplierName}\n`;
+      }
+      if (c.supplierId && c.supplierId.trim()) {
+        note += `Supplier ID: ${c.supplierId}\n`;
+      }
+      if (c.paymentCardNumber && c.paymentCardNumber.trim()) {
+        note += `Payment card number: ${c.paymentCardNumber}\n`;
+      }
+      if (c.amount && c.amount > 0) {
+        note += `Amount: $${c.amount.toFixed(2)}\n`;
+      }
+      if (c.recoveryRate && c.recoveryRate > 0) {
+        note += `Recovery rate: $${c.recoveryRate.toFixed(2)}\n`;
+      }
       if (c.directCredit === 'yes' && c.paymentReference) {
         note += `Reference number: ${c.paymentReference}\n`;
       }
@@ -157,10 +168,21 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       }
 
       note += '\n~~~ Payment ~~~\n';
-      note += `Supplier Name: ${e.supplierName || '-'}\n`;
-      note += `Supplier ID: ${e.supplierId || '-'}\n`;
-      note += `Amount: $${e.amount?.toFixed(2) || '0.00'}\n`;
-      note += `Recovery rate: $${e.recoveryRate?.toFixed(2) || '0.00'}\n`;
+      if (e.supplierName && e.supplierName.trim()) {
+        note += `Supplier Name: ${e.supplierName}\n`;
+      }
+      if (e.supplierId && e.supplierId.trim()) {
+        note += `Supplier ID: ${e.supplierId}\n`;
+      }
+      if (e.paymentCardNumber && e.paymentCardNumber.trim()) {
+        note += `Payment card number: ${e.paymentCardNumber}\n`;
+      }
+      if (e.amount && e.amount > 0) {
+        note += `Amount: $${e.amount.toFixed(2)}\n`;
+      }
+      if (e.recoveryRate && e.recoveryRate > 0) {
+        note += `Recovery rate: $${e.recoveryRate.toFixed(2)}\n`;
+      }
       if (e.directCredit === 'yes' && e.paymentReference) {
         note += `Reference number: ${e.paymentReference}\n`;
       }
@@ -235,10 +257,21 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       }
 
       note += '\n~~~ Payment ~~~\n';
-      note += `Supplier Name: ${t.supplierName || '-'}\n`;
-      note += `Supplier ID: ${t.supplierId || '-'}\n`;
-      note += `Amount: $${t.amount?.toFixed(2) || '0.00'}\n`;
-      note += `Recovery rate: $${t.recoveryRate?.toFixed(2) || '0.00'}\n`;
+      if (t.supplierName && t.supplierName.trim()) {
+        note += `Supplier Name: ${t.supplierName}\n`;
+      }
+      if (t.supplierId && t.supplierId.trim()) {
+        note += `Supplier ID: ${t.supplierId}\n`;
+      }
+      if (t.paymentCardNumber && t.paymentCardNumber.trim()) {
+        note += `Payment card number: ${t.paymentCardNumber}\n`;
+      }
+      if (t.amount && t.amount > 0) {
+        note += `Amount: $${t.amount.toFixed(2)}\n`;
+      }
+      if (t.recoveryRate && t.recoveryRate > 0) {
+        note += `Recovery rate: $${t.recoveryRate.toFixed(2)}\n`;
+      }
       if (t.directCredit === 'yes' && t.paymentReference) {
         note += `Reference number: ${t.paymentReference}\n`;
       }
@@ -276,8 +309,15 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       }
 
       note += '\n~~~ Payment ~~~\n';
-      note += `Amount: $${a.amount?.toFixed(2) || '0.00'}\n`;
-      note += `Recovery rate: $${a.recoveryRate?.toFixed(2) || '0.00'}\n`;
+      if (a.amount && a.amount > 0) {
+        note += `Amount: $${a.amount.toFixed(2)}\n`;
+      }
+      if (a.recoveryRate && a.recoveryRate > 0) {
+        note += `Recovery rate: $${a.recoveryRate.toFixed(2)}\n`;
+      }
+      if (a.paymentCardNumber && a.paymentCardNumber.trim()) {
+        note += `Payment card number: ${a.paymentCardNumber}\n`;
+      }
       if (a.directCredit === 'yes' && a.paymentReference) {
         note += `Reference number: ${a.paymentReference}\n`;
       }
@@ -319,10 +359,21 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       }
 
       note += '\n~~~ Payment ~~~\n';
-      note += `Supplier Name: ${r.supplierName || '-'}\n`;
-      note += `Supplier ID: ${r.supplierId || '-'}\n`;
-      note += `Amount: $${r.amount?.toFixed(2) || '0.00'}\n`;
-      note += `Recovery rate: $${r.recoveryRate?.toFixed(2) || '0.00'}\n`;
+      if (r.supplierName && r.supplierName.trim()) {
+        note += `Supplier Name: ${r.supplierName}\n`;
+      }
+      if (r.supplierId && r.supplierId.trim()) {
+        note += `Supplier ID: ${r.supplierId}\n`;
+      }
+      if (r.paymentCardNumber && r.paymentCardNumber.trim()) {
+        note += `Payment card number: ${r.paymentCardNumber}\n`;
+      }
+      if (r.amount && r.amount > 0) {
+        note += `Amount: $${r.amount.toFixed(2)}\n`;
+      }
+      if (r.recoveryRate && r.recoveryRate > 0) {
+        note += `Recovery rate: $${r.recoveryRate.toFixed(2)}\n`;
+      }
       if (r.directCredit === 'yes' && r.paymentReference) {
         note += `Reference number: ${r.paymentReference}\n`;
       }
@@ -372,10 +423,21 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       }
 
       note += '\n~~~ Payment ~~~\n';
-      note += `Supplier Name: ${c.supplierName || '-'}\n`;
-      note += `Supplier ID: ${c.supplierId || '-'}\n`;
-      note += `Amount: $${c.amount?.toFixed(2) || '0.00'}\n`;
-      note += `Recovery rate: $${c.recoveryRate?.toFixed(2) || '0.00'}\n`;
+      if (c.supplierName && c.supplierName.trim()) {
+        note += `Supplier Name: ${c.supplierName}\n`;
+      }
+      if (c.supplierId && c.supplierId.trim()) {
+        note += `Supplier ID: ${c.supplierId}\n`;
+      }
+      if (c.paymentCardNumber && c.paymentCardNumber.trim()) {
+        note += `Payment card number: ${c.paymentCardNumber}\n`;
+      }
+      if (c.amount && c.amount > 0) {
+        note += `Amount: $${c.amount.toFixed(2)}\n`;
+      }
+      if (c.recoveryRate && c.recoveryRate > 0) {
+        note += `Recovery rate: $${c.recoveryRate.toFixed(2)}\n`;
+      }
       if (c.directCredit === 'yes' && c.paymentReference) {
         note += `Reference number: ${c.paymentReference}\n`;
       }
@@ -431,10 +493,21 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       }
 
       note += '\n~~~ Payment ~~~\n';
-      note += `Supplier Name: ${f.supplierName || '-'}\n`;
-      note += `Supplier ID: ${f.supplierId || '-'}\n`;
-      note += `Amount: $${f.amount?.toFixed(2) || '0.00'}\n`;
-      note += `Recovery rate: $${f.recoveryRate?.toFixed(2) || '0.00'}\n`;
+      if (f.supplierName && f.supplierName.trim()) {
+        note += `Supplier Name: ${f.supplierName}\n`;
+      }
+      if (f.supplierId && f.supplierId.trim()) {
+        note += `Supplier ID: ${f.supplierId}\n`;
+      }
+      if (f.paymentCardNumber && f.paymentCardNumber.trim()) {
+        note += `Payment card number: ${f.paymentCardNumber}\n`;
+      }
+      if (f.amount && f.amount > 0) {
+        note += `Amount: $${f.amount.toFixed(2)}\n`;
+      }
+      if (f.recoveryRate && f.recoveryRate > 0) {
+        note += `Recovery rate: $${f.recoveryRate.toFixed(2)}\n`;
+      }
       if (f.directCredit === 'yes' && f.paymentReference) {
         note += `Reference number: ${f.paymentReference}\n`;
       }
@@ -490,10 +563,21 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       }
 
       note += '\n~~~ Payment ~~~\n';
-      note += `Supplier Name: ${s.supplierName || '-'}\n`;
-      note += `Supplier ID: ${s.supplierId || '-'}\n`;
-      note += `Amount: $${s.amount?.toFixed(2) || '0.00'}\n`;
-      note += `Recovery rate: $${s.recoveryRate?.toFixed(2) || '0.00'}\n`;
+      if (s.supplierName && s.supplierName.trim()) {
+        note += `Supplier Name: ${s.supplierName}\n`;
+      }
+      if (s.supplierId && s.supplierId.trim()) {
+        note += `Supplier ID: ${s.supplierId}\n`;
+      }
+      if (s.paymentCardNumber && s.paymentCardNumber.trim()) {
+        note += `Payment card number: ${s.paymentCardNumber}\n`;
+      }
+      if (s.amount && s.amount > 0) {
+        note += `Amount: $${s.amount.toFixed(2)}\n`;
+      }
+      if (s.recoveryRate && s.recoveryRate > 0) {
+        note += `Recovery rate: $${s.recoveryRate.toFixed(2)}\n`;
+      }
       if (s.directCredit === 'yes' && s.paymentReference) {
         note += `Reference number: ${s.paymentReference}\n`;
       }
@@ -543,12 +627,28 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       }
       
       note += '\n~~~ Payment ~~~\n';
-      note += `Supplier Name: ${b.supplierName || '-'}\n`;
-      note += `Supplier ID: ${b.supplierId || '-'}\n`;
-      note += `Bond Amount: $${b.bondAmount?.toFixed(2) || '0.00'}\n`;
-      note += `Rent in Advance Amount: $${b.rentInAdvanceAmount?.toFixed(2) || '0.00'}\n`;
-      note += `Total Amount: $${((b.bondAmount || 0) + (b.rentInAdvanceAmount || 0)).toFixed(2)}\n`;
-      note += `Recovery rate: $${b.recoveryRate?.toFixed(2) || '0.00'}\n`;
+      if (b.supplierName && b.supplierName.trim()) {
+        note += `Supplier Name: ${b.supplierName}\n`;
+      }
+      if (b.supplierId && b.supplierId.trim()) {
+        note += `Supplier ID: ${b.supplierId}\n`;
+      }
+      if (b.paymentCardNumber && b.paymentCardNumber.trim()) {
+        note += `Payment card number: ${b.paymentCardNumber}\n`;
+      }
+      if (b.bondAmount && b.bondAmount > 0) {
+        note += `Bond Amount: $${b.bondAmount.toFixed(2)}\n`;
+      }
+      if (b.rentInAdvanceAmount && b.rentInAdvanceAmount > 0) {
+        note += `Rent in Advance Amount: $${b.rentInAdvanceAmount.toFixed(2)}\n`;
+      }
+      const totalAmount = (b.bondAmount || 0) + (b.rentInAdvanceAmount || 0);
+      if (totalAmount > 0) {
+        note += `Total Amount: $${totalAmount.toFixed(2)}\n`;
+      }
+      if (b.recoveryRate && b.recoveryRate > 0) {
+        note += `Recovery rate: $${b.recoveryRate.toFixed(2)}\n`;
+      }
       if (b.directCredit === 'yes' && b.paymentReference) {
         note += `Reference number: ${b.paymentReference}\n`;
       }
@@ -588,10 +688,21 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
 
       note += `Power Account Number: ${e.powerAccountNumber || '-'}\n`;
       note += '\n~~~ Payment ~~~\n';
-      note += `Supplier Name: ${e.supplierName || '-'}\n`;
-      note += `Supplier ID: ${e.supplierId || '-'}\n`;
-      note += `Amount: $${e.amount?.toFixed(2) || '0.00'}\n`;
-      note += `Recovery rate: $${e.recoveryRate?.toFixed(2) || '0.00'}\n`;
+      if (e.supplierName && e.supplierName.trim()) {
+        note += `Supplier Name: ${e.supplierName}\n`;
+      }
+      if (e.supplierId && e.supplierId.trim()) {
+        note += `Supplier ID: ${e.supplierId}\n`;
+      }
+      if (e.paymentCardNumber && e.paymentCardNumber.trim()) {
+        note += `Payment card number: ${e.paymentCardNumber}\n`;
+      }
+      if (e.amount && e.amount > 0) {
+        note += `Amount: $${e.amount.toFixed(2)}\n`;
+      }
+      if (e.recoveryRate && e.recoveryRate > 0) {
+        note += `Recovery rate: $${e.recoveryRate.toFixed(2)}\n`;
+      }
       if (e.directCredit === 'yes' && e.paymentReference) {
         note += `Reference number: ${e.paymentReference}\n`;
       }
@@ -628,16 +739,27 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       if (d.whyNeedDental) note += `${d.whyNeedDental}\n`;
 
       note += '\n~~~ Payment ~~~\n';
-      note += `Supplier Name: ${d.supplierName || '-'}\n`;
-      note += `Supplier ID: ${d.supplierId || '-'}\n`;
-      note += `Total Cost: $${d.amount?.toFixed(2) || '0.00'}\n`;
+      if (d.supplierName && d.supplierName.trim()) {
+        note += `Supplier Name: ${d.supplierName}\n`;
+      }
+      if (d.supplierId && d.supplierId.trim()) {
+        note += `Supplier ID: ${d.supplierId}\n`;
+      }
+      if (d.paymentCardNumber && d.paymentCardNumber.trim()) {
+        note += `Payment card number: ${d.paymentCardNumber}\n`;
+      }
+      if (d.amount && d.amount > 0) {
+        note += `Total Cost: $${d.amount.toFixed(2)}\n`;
+      }
       if (d.sngEligible === 'yes') {
         const sng = Math.min(d.amount, d.sngBalance || 0);
         const advance = Math.max(0, d.amount - sng);
         note += `SNG: $${sng.toFixed(2)}\n`;
         if (advance > 0) note += `Advance: $${advance.toFixed(2)}\n`;
       }
-      note += `Recovery rate: $${d.recoveryRate?.toFixed(2) || '0.00'}\n`;
+      if (d.recoveryRate && d.recoveryRate > 0) {
+        note += `Recovery rate: $${d.recoveryRate.toFixed(2)}\n`;
+      }
       if (d.directCredit === 'yes' && d.paymentReference) {
         note += `Reference number: ${d.paymentReference}\n`;
       }
@@ -674,10 +796,21 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       if (b.whyNeedBeds) note += `${b.whyNeedBeds}\n`;
 
       note += '\n~~~ Payment ~~~\n';
-      note += `Supplier Name: ${b.supplierName || '-'}\n`;
-      note += `Supplier ID: ${b.supplierId || '-'}\n`;
-      note += `Amount: $${b.amount?.toFixed(2) || '0.00'}\n`;
-      note += `Recovery rate: $${b.recoveryRate?.toFixed(2) || '0.00'}\n`;
+      if (b.supplierName && b.supplierName.trim()) {
+        note += `Supplier Name: ${b.supplierName}\n`;
+      }
+      if (b.supplierId && b.supplierId.trim()) {
+        note += `Supplier ID: ${b.supplierId}\n`;
+      }
+      if (b.paymentCardNumber && b.paymentCardNumber.trim()) {
+        note += `Payment card number: ${b.paymentCardNumber}\n`;
+      }
+      if (b.amount && b.amount > 0) {
+        note += `Amount: $${b.amount.toFixed(2)}\n`;
+      }
+      if (b.recoveryRate && b.recoveryRate > 0) {
+        note += `Recovery rate: $${b.recoveryRate.toFixed(2)}\n`;
+      }
       if (b.directCredit === 'yes' && b.paymentReference) {
         note += `Reference number: ${b.paymentReference}\n`;
       }
@@ -715,10 +848,21 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       if (f.furnitureType) note += `Client is requesting help with a ${f.furnitureType}\n`;
 
       note += '\n~~~ Payment ~~~\n';
-      note += `Supplier Name: ${f.supplierName || '-'}\n`;
-      note += `Supplier ID: ${f.supplierId || '-'}\n`;
-      note += `Amount: $${f.amount?.toFixed(2) || '0.00'}\n`;
-      note += `Recovery rate: $${f.recoveryRate?.toFixed(2) || '0.00'}\n`;
+      if (f.supplierName && f.supplierName.trim()) {
+        note += `Supplier Name: ${f.supplierName}\n`;
+      }
+      if (f.supplierId && f.supplierId.trim()) {
+        note += `Supplier ID: ${f.supplierId}\n`;
+      }
+      if (f.paymentCardNumber && f.paymentCardNumber.trim()) {
+        note += `Payment card number: ${f.paymentCardNumber}\n`;
+      }
+      if (f.amount && f.amount > 0) {
+        note += `Amount: $${f.amount.toFixed(2)}\n`;
+      }
+      if (f.recoveryRate && f.recoveryRate > 0) {
+        note += `Recovery rate: $${f.recoveryRate.toFixed(2)}\n`;
+      }
       if (f.directCredit === 'yes' && f.paymentReference) {
         note += `Reference number: ${f.paymentReference}\n`;
       }
@@ -759,10 +903,21 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
         if (b.beddingSngReason) note += `Reason: ${b.beddingSngReason}\n`;
       }
       note += '\n~~~ Payment ~~~\n';
-      note += `Supplier Name: ${b.supplierName || '-'}\n`;
-      note += `Supplier ID: ${b.supplierId || '-'}\n`;
-      note += `Amount: $${b.amount?.toFixed(2) || '0.00'}\n`;
-      note += `Recovery rate: $${b.recoveryRate?.toFixed(2) || '0.00'}\n`;
+      if (b.supplierName && b.supplierName.trim()) {
+        note += `Supplier Name: ${b.supplierName}\n`;
+      }
+      if (b.supplierId && b.supplierId.trim()) {
+        note += `Supplier ID: ${b.supplierId}\n`;
+      }
+      if (b.paymentCardNumber && b.paymentCardNumber.trim()) {
+        note += `Payment card number: ${b.paymentCardNumber}\n`;
+      }
+      if (b.amount && b.amount > 0) {
+        note += `Amount: $${b.amount.toFixed(2)}\n`;
+      }
+      if (b.recoveryRate && b.recoveryRate > 0) {
+        note += `Recovery rate: $${b.recoveryRate.toFixed(2)}\n`;
+      }
       if (b.directCredit === 'yes' && b.paymentReference) {
         note += `Reference number: ${b.paymentReference}\n`;
       }
@@ -799,10 +954,21 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       if (g.whyNeedGlasses) note += `${g.whyNeedGlasses}\n`;
 
       note += '\n~~~ Payment ~~~\n';
-      note += `Supplier Name: ${g.supplierName || '-'}\n`;
-      note += `Supplier ID: ${g.supplierId || '-'}\n`;
-      note += `Amount: $${g.amount?.toFixed(2) || '0.00'}\n`;
-      note += `Recovery rate: $${g.recoveryRate?.toFixed(2) || '0.00'}\n`;
+      if (g.supplierName && g.supplierName.trim()) {
+        note += `Supplier Name: ${g.supplierName}\n`;
+      }
+      if (g.supplierId && g.supplierId.trim()) {
+        note += `Supplier ID: ${g.supplierId}\n`;
+      }
+      if (g.paymentCardNumber && g.paymentCardNumber.trim()) {
+        note += `Payment card number: ${g.paymentCardNumber}\n`;
+      }
+      if (g.amount && g.amount > 0) {
+        note += `Amount: $${g.amount.toFixed(2)}\n`;
+      }
+      if (g.recoveryRate && g.recoveryRate > 0) {
+        note += `Recovery rate: $${g.recoveryRate.toFixed(2)}\n`;
+      }
       if (g.directCredit === 'yes' && g.paymentReference) {
         note += `Reference number: ${g.paymentReference}\n`;
       }
@@ -854,10 +1020,21 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       }
       
       note += '\n~~~ Payment ~~~\n';
-      note += `Supplier Name: ${f.supplierName || '-'}\n`;
-      note += `Supplier ID: ${f.supplierId || '-'}\n`;
-      note += `Amount: $${f.amount?.toFixed(2) || '0.00'}\n`;
-      note += `Recovery rate: $${f.recoveryRate?.toFixed(2) || '0.00'}\n`;
+      if (f.supplierName && f.supplierName.trim()) {
+        note += `Supplier Name: ${f.supplierName}\n`;
+      }
+      if (f.supplierId && f.supplierId.trim()) {
+        note += `Supplier ID: ${f.supplierId}\n`;
+      }
+      if (f.paymentCardNumber && f.paymentCardNumber.trim()) {
+        note += `Payment card number: ${f.paymentCardNumber}\n`;
+      }
+      if (f.amount && f.amount > 0) {
+        note += `Amount: $${f.amount.toFixed(2)}\n`;
+      }
+      if (f.recoveryRate && f.recoveryRate > 0) {
+        note += `Recovery rate: $${f.recoveryRate.toFixed(2)}\n`;
+      }
       if (f.directCredit === 'yes' && f.paymentReference) {
         note += `Reference number: ${f.paymentReference}\n`;
       }
@@ -909,10 +1086,21 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       }
       
       note += '\n~~~ Payment ~~~\n';
-      note += `Supplier Name: ${w.supplierName || '-'}\n`;
-      note += `Supplier ID: ${w.supplierId || '-'}\n`;
-      note += `Amount: $${w.amount?.toFixed(2) || '0.00'}\n`;
-      note += `Recovery rate: $${w.recoveryRate?.toFixed(2) || '0.00'}\n`;
+      if (w.supplierName && w.supplierName.trim()) {
+        note += `Supplier Name: ${w.supplierName}\n`;
+      }
+      if (w.supplierId && w.supplierId.trim()) {
+        note += `Supplier ID: ${w.supplierId}\n`;
+      }
+      if (w.paymentCardNumber && w.paymentCardNumber.trim()) {
+        note += `Payment card number: ${w.paymentCardNumber}\n`;
+      }
+      if (w.amount && w.amount > 0) {
+        note += `Amount: $${w.amount.toFixed(2)}\n`;
+      }
+      if (w.recoveryRate && w.recoveryRate > 0) {
+        note += `Recovery rate: $${w.recoveryRate.toFixed(2)}\n`;
+      }
       if (w.directCredit === 'yes' && w.paymentReference) {
         note += `Reference number: ${w.paymentReference}\n`;
       }
@@ -1108,12 +1296,30 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       });
     }
     
+    // Check for Amount
+    if (formData.amount && formData.amount > 0) {
+      fields.push({
+        label: 'Amount',
+        value: `$${formData.amount.toFixed(2)}`,
+        key: 'amount'
+      });
+    }
+    
     // Check for Payment Reference
     if (formData.paymentReference && formData.paymentReference.trim()) {
       fields.push({
         label: 'Payment Reference',
         value: formData.paymentReference,
         key: 'paymentReference'
+      });
+    }
+    
+    // Check for Payment Card Number
+    if (formData.paymentCardNumber && formData.paymentCardNumber.trim()) {
+      fields.push({
+        label: 'Payment Card Number',
+        value: formData.paymentCardNumber,
+        key: 'paymentCardNumber'
       });
     }
     
@@ -1170,7 +1376,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
           </div>
         ) : (
           <div className="quick-copy-empty-text">
-            Fill out Supplier ID, Supplier Name, or Payment Reference to see quick copy options
+            Fill out Supplier ID, Supplier Name, Amount, Payment Reference, or Payment Card Number to see quick copy options
           </div>
         )}
       </div>
