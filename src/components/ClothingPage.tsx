@@ -45,7 +45,6 @@ const ClothingPage: React.FC = () => {
     directCredit: '',
     paymentReference: '',
     paymentCardNumber: '',
-    paymentCardNumber: '',
     income: {
       benefit: 0,
       employment: 0,

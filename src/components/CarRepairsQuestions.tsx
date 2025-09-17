@@ -24,6 +24,7 @@ interface CarRepairsFormData {
   recoveryRate: number;
   directCredit: string; // 'yes' | 'no' | ''
   paymentReference: string;
+  paymentCardNumber: string;
   income: {
     benefit: number;
     employment: number;

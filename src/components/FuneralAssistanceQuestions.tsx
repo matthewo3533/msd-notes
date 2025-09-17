@@ -64,6 +64,7 @@ interface FuneralAssistanceFormData {
   recoveryRate: number;
   directCredit: string;
   paymentReference: string;
+  paymentCardNumber: string;
   income: {
     benefit: number;
     employment: number;

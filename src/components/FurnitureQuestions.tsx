@@ -15,6 +15,7 @@ export interface FurnitureFormData {
   recoveryRate: number;
   directCredit: string;
   paymentReference: string;
+  paymentCardNumber: string;
   income: {
     benefit: number;
     employment: number;
