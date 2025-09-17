@@ -422,6 +422,7 @@ input[type="number"]:focus {
 /* Apply dropdown scrollbar styling to Income Summary and Generated Note */
 .income-summary,
 .income-summary-sticky,
+.note-section,
 .note-output pre {
   scrollbar-width: thin;
   scrollbar-color: var(--border-primary) transparent;
@@ -429,6 +430,7 @@ input[type="number"]:focus {
 
 .income-summary::-webkit-scrollbar,
 .income-summary-sticky::-webkit-scrollbar,
+.note-section::-webkit-scrollbar,
 .note-output pre::-webkit-scrollbar {
   width: 12px;
   height: 12px;
@@ -437,6 +439,7 @@ input[type="number"]:focus {
 
 .income-summary::-webkit-scrollbar-track,
 .income-summary-sticky::-webkit-scrollbar-track,
+.note-section::-webkit-scrollbar-track,
 .note-output pre::-webkit-scrollbar-track {
   background: transparent;
   border-radius: 3px;
@@ -444,6 +447,7 @@ input[type="number"]:focus {
 
 .income-summary::-webkit-scrollbar-thumb,
 .income-summary-sticky::-webkit-scrollbar-thumb,
+.note-section::-webkit-scrollbar-thumb,
 .note-output pre::-webkit-scrollbar-thumb {
   background: var(--border-primary);
   border-radius: 3px;
@@ -452,6 +456,7 @@ input[type="number"]:focus {
 
 .income-summary::-webkit-scrollbar-thumb:hover,
 .income-summary-sticky::-webkit-scrollbar-thumb:hover,
+.note-section::-webkit-scrollbar-thumb:hover,
 .note-output pre::-webkit-scrollbar-thumb:hover {
   background: var(--text-muted);
   transform: scaleY(1.2);
