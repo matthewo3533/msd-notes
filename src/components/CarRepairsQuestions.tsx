@@ -74,6 +74,7 @@ const CarRepairsQuestions: React.FC<CarRepairsQuestionsProps> = ({ formData, onF
   const [filteredCars, setFilteredCars] = useState<CarData[]>([]);
   const [showCarDropdown, setShowCarDropdown] = useState(false);
   const [carSearchTerm, setCarSearchTerm] = useState('');
+  const [carDropdownHeight, setCarDropdownHeight] = useState(0);
 
   useEffect(() => {
     const observer = new window.IntersectionObserver(
@@ -148,7 +149,17 @@ const CarRepairsQuestions: React.FC<CarRepairsQuestionsProps> = ({ formData, onF
     } else {
       setFilteredCars(carData);
     }
-  }, [carSearchTerm, carData]);
+    
+    // Calculate dropdown height
+    if (showCarDropdown && filteredCars.length > 0) {
+      const maxHeight = 200; // Max height in pixels
+      const itemHeight = 50; // Height per item in pixels
+      const calculatedHeight = Math.min(filteredCars.length * itemHeight, maxHeight);
+      setCarDropdownHeight(calculatedHeight);
+    } else {
+      setCarDropdownHeight(0);
+    }
+  }, [carSearchTerm, carData, showCarDropdown, filteredCars.length]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -203,6 +214,7 @@ const CarRepairsQuestions: React.FC<CarRepairsQuestionsProps> = ({ formData, onF
     onFormDataChange({ vehicleMakeModel: car.Model });
     setCarSearchTerm(car.Model);
     setShowCarDropdown(false);
+    setCarDropdownHeight(0);
   };
 
   return (
@@ -296,6 +308,14 @@ const CarRepairsQuestions: React.FC<CarRepairsQuestionsProps> = ({ formData, onF
               </div>
             )}
           </div>
+          
+          {/* Dynamic spacer to push content down when dropdown appears */}
+          {carDropdownHeight > 0 && showCarDropdown && (
+            <div 
+              className="car-dropdown-spacer" 
+              style={{ height: `${carDropdownHeight}px` }}
+            />
+          )}
         </div>
 
         <div className="form-group">

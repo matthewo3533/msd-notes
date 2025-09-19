@@ -3,7 +3,7 @@ import { FoodFormData, ClothingFormData, RentArrearsFormData, CarRepairsFormData
 
 interface NoteOutputProps {
   formData: any;
-  service?: 'food' | 'clothing' | 'electricity' | 'dental' | 'beds' | 'bedding' | 'furniture' | 'glasses' | 'fridge' | 'washing' | 'tas-grant' | 'declare-income' | 'bond-rent' | 'rent-arrears' | 'car-repairs' | 'funeral-assistance' | 'stranded-travel' | 'adsd' | 'emergency' | 'transition-to-work';
+  service?: 'food' | 'clothing' | 'electricity' | 'dental' | 'beds' | 'bedding' | 'furniture' | 'glasses' | 'fridge' | 'washing' | 'tas-grant' | 'declare-income' | 'bond-rent' | 'rent-arrears' | 'car-repairs' | 'funeral-assistance' | 'stranded-travel' | 'adsd' | 'emergency' | 'transition-to-work' | 'petrol-calculator';
   onReset: () => void;
 }
 
@@ -297,6 +297,36 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       if (t.decision === 'approved') note += 'APPLICATION APPROVED\n';
       else if (t.decision === 'declined') note += 'APPLICATION DECLINED\n';
       if (t.decisionReason) note += `${t.decisionReason}\n`;
+      return note;
+    } else if (service === 'petrol-calculator') {
+      // Petrol Calculator note output
+      const p = formData;
+      let note = '';
+      
+      note += '~~~ Travel Details ~~~\n';
+      if (p.startLocation && p.destination) {
+        note += `Travelling from: ${p.startLocation} to ${p.destination}\n`;
+      }
+      if (p.returnTrip) {
+        note += `Return trip: ${p.returnTrip === 'yes' ? 'Yes' : 'No'}\n`;
+      }
+      if (p.distance > 0) {
+        const totalDistance = p.returnTrip === 'yes' ? p.distance * 2 : p.distance;
+        note += `Distance: ${totalDistance.toFixed(1)} km\n`;
+      }
+      if (p.vehicleMakeModel) {
+        note += `Vehicle: ${p.vehicleMakeModel}\n`;
+      }
+      if (p.vehicleMileage) {
+        note += `Vehicle mileage: ${p.vehicleMileage} L/100km\n`;
+      }
+      if (p.petrolCost) {
+        note += `Petrol cost: $${p.petrolCost} per litre\n`;
+      }
+      if (p.calculatedCost > 0) {
+        note += `Calculated Cost of travel: $${p.calculatedCost.toFixed(2)}\n`;
+      }
+      
       return note;
     } else if (service === 'adsd') {
       // ADSD note output
@@ -1134,17 +1164,22 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       const remainingIncome = totalIncome - totalCosts;
       let note = '';
       note += `CCID: ${f.clientId === false ? 'No' : 'Yes'}\n\n`;
-             note += '~~~ Need ~~~\n';
-       if (f.whyNeedFood) note += `${f.whyNeedFood}\n`;
+      note += '~~~ Need ~~~\n';
+      if (f.whyNeedFood) note += `${f.whyNeedFood}\n`;
 
-       note += '\n';
-       if (f.currentFoodBalance > 0) {
-         note += `Food balance: $${f.currentFoodBalance.toFixed(2)}\n`;
-         if (f.hardshipUnforeseen === 'yes' && f.unforeseenCircumstance) {
-           note += `Client is in hardship due to the following unforeseen circumstance: ${f.unforeseenCircumstance}\n`;
-         }
-       }
-       if (f.foodAmountRequested > 0) note += `Amount requesting: $${f.foodAmountRequested.toFixed(2)}\n`;
+      note += '\n';
+      if (f.currentFoodBalance > 0) {
+        note += `Food balance: $${f.currentFoodBalance.toFixed(2)}\n`;
+        if (f.hardshipUnforeseen === 'yes' && f.unforeseenCircumstance) {
+          note += `Client is in hardship due to the following unforeseen circumstance: ${f.unforeseenCircumstance}\n`;
+        }
+      }
+      if (f.foodAmountRequested > 0) note += `Amount requesting: $${f.foodAmountRequested.toFixed(2)}\n`;
+      
+      note += '\n~~~ Payment ~~~\n';
+      note += `Supplier Name: Food Supplier Group\n`;
+      if (f.amount > 0) note += `Total Cost: $${f.amount.toFixed(2)}\n`;
+      
       note += '\n~~~ Income ~~~\n';
       if (f.income.benefit > 0) note += `$${f.income.benefit.toFixed(2)} Benefit\n`;
       if (f.income.employment > 0) note += `$${f.income.employment.toFixed(2)} Employment\n`;

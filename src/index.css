@@ -21,16 +21,16 @@
 }
 
 :root {
-  --bg-primary: #f6f9fc;
-  --bg-secondary: #ffffff;
-  --bg-tertiary: #f8fafc;
-  --text-primary: #1a1f36;
-  --text-secondary: #374151;
-  --text-muted: #6b7280;
-  --border-primary: #e5e7eb;
-  --border-secondary: #e2e8f0;
-  --shadow-primary: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
-  --shadow-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --bg-primary: #f8fafc;
+  --bg-secondary: #f1f5f9;
+  --bg-tertiary: #e2e8f0;
+  --text-primary: #0f172a;
+  --text-secondary: #334155;
+  --text-muted: #64748b;
+  --border-primary: #cbd5e1;
+  --border-secondary: #94a3b8;
+  --shadow-primary: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.08);
+  --shadow-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 10px 10px -5px rgba(0, 0, 0, 0.08);
   --accent-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   --success-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
   --danger-gradient: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
@@ -81,6 +81,25 @@
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+}
+
+/* Ensure brand text maintains gradient when it's a button */
+.nav-brand button.brand-text,
+.nav-brand .brand-button {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  color: transparent !important; /* Ensure no fallback color interferes */
+  border: none !important;
+  outline: none !important;
+  font-family: inherit !important;
+  font-size: inherit !important;
+  font-weight: inherit !important;
+  text-decoration: none !important;
+  cursor: pointer !important;
+  padding: 0 !important;
+  margin: 0 !important;
 }
 
 .nav-menu {
@@ -1181,16 +1200,16 @@ body {
 }
 
 .theme-light {
-  --bg-primary: #ffffff;
-  --bg-secondary: #f8fafc;
-  --bg-tertiary: #f1f5f9;
-  --text-primary: #1e293b;
-  --text-secondary: #475569;
+  --bg-primary: #f8fafc;
+  --bg-secondary: #f1f5f9;
+  --bg-tertiary: #e2e8f0;
+  --text-primary: #0f172a;
+  --text-secondary: #334155;
   --text-muted: #64748b;
-  --border-primary: #e2e8f0;
-  --border-secondary: #cbd5e1;
-  --shadow-primary: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
-  --shadow-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --border-primary: #cbd5e1;
+  --border-secondary: #94a3b8;
+  --shadow-primary: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.08);
+  --shadow-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 10px 10px -5px rgba(0, 0, 0, 0.08);
   --accent-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 
@@ -2379,21 +2398,108 @@ input[type="number"] {
 
 /* Form Section Cards */
 .form-section-card {
-  background: var(--bg-secondary);
-  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 20px;
   padding: 2rem;
   margin-bottom: 0;
-  box-shadow: var(--shadow-primary);
-  border: 1px solid var(--border-primary);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.1),
+    0 2px 8px rgba(0, 0, 0, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   opacity: 0;
   transform: translateY(30px);
   transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
   width: 100%;
+  position: relative;
+  overflow: hidden;
 }
 
 .form-section-card.section-visible {
   opacity: 1;
   transform: translateY(0);
+}
+
+/* Liquid glass effects for different themes */
+.theme-light .form-section-card {
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.08),
+    0 2px 8px rgba(0, 0, 0, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.theme-dark-blue .form-section-card {
+  background: rgba(30, 41, 59, 0.3);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    0 2px 8px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.05);
+}
+
+/* Hover effects for liquid glass cards */
+.form-section-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    0 12px 40px rgba(0, 0, 0, 0.15),
+    0 4px 12px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.15);
+}
+
+.theme-light .form-section-card:hover {
+  box-shadow: 
+    0 12px 40px rgba(0, 0, 0, 0.12),
+    0 4px 12px rgba(0, 0, 0, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.25);
+}
+
+.theme-dark-blue .form-section-card:hover {
+  box-shadow: 
+    0 12px 40px rgba(0, 0, 0, 0.4),
+    0 4px 12px rgba(0, 0, 0, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.08);
+}
+
+/* Subtle gradient overlay for extra depth */
+.form-section-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.1) 0%,
+    rgba(255, 255, 255, 0.05) 50%,
+    rgba(255, 255, 255, 0.02) 100%
+  );
+  border-radius: 20px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.theme-dark-blue .form-section-card::before {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.05) 0%,
+    rgba(255, 255, 255, 0.02) 50%,
+    rgba(255, 255, 255, 0.01) 100%
+  );
 }
 
 .section-header {
@@ -2402,7 +2508,67 @@ input[type="number"] {
   justify-content: space-between;
   margin-bottom: 2rem;
   padding-bottom: 1rem;
-  border-bottom: 2px solid var(--border-secondary);
+  border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+  position: relative;
+  z-index: 2;
+}
+
+.section-header-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.section-header-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.expand-collapse-btn {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-primary);
+  border-radius: 8px;
+  padding: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  color: var(--text-secondary);
+}
+
+.expand-collapse-btn:hover {
+  background: var(--bg-secondary);
+  border-color: var(--accent-color);
+  color: var(--accent-color);
+  transform: scale(1.05);
+}
+
+.expand-collapse-btn svg {
+  width: 16px;
+  height: 16px;
+  transition: transform 0.2s ease;
+}
+
+.expand-collapse-btn.collapsed svg {
+  transform: rotate(-90deg);
+}
+
+.form-section-card.collapsed .section-content {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
+.form-section-card:not(.collapsed) .section-content {
+  max-height: none;
+  overflow: visible;
+  opacity: 1;
+  transition: all 0.3s ease;
 }
 
 .section-header h3 {
@@ -2414,6 +2580,7 @@ input[type="number"] {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 /* Enhanced section headers for petrol calculator */
@@ -2456,6 +2623,8 @@ input[type="number"] {
   animation: slideInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
   opacity: 0;
   transform: translateY(20px);
+  position: relative;
+  z-index: 2;
 }
 
 .form-section-card.section-visible .form-group:nth-child(2) { animation-delay: 0.1s; }
@@ -2492,6 +2661,9 @@ input[type="number"] {
   .form-section-card {
     padding: 1.5rem;
     margin-bottom: 1.5rem;
+    border-radius: 16px;
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
   }
   
   .section-header h3 {
@@ -3667,6 +3839,12 @@ input[type="number"] {
   margin-bottom: 0.5rem;
 }
 
+/* Dynamic spacer for car dropdown */
+.car-dropdown-spacer {
+  transition: height 0.3s ease;
+  margin-bottom: 0.5rem;
+}
+
 .distance-note {
   margin-top: 0.75rem;
   padding: 0.75rem;
@@ -3775,6 +3953,10 @@ input[type="number"] {
   }
   
   .suggestions-spacer {
+    margin-bottom: 1rem;
+  }
+  
+  .car-dropdown-spacer {
     margin-bottom: 1rem;
   }
   

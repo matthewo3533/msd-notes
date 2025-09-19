@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import IncomeSection, { IncomeLabels } from './IncomeSection';
 import PaymentSection from './PaymentSection';
 import DecisionSection from './DecisionSection';
+import ExpandableSection from './ExpandableSection';
 
 interface ElectricityFormData {
   clientId: boolean | null;
@@ -120,10 +121,12 @@ const ElectricityQuestions: React.FC<ElectricityQuestionsProps> = ({ formData, o
   return (
     <div className="form-sections-container">
       {/* General Questions */}
-      <div className="form-section-card section-visible">
-        <div className="section-header">
-          <h3>General Questions</h3>
-        </div>
+      <ExpandableSection
+        title="General Questions"
+        dataSection="client"
+        isVisible={visibleSections.has('client')}
+        defaultExpanded={true}
+      >
         <div className="form-group">
           <label>Has the client been ID'd?</label>
           <div className="radio-group">
@@ -198,7 +201,7 @@ const ElectricityQuestions: React.FC<ElectricityQuestionsProps> = ({ formData, o
             placeholder="Enter power account number"
           />
         </div>
-      </div>
+      </ExpandableSection>
 
       {/* Income Section */}
       <IncomeSection

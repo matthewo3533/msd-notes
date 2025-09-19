@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import ExpandableSection from './ExpandableSection';
 
 interface PaymentSectionProps {
   supplierName: string;
@@ -106,11 +107,12 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
   const displayAmount = typeof totalAmount === 'number' ? totalAmount : amount;
 
   return (
-    <div className={`form-section-card ${isVisible ? 'section-visible' : ''}`} data-section="payment">
-      <div className="section-header">
-        <h3>Payment</h3>
-        <div className="section-number">{sectionNumber}</div>
-      </div>
+    <ExpandableSection
+      title="Payment"
+      dataSection="payment"
+      isVisible={isVisible}
+      defaultExpanded={true}
+    >
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
         <div className="form-group">
           <label>Supplier Name</label>
@@ -257,7 +259,7 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
           />
         </div>
       )}
-    </div>
+    </ExpandableSection>
   );
 };
 

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import IncomeSection, { IncomeLabels } from './IncomeSection';
 import DecisionSection from './DecisionSection';
+import FoodPaymentSection from './FoodPaymentSection';
 import { FoodFormData } from '../App';
 
 interface FoodQuestionsProps {
@@ -21,9 +22,7 @@ function autoResizeTextarea(el: HTMLTextAreaElement | null) {
 }
 
 const FoodQuestions: React.FC<FoodQuestionsProps> = ({ formData, onFormDataChange }) => {
-  const [skippedQuestions, setSkippedQuestions] = useState<Set<string>>(new Set());
   const [visibleSections, setVisibleSections] = useState<Set<string>>(new Set());
-  const [animatingQuestions, setAnimatingQuestions] = useState<Set<string>>(new Set());
   const [incomeLabels, setIncomeLabels] = useState<IncomeLabels>({
     benefit: 'Benefit',
     employment: 'Employment',
@@ -77,27 +76,6 @@ const FoodQuestions: React.FC<FoodQuestionsProps> = ({ formData, onFormDataChang
     };
   }, []);
 
-  const handleSkip = (questionKey: string) => {
-    setAnimatingQuestions(prev => new Set(prev).add(questionKey));
-    
-    // Wait for animation to complete before hiding
-    setTimeout(() => {
-      setSkippedQuestions(prev => new Set(prev).add(questionKey));
-      setAnimatingQuestions(prev => {
-        const newSet = new Set(prev);
-        newSet.delete(questionKey);
-        return newSet;
-      });
-    }, 300);
-  };
-
-  const handleRestore = (questionKey: string) => {
-    setSkippedQuestions(prev => {
-      const newSet = new Set(prev);
-      newSet.delete(questionKey);
-      return newSet;
-    });
-  };
 
   const handleInputChange = (field: keyof FoodFormData, value: any) => {
     onFormDataChange({ [field]: value });
@@ -171,91 +149,52 @@ const FoodQuestions: React.FC<FoodQuestionsProps> = ({ formData, onFormDataChang
           </div>
         </div>
 
-        {!skippedQuestions.has('whyNeedFood') && (
-          <div className={`form-group ${animatingQuestions.has('whyNeedFood') ? 'question-skipped' : ''}`}>
-            <label>1. Why is the client needing food?</label>
-            <textarea
+        <div className="form-group">
+          <label>1. Why is the client needing food?</label>
+          <textarea
+            className="form-control"
+            value={formData.whyNeedFood}
+            onChange={(e) => handleInputChange('whyNeedFood', e.target.value)}
+            placeholder="Please describe the client's situation..."
+            ref={el => autoResizeTextarea(el)}
+            onInput={e => autoResizeTextarea(e.currentTarget)}
+          />
+        </div>
+
+        <div className="form-group">
+          <label>2. How much food is the client requesting?</label>
+          <div className="dollar-input">
+            <input
+              type="number"
               className="form-control"
-              value={formData.whyNeedFood}
-              onChange={(e) => handleInputChange('whyNeedFood', e.target.value)}
-              placeholder="Please describe the client's situation..."
-              ref={el => autoResizeTextarea(el)}
-              onInput={e => autoResizeTextarea(e.currentTarget)}
+              value={formData.foodAmountRequested || ''}
+              onChange={(e) => handleInputChange('foodAmountRequested', parseFloat(e.target.value) || 0)}
+              placeholder="0.00"
+              step="0.01"
+              min="0"
             />
-            <button className="skip-btn" onClick={() => handleSkip('whyNeedFood')}>
-              Skip this question
-            </button>
           </div>
-        )}
+        </div>
 
-        {skippedQuestions.has('whyNeedFood') && (
-          <div className="form-group question-restored">
-            <button className="skip-btn restore" onClick={() => handleRestore('whyNeedFood')}>
-              Question skipped. Click to restore
-            </button>
+
+
+        <div className="form-group">
+          <label>3. What is the client's current food balance?</label>
+          <div className="dollar-input">
+            <input
+              type="number"
+              className="form-control"
+              value={formData.currentFoodBalance || ''}
+              onChange={(e) => handleInputChange('currentFoodBalance', parseFloat(e.target.value) || 0)}
+              placeholder="0.00"
+              step="0.01"
+              min="0"
+            />
           </div>
-        )}
+        </div>
 
-        {!skippedQuestions.has('foodAmountRequested') && (
-          <div className={`form-group ${animatingQuestions.has('foodAmountRequested') ? 'question-skipped' : ''}`}>
-            <label>2. How much food is the client requesting?</label>
-            <div className="dollar-input">
-              <input
-                type="number"
-                className="form-control"
-                value={formData.foodAmountRequested || ''}
-                onChange={(e) => handleInputChange('foodAmountRequested', parseFloat(e.target.value) || 0)}
-                placeholder="0.00"
-                step="0.01"
-                min="0"
-              />
-            </div>
-            <button className="skip-btn" onClick={() => handleSkip('foodAmountRequested')}>
-              Skip this question
-            </button>
-          </div>
-        )}
-
-        {skippedQuestions.has('foodAmountRequested') && (
-          <div className="form-group question-restored">
-            <button className="skip-btn restore" onClick={() => handleRestore('foodAmountRequested')}>
-              Question skipped. Click to restore
-            </button>
-          </div>
-        )}
-
-
-
-        {!skippedQuestions.has('currentFoodBalance') && (
-          <div className={`form-group ${animatingQuestions.has('currentFoodBalance') ? 'question-skipped' : ''}`}>
-            <label>3. What is the client's current food balance?</label>
-            <div className="dollar-input">
-              <input
-                type="number"
-                className="form-control"
-                value={formData.currentFoodBalance || ''}
-                onChange={(e) => handleInputChange('currentFoodBalance', parseFloat(e.target.value) || 0)}
-                placeholder="0.00"
-                step="0.01"
-                min="0"
-              />
-            </div>
-            <button className="skip-btn" onClick={() => handleSkip('currentFoodBalance')}>
-              Skip this question
-            </button>
-          </div>
-        )}
-
-        {skippedQuestions.has('currentFoodBalance') && (
-          <div className="form-group question-restored">
-            <button className="skip-btn restore" onClick={() => handleRestore('currentFoodBalance')}>
-              Question skipped. Click to restore
-            </button>
-          </div>
-        )}
-
-        {formData.currentFoodBalance < 30 && formData.currentFoodBalance > 0 && !skippedQuestions.has('hardshipUnforeseen') && (
-          <div className={`form-group ${animatingQuestions.has('hardshipUnforeseen') ? 'question-skipped' : ''}`}>
+        {formData.currentFoodBalance < 30 && formData.currentFoodBalance > 0 && (
+          <div className="form-group">
             <label>4.5. Is client in hardship due to an unforeseen circumstance?</label>
             <div className="radio-group">
               <label className={`radio-btn ${formData.hardshipUnforeseen === 'yes' ? 'selected' : ''}`}>Yes
@@ -277,22 +216,11 @@ const FoodQuestions: React.FC<FoodQuestionsProps> = ({ formData, onFormDataChang
                 />
               </label>
             </div>
-            <button className="skip-btn" onClick={() => handleSkip('hardshipUnforeseen')}>
-              Skip this question
-            </button>
           </div>
         )}
 
-        {skippedQuestions.has('hardshipUnforeseen') && (
-          <div className="form-group question-restored">
-            <button className="skip-btn restore" onClick={() => handleRestore('hardshipUnforeseen')}>
-              Question skipped. Click to restore
-            </button>
-          </div>
-        )}
-
-        {formData.hardshipUnforeseen === 'yes' && !skippedQuestions.has('unforeseenCircumstance') && (
-          <div className={`form-group ${animatingQuestions.has('unforeseenCircumstance') ? 'question-skipped' : ''}`}>
+        {formData.hardshipUnforeseen === 'yes' && (
+          <div className="form-group">
             <label>4.6. What is the unforeseen circumstance?</label>
             <textarea
               className="form-control"
@@ -302,44 +230,20 @@ const FoodQuestions: React.FC<FoodQuestionsProps> = ({ formData, onFormDataChang
               ref={el => autoResizeTextarea(el)}
               onInput={e => autoResizeTextarea(e.currentTarget)}
             />
-            <button className="skip-btn" onClick={() => handleSkip('unforeseenCircumstance')}>
-              Skip this question
-            </button>
           </div>
         )}
 
-        {skippedQuestions.has('unforeseenCircumstance') && (
-          <div className="form-group question-restored">
-            <button className="skip-btn restore" onClick={() => handleRestore('unforeseenCircumstance')}>
-              Question skipped. Click to restore
-            </button>
-          </div>
-        )}
-
-        {!skippedQuestions.has('reasonableSteps') && (
-          <div className={`form-group ${animatingQuestions.has('reasonableSteps') ? 'question-skipped' : ''}`}>
-            <label>5. What reasonable steps is the client taken to improve their situation?</label>
-            <textarea
-              className="form-control"
-              value={formData.reasonableSteps}
-              onChange={(e) => handleInputChange('reasonableSteps', e.target.value)}
-              placeholder="Describe steps taken..."
-              ref={el => autoResizeTextarea(el)}
-              onInput={e => autoResizeTextarea(e.currentTarget)}
-            />
-            <button className="skip-btn" onClick={() => handleSkip('reasonableSteps')}>
-              Skip this question
-            </button>
-          </div>
-        )}
-
-        {skippedQuestions.has('reasonableSteps') && (
-          <div className="form-group question-restored">
-            <button className="skip-btn restore" onClick={() => handleRestore('reasonableSteps')}>
-              Question skipped. Click to restore
-            </button>
-          </div>
-        )}
+        <div className="form-group">
+          <label>5. What reasonable steps is the client taken to improve their situation?</label>
+          <textarea
+            className="form-control"
+            value={formData.reasonableSteps}
+            onChange={(e) => handleInputChange('reasonableSteps', e.target.value)}
+            placeholder="Describe steps taken..."
+            ref={el => autoResizeTextarea(el)}
+            onInput={e => autoResizeTextarea(e.currentTarget)}
+          />
+        </div>
       </div>
 
       {/* Income Section */}
@@ -356,13 +260,27 @@ const FoodQuestions: React.FC<FoodQuestionsProps> = ({ formData, onFormDataChang
         isVisible={visibleSections.has('income')}
       />
 
+      {/* Payment Section */}
+      <FoodPaymentSection
+        amount={formData.amount}
+        directCredit={formData.directCredit}
+        paymentReference={formData.paymentReference}
+        paymentCardNumber={formData.paymentCardNumber}
+        onAmountChange={(amount) => handleInputChange('amount', amount)}
+        onDirectCreditChange={(credit) => handleInputChange('directCredit', credit)}
+        onPaymentReferenceChange={(reference) => handleInputChange('paymentReference', reference)}
+        onPaymentCardNumberChange={(cardNumber) => handleInputChange('paymentCardNumber', cardNumber)}
+        sectionNumber={3}
+        isVisible={visibleSections.has('payment')}
+      />
+
       {/* Decision Section */}
       <DecisionSection
         decision={formData.decision}
         decisionReason={formData.decisionReason}
         onDecisionChange={(decision) => handleInputChange('decision', decision)}
         onDecisionReasonChange={(reason) => handleInputChange('decisionReason', reason)}
-        sectionNumber={3}
+        sectionNumber={4}
         isVisible={visibleSections.has('decision')}
       />
     </div>

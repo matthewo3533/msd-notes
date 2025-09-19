@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import NoteOutput from './NoteOutput';
 
 // Google Maps API TypeScript declarations
 declare global {
@@ -45,46 +46,51 @@ interface Location {
   coordinates?: { lat: number; lng: number };
 }
 
-interface PetrolCalculatorProps {
-  isStandalone?: boolean;
+interface PetrolCalculatorFormData {
+  startLocation: string;
+  destination: string;
+  returnTrip: string;
+  distance: number;
+  vehicleMakeModel: string;
+  vehicleMileage: string;
+  petrolCost: string;
+  calculatedCost: number;
 }
 
-const PetrolCalculator: React.FC<PetrolCalculatorProps> = ({ 
-  isStandalone = true 
-}) => {
+const PetrolCalculator: React.FC = () => {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({
-    distance: '',
-    returnTrip: false,
-    petrolCost: '',
+  const [formData, setFormData] = useState<PetrolCalculatorFormData>({
+    startLocation: '',
+    destination: '',
+    returnTrip: '',
+    distance: 0,
+    vehicleMakeModel: '',
     vehicleMileage: '',
-    selectedCar: '',
-    carSearchTerm: '',
-    fromLocation: '',
-    toLocation: '',
-    fromLocationData: null as Location | null,
-    toLocationData: null as Location | null,
-    useLocationCalculation: false
+    petrolCost: '',
+    calculatedCost: 0,
   });
+
+  // Car dropdown state
   const [carData, setCarData] = useState<CarData[]>([]);
   const [filteredCars, setFilteredCars] = useState<CarData[]>([]);
   const [showCarDropdown, setShowCarDropdown] = useState(false);
-  const [calculatedCost, setCalculatedCost] = useState<number | null>(null);
-  const [visibleSections, setVisibleSections] = useState<Set<string>>(new Set());
-  const sectionRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
+  const [carSearchTerm, setCarSearchTerm] = useState('');
+  const [carDropdownHeight, setCarDropdownHeight] = useState(0);
   
   // Google Places API state
   const [fromLocationSuggestions, setFromLocationSuggestions] = useState<Location[]>([]);
   const [toLocationSuggestions, setToLocationSuggestions] = useState<Location[]>([]);
   const [showFromSuggestions, setShowFromSuggestions] = useState(false);
   const [showToSuggestions, setShowToSuggestions] = useState(false);
-  const [isCalculatingDistance, setIsCalculatingDistance] = useState(false);
   const [distanceCalculationError, setDistanceCalculationError] = useState<string>('');
   const [showDistanceError, setShowDistanceError] = useState(false);
   
+  // Store place IDs for distance calculation
+  const [fromPlaceId, setFromPlaceId] = useState<string>('');
+  const [toPlaceId, setToPlaceId] = useState<string>('');
+  
   // Layout management for suggestions
   const [suggestionsHeight, setSuggestionsHeight] = useState(0);
-  const [carDropdownHeight, setCarDropdownHeight] = useState(0);
   
   // Cache for distance calculations to minimize API calls
   const distanceCache = useRef<Map<string, number>>(new Map());
@@ -93,88 +99,33 @@ const PetrolCalculator: React.FC<PetrolCalculatorProps> = ({
   const GOOGLE_API_KEY = (import.meta as any).env?.VITE_GOOGLE_API_KEY || '';
   
   // Google Places service references
-  const placesService = useRef<any>(null);
   const autocompleteService = useRef<any>(null);
-  const geocoder = useRef<any>(null);
   const distanceMatrixService = useRef<any>(null);
 
-  // Load Google Places API
+  // Load Google Maps API
   useEffect(() => {
-    if (!GOOGLE_API_KEY) {
-      console.error('Google Places API key not found. Please set VITE_GOOGLE_API_KEY in your .env file');
-      return;
-    }
-
-    const loadGooglePlacesAPI = () => {
+    const loadGoogleMapsAPI = () => {
       if (window.google && window.google.maps) {
         autocompleteService.current = new window.google.maps.places.AutocompleteService();
-        placesService.current = new window.google.maps.places.PlacesService(document.createElement('div'));
-        geocoder.current = new window.google.maps.Geocoder();
         distanceMatrixService.current = new window.google.maps.DistanceMatrixService();
         return;
       }
-      
-      // If Google Maps API is not loaded, load it
+
       const script = document.createElement('script');
       script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_API_KEY}&libraries=places`;
       script.async = true;
       script.defer = true;
       script.onload = () => {
-        if (window.google && window.google.maps) {
-          autocompleteService.current = new window.google.maps.places.AutocompleteService();
-          placesService.current = new window.google.maps.places.PlacesService(document.createElement('div'));
-          geocoder.current = new window.google.maps.Geocoder();
-          distanceMatrixService.current = new window.google.maps.DistanceMatrixService();
-        }
+        autocompleteService.current = new window.google.maps.places.AutocompleteService();
+        distanceMatrixService.current = new window.google.maps.DistanceMatrixService();
       };
       document.head.appendChild(script);
     };
 
-    loadGooglePlacesAPI();
+    if (GOOGLE_API_KEY) {
+      loadGoogleMapsAPI();
+    }
   }, [GOOGLE_API_KEY]);
-
-  // Intersection Observer for scroll animations
-  useEffect(() => {
-    // Make the first section visible immediately
-    setVisibleSections(new Set(['calculator']));
-    
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            const sectionId = entry.target.getAttribute('data-section');
-            if (sectionId) {
-              setVisibleSections(prev => new Set(prev).add(sectionId));
-            }
-          }
-        });
-      },
-      {
-        threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px'
-      }
-    );
-
-    // Use setTimeout to ensure DOM is fully rendered
-    const timeoutId = setTimeout(() => {
-      // Observe sections with data-section attributes
-      const sections = document.querySelectorAll('[data-section]');
-      sections.forEach((section) => {
-        observer.observe(section);
-      });
-      
-      // Also observe form-section-card elements (for reusable components)
-      const formSections = document.querySelectorAll('.form-section-card');
-      formSections.forEach((section) => {
-        observer.observe(section);
-      });
-    }, 100);
-
-    return () => {
-      clearTimeout(timeoutId);
-      observer.disconnect();
-    };
-  }, []);
 
   // Load car data from CSV
   useEffect(() => {
@@ -182,16 +133,19 @@ const PetrolCalculator: React.FC<PetrolCalculatorProps> = ({
       try {
         const response = await fetch('/data/cars.csv');
         const csvText = await response.text();
-        const lines = csvText.split('\n').filter(line => line.trim());
+        const lines = csvText.split('\n');
         const cars: CarData[] = [];
         
         for (let i = 1; i < lines.length; i++) {
-          const values = lines[i].split(',');
-          if (values.length >= 2) {
-            cars.push({
-              Model: values[0].trim(),
-              'L/100km': parseFloat(values[1].trim())
-            });
+          const line = lines[i].trim();
+          if (line) {
+            const [model, l100km] = line.split(',');
+            if (model && l100km) {
+              cars.push({
+                Model: model.trim(),
+                'L/100km': parseFloat(l100km.trim())
+              });
+            }
           }
         }
         setCarData(cars);
@@ -209,15 +163,15 @@ const PetrolCalculator: React.FC<PetrolCalculatorProps> = ({
 
   // Filter cars based on search term
   useEffect(() => {
-    if (formData.carSearchTerm) {
+    if (carSearchTerm) {
       const filtered = carData.filter(car => 
-        car.Model.toLowerCase().includes(formData.carSearchTerm.toLowerCase())
+        car.Model.toLowerCase().includes(carSearchTerm.toLowerCase())
       );
       setFilteredCars(filtered);
     } else {
       setFilteredCars(carData);
     }
-  }, [formData.carSearchTerm, carData]);
+  }, [carSearchTerm, carData]);
 
   // Calculate car dropdown height when filtered cars change
   useEffect(() => {
@@ -236,111 +190,63 @@ const PetrolCalculator: React.FC<PetrolCalculatorProps> = ({
       if (!target.closest('.car-selector')) {
         setShowCarDropdown(false);
       }
-    };
-
-    if (showCarDropdown) {
-      document.addEventListener('mousedown', handleClickOutside);
-      return () => {
-        document.removeEventListener('mousedown', handleClickOutside);
-      };
-    }
-  }, [showCarDropdown]);
-
-  // Close location suggestions when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target as Element;
       if (!target.closest('.location-input-container')) {
         setShowFromSuggestions(false);
         setShowToSuggestions(false);
         setFromLocationSuggestions([]);
         setToLocationSuggestions([]);
-        // Only reset height if no suggestions are visible
         if (!showFromSuggestions && !showToSuggestions) {
           setSuggestionsHeight(0);
         }
       }
     };
 
-    if (showFromSuggestions || showToSuggestions) {
+    if (showCarDropdown || showFromSuggestions || showToSuggestions) {
       document.addEventListener('mousedown', handleClickOutside);
       return () => {
         document.removeEventListener('mousedown', handleClickOutside);
       };
     }
-  }, [showFromSuggestions, showToSuggestions]);
+  }, [showCarDropdown, showFromSuggestions, showToSuggestions]);
 
   // Calculate cost when form data changes
   useEffect(() => {
-    if (formData.distance && formData.petrolCost && (formData.vehicleMileage || formData.selectedCar)) {
+    if (formData.distance && formData.petrolCost && formData.vehicleMileage) {
       calculateCost();
     } else {
-      setCalculatedCost(null);
+      setFormData(prev => ({ ...prev, calculatedCost: 0 }));
     }
-  }, [formData]);
+  }, [formData.distance, formData.petrolCost, formData.vehicleMileage, formData.returnTrip]);
 
   const calculateCost = () => {
-    const distance = parseFloat(formData.distance);
-    const petrolCost = parseFloat(formData.petrolCost);
-    let mileage = parseFloat(formData.vehicleMileage);
+    const distance = formData.distance;
+    const petrolCostValue = parseFloat(formData.petrolCost);
+    const mileage = parseFloat(formData.vehicleMileage);
     
-    // If no manual mileage, use selected car's mileage
-    if (!mileage && formData.selectedCar) {
-      const selectedCar = carData.find(car => car.Model === formData.selectedCar);
-      if (selectedCar) {
-        mileage = selectedCar['L/100km'];
-      }
-    }
-    
-    if (distance && petrolCost && mileage) {
+    if (distance && petrolCostValue && mileage) {
       let totalDistance = distance;
-      if (formData.returnTrip) {
+      if (formData.returnTrip === 'yes') {
         totalDistance = distance * 2;
       }
       
       const fuelUsed = (totalDistance / 100) * mileage;
-      const cost = fuelUsed * petrolCost;
-      setCalculatedCost(cost);
+      const cost = fuelUsed * petrolCostValue;
+      setFormData(prev => ({ ...prev, calculatedCost: cost }));
     }
   };
 
-  const handleInputChange = (field: string, value: string | boolean) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value
-    }));
+  const handleInputChange = (field: keyof PetrolCalculatorFormData, value: any) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
   };
 
   const handleCarSelect = (car: CarData) => {
     setFormData(prev => ({
       ...prev,
-      selectedCar: car.Model,
-      vehicleMileage: car['L/100km'].toString(),
-      carSearchTerm: car.Model,
-      showCarDropdown: false
+      vehicleMakeModel: car.Model,
+      vehicleMileage: car['L/100km'].toString()
     }));
+    setCarSearchTerm(car.Model);
     setShowCarDropdown(false);
-  };
-
-  const resetForm = () => {
-    setFormData({
-      distance: '',
-      returnTrip: false,
-      petrolCost: '',
-      vehicleMileage: '',
-      selectedCar: '',
-      carSearchTerm: '',
-      fromLocation: '',
-      toLocation: '',
-      fromLocationData: null,
-      toLocationData: null,
-      useLocationCalculation: false
-    });
-    setCalculatedCost(null);
-    setDistanceCalculationError('');
-    setShowDistanceError(false);
-    setFromLocationSuggestions([]);
-    setToLocationSuggestions([]);
   };
 
   // Google Places API functions
@@ -356,8 +262,7 @@ const PetrolCalculator: React.FC<PetrolCalculatorProps> = ({
       autocompleteService.current.getPlacePredictions(
         {
           input: query,
-          // Don't restrict types - this allows searching for addresses, businesses, and POIs
-          componentRestrictions: { country: 'nz' } // Restrict to New Zealand only
+          componentRestrictions: { country: 'nz' }
         },
         (predictions: any[], status: string) => {
           if (status === window.google.maps.places.PlacesServiceStatus.OK && predictions) {
@@ -395,27 +300,16 @@ const PetrolCalculator: React.FC<PetrolCalculatorProps> = ({
           unitSystem: window.google.maps.UnitSystem.METRIC
         },
         (response: any, status: string) => {
-          if (status === window.google.maps.DistanceMatrixStatus.OK && 
-              response && 
-              response.rows && 
-              response.rows[0] && 
-              response.rows[0].elements && 
-              response.rows[0].elements[0]) {
-            
+          if (status === window.google.maps.DistanceMatrixStatus.OK) {
             const element = response.rows[0].elements[0];
             if (element.status === window.google.maps.DistanceMatrixStatus.OK) {
-              // Distance is returned in meters, convert to kilometers
-              const distanceInKm = element.distance.value / 1000;
-              
-              // Cache the result
-              distanceCache.current.set(cacheKey, distanceInKm);
-              resolve(distanceInKm);
+              const distance = element.distance.value / 1000; // Convert to km
+              distanceCache.current.set(cacheKey, distance);
+              resolve(distance);
             } else {
-              console.error('Distance Matrix element status:', element.status);
               resolve(null);
             }
           } else {
-            console.error('Distance Matrix API error:', status);
             resolve(null);
           }
         }
@@ -423,351 +317,258 @@ const PetrolCalculator: React.FC<PetrolCalculatorProps> = ({
     });
   };
 
-  // Debounce function to reduce API calls
-  const debounce = (func: Function, delay: number) => {
-    let timeoutId: ReturnType<typeof setTimeout>;
-    return (...args: any[]) => {
-      clearTimeout(timeoutId);
-      timeoutId = setTimeout(() => func.apply(null, args), delay);
-    };
-  };
-
-  const handleLocationSearch = async (query: string, type: 'from' | 'to') => {
-    if (query.length < 3) {
-      if (type === 'from') {
-        setFromLocationSuggestions([]);
-        setShowFromSuggestions(false);
-      } else {
-        setToLocationSuggestions([]);
-        setShowToSuggestions(false);
-      }
-      // Only reset suggestions height if no suggestions are visible from either field
-      if (!showFromSuggestions && !showToSuggestions) {
-        setSuggestionsHeight(0);
-      }
-      return;
-    }
-
+  const handleFromLocationSearch = async (query: string) => {
     const suggestions = await searchPlaces(query);
+    setFromLocationSuggestions(suggestions);
+    setShowFromSuggestions(suggestions.length > 0);
+    setSuggestionsHeight(Math.min(suggestions.length * 50, 200));
+  };
+
+  const handleToLocationSearch = async (query: string) => {
+    const suggestions = await searchPlaces(query);
+    setToLocationSuggestions(suggestions);
+    setShowToSuggestions(suggestions.length > 0);
+    setSuggestionsHeight(Math.min(suggestions.length * 50, 200));
+  };
+
+  const handleFromLocationSelect = async (location: Location) => {
+    setFormData(prev => ({ ...prev, startLocation: location.description }));
+    setFromPlaceId(location.placeId);
+    setFromLocationSuggestions([]);
+    setShowFromSuggestions(false);
+    setSuggestionsHeight(0);
     
-    if (type === 'from') {
-      setFromLocationSuggestions(suggestions);
-      setShowFromSuggestions(suggestions.length > 0);
-      // Adjust layout height based on suggestions
-      if (suggestions.length > 0) {
-        setSuggestionsHeight(Math.min(suggestions.length * 50, 200)); // 50px per suggestion, max 200px
-        // Scroll the input into view to show suggestions
-        setTimeout(() => {
-          const fromInput = document.querySelector('.location-input-container input[placeholder="Enter starting location"]');
-          if (fromInput) {
-            fromInput.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-          }
-        }, 100);
-      }
-    } else {
-      setToLocationSuggestions(suggestions);
-      setShowToSuggestions(suggestions.length > 0);
-      // Adjust layout height based on suggestions
-      if (suggestions.length > 0) {
-        setSuggestionsHeight(Math.min(suggestions.length * 50, 200)); // 50px per suggestion, max 200px
-        // Scroll the input into view to show suggestions
-        setTimeout(() => {
-          const toInput = document.querySelector('.location-input-container input[placeholder="Enter destination location"]');
-          if (toInput) {
-            toInput.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-          }
-        }, 100);
-      }
+    // Calculate distance if both locations are set
+    if (toPlaceId) {
+      await calculateDistanceBetweenLocations(location.placeId, toPlaceId);
     }
   };
 
-  // Debounced version of location search
-  const debouncedLocationSearch = debounce(handleLocationSearch, 300);
-
-  const handleLocationSelect = async (location: Location, type: 'from' | 'to') => {
-    const locationField = type === 'from' ? 'fromLocation' : 'toLocation';
-    const locationDataField = type === 'from' ? 'fromLocationData' : 'toLocationData';
+  const handleToLocationSelect = async (location: Location) => {
+    setFormData(prev => ({ ...prev, destination: location.description }));
+    setToPlaceId(location.placeId);
+    setToLocationSuggestions([]);
+    setShowToSuggestions(false);
+    setSuggestionsHeight(0);
     
-    setFormData(prev => ({
-      ...prev,
-      [locationField]: location.description,
-      [locationDataField]: location
-    }));
-
-    if (type === 'from') {
-      setShowFromSuggestions(false);
-      setFromLocationSuggestions([]);
-    } else {
-      setShowToSuggestions(false);
-      setToLocationSuggestions([]);
-    }
-
-    // Reset suggestions height when hiding suggestions
-    if (!showFromSuggestions && !showToSuggestions) {
-      setSuggestionsHeight(0);
-    }
-
-    // Auto-calculate distance if both locations are set
-    if (formData.fromLocation && (type === 'to' ? location.description : formData.toLocation)) {
-      await calculateDistanceFromLocations();
+    // Calculate distance if both locations are set
+    if (fromPlaceId) {
+      await calculateDistanceBetweenLocations(fromPlaceId, location.placeId);
     }
   };
 
-  const calculateDistanceFromLocations = async () => {
-    if (!formData.fromLocation || !formData.toLocation) return;
-    
-    setIsCalculatingDistance(true);
+  const calculateDistanceBetweenLocations = async (fromPlaceId: string, toPlaceId: string) => {
     setDistanceCalculationError('');
-    setShowDistanceError(false); // Reset error display
+    setShowDistanceError(false);
     
     try {
-      // Use the stored location data instead of searching through suggestions
-      const fromLocation = formData.fromLocationData;
-      const toLocation = formData.toLocationData;
-      
-      if (!fromLocation || !toLocation) {
-        throw new Error('Please select locations from the suggestions');
-      }
-
-      const distance = await calculateDistance(fromLocation.placeId, toLocation.placeId);
-      
+      const distance = await calculateDistance(fromPlaceId, toPlaceId);
       if (distance !== null) {
-        setFormData(prev => ({
-          ...prev,
-          distance: distance.toFixed(1),
-          useLocationCalculation: true
-        }));
+        setFormData(prev => ({ ...prev, distance: distance }));
       } else {
-        throw new Error('Could not calculate distance');
+        setDistanceCalculationError('Unable to calculate distance. Please check the addresses.');
+        setShowDistanceError(true);
       }
     } catch (error) {
-      setDistanceCalculationError(error instanceof Error ? error.message : 'Error calculating distance');
-      setShowDistanceError(true); // Show error when calculation fails
-    } finally {
-      setIsCalculatingDistance(false);
+      setDistanceCalculationError('Error calculating distance. Please try again.');
+      setShowDistanceError(true);
     }
   };
 
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-NZ', {
-      style: 'currency',
-      currency: 'NZD'
-    }).format(amount);
+  const resetForm = () => {
+    setFormData({
+      startLocation: '',
+      destination: '',
+      returnTrip: '',
+      distance: 0,
+      vehicleMakeModel: '',
+      vehicleMileage: '',
+      petrolCost: '',
+      calculatedCost: 0,
+    });
+    setFromPlaceId('');
+    setToPlaceId('');
+    setDistanceCalculationError('');
+    setShowDistanceError(false);
+    setFromLocationSuggestions([]);
+    setToLocationSuggestions([]);
+    setCarSearchTerm('');
+  };
+
+  const handleBack = () => {
+    navigate('/');
+  };
+
+  const getCurrentDate = () => {
+    const now = new Date();
+    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const dayName = days[now.getDay()];
+    const day = now.getDate().toString().padStart(2, '0');
+    const month = (now.getMonth() + 1).toString().padStart(2, '0');
+    const year = now.getFullYear();
+    return `${dayName} ${day}/${month}/${year}`;
   };
 
   return (
-    <div className="container petrol-calculator">
-      {isStandalone && (
-        <div className="header">
-          <div className="header-top">
-            <div className="greeting-section">
-              <h1 className="greeting">Petrol Cost Calculator</h1>
-            </div>
+    <div className="container">
+      <div className="header">
+        <div className="header-top">
+          <div className="greeting-section">
+            <h1 className="greeting">Petrol Cost Calculator</h1>
+            <p className="date">{getCurrentDate()}</p>
           </div>
         </div>
-      )}
+      </div>
       
-      <div className="form-sections-container">
-        <div 
-          ref={(el) => { sectionRefs.current['calculator'] = el; }}
-          data-section="calculator"
-          className={`form-section-card ${visibleSections.has('calculator') ? 'section-visible' : ''}`}
-        >
-          {/* Distance Section */}
-          <div className="section-header">
-            <h3>Distance</h3>
-          </div>
-          
-          {/* Location-based Distance Calculation */}
-          <div className="form-group">
-            <label className="checkbox-label">
-              <input
-                type="checkbox"
-                checked={formData.useLocationCalculation}
-                onChange={(e) => handleInputChange('useLocationCalculation', e.target.checked)}
-              />
-              <span>Calculate distance from locations</span>
-            </label>
-          </div>
-
-          {formData.useLocationCalculation && (
-            <>
-              <div className="form-group">
-                <label>From Location</label>
-                <div className="location-input-container">
-                  <input
-                    type="text"
-                    className="form-control"
-                    value={formData.fromLocation}
-                    onChange={(e) => {
-                      handleInputChange('fromLocation', e.target.value);
-                      debouncedLocationSearch(e.target.value, 'from');
-                    }}
-                    placeholder="Enter starting location"
-                  />
-                  {showFromSuggestions && fromLocationSuggestions.length > 0 && (
-                    <div className="location-suggestions">
-                      {fromLocationSuggestions.map((location, index) => (
-                        <div
-                          key={index}
-                          className="location-suggestion"
-                          onClick={() => handleLocationSelect(location, 'from')}
-                        >
-                          {location.description}
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
-              
-              {/* Dynamic spacer to push content down when suggestions appear */}
-              {suggestionsHeight > 0 && showFromSuggestions && (
-                <div 
-                  className="suggestions-spacer" 
-                  style={{ height: `${suggestionsHeight}px` }}
+      <div style={{ marginBottom: '1.5rem' }}>
+        <button className="copy-btn" onClick={handleBack}>
+          ← Back to Services
+        </button>
+      </div>
+      
+      <div className="food-layout">
+        <div className="form-sections-container">
+          {/* Travel Details Section */}
+          <div className="form-section-card section-visible">
+            <div className="section-header">
+              <h3>Travel Details</h3>
+            </div>
+            
+            <div className="form-group">
+              <label>From:</label>
+              <div className="location-input-container">
+                <input
+                  type="text"
+                  className="form-control"
+                  value={formData.startLocation}
+                  onChange={(e) => {
+                    handleInputChange('startLocation', e.target.value);
+                    handleFromLocationSearch(e.target.value);
+                  }}
+                  onFocus={() => {
+                    if (formData.startLocation) {
+                      handleFromLocationSearch(formData.startLocation);
+                    }
+                  }}
+                  placeholder="Enter starting location"
                 />
-              )}
-
-              <div className="form-group">
-                <label>To Location</label>
-                <div className="location-input-container">
-                  <input
-                    type="text"
-                    className="form-control"
-                    value={formData.toLocation}
-                    onChange={(e) => {
-                      handleInputChange('toLocation', e.target.value);
-                      debouncedLocationSearch(e.target.value, 'to');
-                    }}
-                    placeholder="Enter destination location"
-                  />
-                  {showToSuggestions && toLocationSuggestions.length > 0 && (
-                    <div className="location-suggestions">
-                      {toLocationSuggestions.map((location, index) => (
-                        <div
-                          key={index}
-                          className="location-suggestion"
-                          onClick={() => handleLocationSelect(location, 'to')}
-                        >
-                          {location.description}
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
+                {showFromSuggestions && fromLocationSuggestions.length > 0 && (
+                  <div className="address-suggestions">
+                    {fromLocationSuggestions.map((location, index) => (
+                      <div
+                        key={index}
+                        className="address-suggestion"
+                        onClick={() => handleFromLocationSelect(location)}
+                      >
+                        {location.description}
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
+              <div className="suggestions-spacer" style={{ height: `${suggestionsHeight}px` }}></div>
+            </div>
 
-              {/* Dynamic spacer for To Location suggestions */}
-              {suggestionsHeight > 0 && showToSuggestions && (
-                <div 
-                  className="suggestions-spacer" 
-                  style={{ height: `${suggestionsHeight}px` }}
+            <div className="form-group">
+              <label>To:</label>
+              <div className="location-input-container">
+                <input
+                  type="text"
+                  className="form-control"
+                  value={formData.destination}
+                  onChange={(e) => {
+                    handleInputChange('destination', e.target.value);
+                    handleToLocationSearch(e.target.value);
+                  }}
+                  onFocus={() => {
+                    if (formData.destination) {
+                      handleToLocationSearch(formData.destination);
+                    }
+                  }}
+                  placeholder="Enter destination"
                 />
-              )}
-
-              {isCalculatingDistance && (
-                <div className="loading-message">
-                  Calculating distance...
-                </div>
-              )}
-
-               {showDistanceError && distanceCalculationError && (
-                 <div className="error-message">
-                   {distanceCalculationError}
-                 </div>
-               )}
-
-              <div className="form-group">
-                <button
-                  type="button"
-                  className="btn btn-secondary"
-                  onClick={calculateDistanceFromLocations}
-                  disabled={!formData.fromLocation || !formData.toLocation || isCalculatingDistance}
-                >
-                  Calculate Distance
-                </button>
-                
+                {showToSuggestions && toLocationSuggestions.length > 0 && (
+                  <div className="address-suggestions">
+                    {toLocationSuggestions.map((location, index) => (
+                      <div
+                        key={index}
+                        className="address-suggestion"
+                        onClick={() => handleToLocationSelect(location)}
+                      >
+                        {location.description}
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
-            </>
-          )}
+              <div className="suggestions-spacer" style={{ height: `${suggestionsHeight}px` }}></div>
+            </div>
 
-          <div className="form-group">
-            <label>Distance (km)</label>
-            <input
-              type="number"
-              className="form-control"
-              value={formData.distance}
-              onChange={(e) => handleInputChange('distance', e.target.value)}
-              placeholder="Enter distance in kilometers"
-              min="0"
-              step="0.1"
-            />
-          </div>
+            <div className="form-group">
+              <label>Return trip:</label>
+              <div className="radio-group">
+                <label className={`radio-btn ${formData.returnTrip === 'yes' ? 'selected' : ''}`}>Yes
+                  <input
+                    type="checkbox"
+                    name="returnTripYes"
+                    checked={formData.returnTrip === 'yes'}
+                    onChange={() => handleInputChange('returnTrip', formData.returnTrip === 'yes' ? '' : 'yes')}
+                    className="visually-hidden"
+                  />
+                </label>
+                <label className={`radio-btn ${formData.returnTrip === 'no' ? 'selected' : ''}`}>No
+                  <input
+                    type="checkbox"
+                    name="returnTripNo"
+                    checked={formData.returnTrip === 'no'}
+                    onChange={() => handleInputChange('returnTrip', formData.returnTrip === 'no' ? '' : 'no')}
+                    className="visually-hidden"
+                  />
+                </label>
+              </div>
+            </div>
 
-          <div className="form-group">
-            <label className="checkbox-label">
-              <input
-                type="checkbox"
-                checked={formData.returnTrip}
-                onChange={(e) => handleInputChange('returnTrip', e.target.checked)}
-              />
-              <span>Return trip</span>
-            </label>
-          </div>
+            <div className="form-group">
+              <label>Distance (km):</label>
+              <div className="distance-input-container">
+                <input
+                  type="number"
+                  className="form-control"
+                  value={formData.distance > 0 ? (formData.returnTrip === 'yes' ? formData.distance * 2 : formData.distance) : ''}
+                  onChange={(e) => {
+                    const value = parseFloat(e.target.value) || 0;
+                    // If return trip is checked, divide by 2 to store the base distance
+                    const baseDistance = formData.returnTrip === 'yes' ? value / 2 : value;
+                    handleInputChange('distance', baseDistance);
+                  }}
+                  placeholder="Enter distance manually or use address lookup above"
+                  step="0.1"
+                />
+                {formData.distance > 0 && (
+                  <div className="distance-display">
+                    {formData.returnTrip === 'yes' ? (
+                      <>
+                        Base distance: {formData.distance.toFixed(1)} km<br />
+                        Total distance (return trip): {(formData.distance * 2).toFixed(1)} km
+                      </>
+                    ) : (
+                      `Calculated distance: ${formData.distance.toFixed(1)} km`
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
 
-          {/* Petrol Section */}
-          <div className="section-header">
-            <h3>Petrol</h3>
-          </div>
-
-          <div className="form-group">
-            <label>Petrol cost per litre ($)</label>
-            <input
-              type="number"
-              className="form-control"
-              value={formData.petrolCost}
-              onChange={(e) => handleInputChange('petrolCost', e.target.value)}
-              placeholder="Enter petrol cost per litre"
-              min="0"
-              step="0.01"
-            />
-            <a 
-              href="https://www.gaspy.nz/stats.html" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="link-under-input"
-            >
-              Check current fuel costs
-            </a>
-          </div>
-
-          {/* Fuel Economy Section */}
-          <div className="section-header">
-            <h3>Fuel Economy</h3>
-          </div>
-
-          <div className="form-group">
-            <label>Vehicle mileage (L/100km)</label>
-            <div className="mileage-input-container">
-              <input
-                type="number"
-                className="form-control"
-                value={formData.vehicleMileage}
-                onChange={(e) => handleInputChange('vehicleMileage', e.target.value)}
-                placeholder="Enter vehicle mileage"
-                min="0"
-                step="0.1"
-              />
-              <div className="or-divider">or</div>
+            <div className="form-group">
+              <label>Vehicle make/model:</label>
               <div className="car-selector">
                 <input
                   type="text"
                   className="form-control"
-                  value={formData.carSearchTerm}
-                  onChange={(e) => handleInputChange('carSearchTerm', e.target.value)}
+                  value={carSearchTerm}
+                  onChange={(e) => setCarSearchTerm(e.target.value)}
                   onFocus={() => setShowCarDropdown(true)}
-                  placeholder="Search for a car model"
+                  placeholder="Search for a car model or enter manually"
                 />
                 {showCarDropdown && filteredCars.length > 0 && (
                   <div className="car-dropdown">
@@ -777,72 +578,84 @@ const PetrolCalculator: React.FC<PetrolCalculatorProps> = ({
                         className="car-option"
                         onClick={() => handleCarSelect(car)}
                       >
-                        {car.Model} ({car['L/100km']} L/100km)
+                        {car.Model}
                       </div>
                     ))}
                   </div>
                 )}
               </div>
-              {/* Dynamic spacer for car dropdown */}
-              <div 
-                className="suggestions-spacer" 
-                style={{ height: `${carDropdownHeight}px` }}
+              <div className="suggestions-spacer" style={{ height: `${carDropdownHeight}px` }}></div>
+            </div>
+
+            <div className="form-group">
+              <label>Vehicle mileage (L/100km):</label>
+              <input
+                type="number"
+                className="form-control"
+                value={formData.vehicleMileage}
+                onChange={(e) => handleInputChange('vehicleMileage', e.target.value)}
+                placeholder="Enter vehicle mileage"
+                step="0.1"
               />
             </div>
-          </div>
 
-          {calculatedCost !== null && (
-            <div className="calculation-result">
-              <h3>Calculation Result</h3>
-              <div className="result-details">
-                {(() => {
-                  const distance = parseFloat(formData.distance || '0');
-                  const totalDistance = formData.returnTrip ? distance * 2 : distance;
-                  const mileage = parseFloat(formData.vehicleMileage || '0');
-                  const fuelUsed = (totalDistance / 100) * mileage;
-                  
-                  return (
-                    <>
-                      <p><strong>Total distance:</strong> {totalDistance} km</p>
-                      <p><strong>Fuel used:</strong> {fuelUsed.toFixed(2)} L</p>
-                      <p><strong>Total cost:</strong> <span className="cost-highlight">{formatCurrency(calculatedCost)}</span></p>
-                    </>
-                  );
-                })()}
-              </div>
+            <div className="form-group">
+              <label>Petrol cost per litre ($):</label>
+              <input
+                type="number"
+                className="form-control"
+                value={formData.petrolCost}
+                onChange={(e) => handleInputChange('petrolCost', e.target.value)}
+                placeholder="Enter petrol cost"
+                step="0.01"
+              />
             </div>
-          )}
 
-          {/* Tip Box */}
-          <div className="tip-box">
-            <strong>Please note:</strong> These values are based on distance travelled and fuel economy. They don't account for the fact that:
-            <ul style={{ margin: '0.5rem 0 0 1.5rem', padding: 0 }}>
-              <li>Our clients may be stopping/starting. They are not travelling in a straight line</li>
-              <li>Unexpected events happen. The client may encounter detours or road closures</li>
-              <li>Fuel economy is based around a perfectly functioning vehicle. Wear and tear can reduce fuel economy over time.</li>
-            </ul>
-            <br />
-            With this in mind, use these numbers only as a guideline. Have a conversation with the client to determine what is realistic based on their situation and vehicle condition.
-          </div>
+            {formData.calculatedCost > 0 && (
+              <div className="form-group">
+                <label>Calculated Cost of travel:</label>
+                <div className="form-control-static">
+                  ${formData.calculatedCost.toFixed(2)}
+                </div>
+              </div>
+            )}
 
-          <div className="form-actions">
-            <button 
-              type="button" 
-              className="btn btn-secondary" 
-              onClick={resetForm}
-            >
-              Reset
-            </button>
-            {isStandalone && (
+            {/* Tip Box */}
+            <div className="tip-box">
+              <strong>Please note:</strong> These values are based on distance travelled and fuel economy. They don't account for the fact that:
+              <ul style={{ margin: '0.5rem 0 0 1.5rem', padding: 0 }}>
+                <li>Our clients may be stopping/starting. They are not travelling in a straight line</li>
+                <li>Unexpected events happen. The client may encounter detours or road closures</li>
+                <li>Fuel economy is based around a perfectly functioning vehicle. Wear and tear can reduce fuel economy over time.</li>
+              </ul>
+              <br />
+              With this in mind, use these numbers only as a guideline. Have a conversation with the client to determine what is realistic based on their situation and vehicle condition.
+            </div>
+
+            {showDistanceError && (
+              <div className="form-group">
+                <div className="error-message">
+                  {distanceCalculationError}
+                  <br />
+                  <small>You can manually enter the distance above.</small>
+                </div>
+              </div>
+            )}
+
+            <div className="form-actions">
               <button 
                 type="button" 
-                className="btn btn-primary" 
-                onClick={() => navigate('/')}
+                className="btn btn-secondary" 
+                onClick={resetForm}
               >
-                Back to Home
+                Reset
               </button>
-            )}
+            </div>
           </div>
+        </div>
+        
+        <div className="note-section">
+          <NoteOutput formData={formData} service="petrol-calculator" onReset={resetForm} />
         </div>
       </div>
     </div>

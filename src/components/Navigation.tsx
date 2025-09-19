@@ -362,7 +362,12 @@ const Navigation: React.FC<NavigationProps> = ({ currentTheme, onThemeChange }) 
         }}
       >
         <div className="nav-brand">
-          <span className="brand-text">MSD Notes</span>
+          <button 
+            className="brand-text brand-button"
+            onClick={() => handleNavItemClick('/')}
+          >
+            MSD Note Grid
+          </button>
         </div>
 
         <div className="nav-menu">

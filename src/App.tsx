@@ -2,6 +2,7 @@ import { useEffect, useState, lazy, Suspense } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Navigation from './components/Navigation';
 import Home from './components/Home';
+import { keepAliveService } from './services/keepAliveService';
 
 // Lazy load components for better performance
 const FoodPage = lazy(() => import('./components/FoodPage'));
@@ -663,6 +664,17 @@ function App() {
     localStorage.setItem('msd-theme', currentTheme);
   }, [currentTheme]);
 
+  // Initialize keep-alive service
+  useEffect(() => {
+    // Start the keep-alive service when the app mounts
+    keepAliveService.start();
+    
+    // Cleanup: stop the service when the app unmounts
+    return () => {
+      keepAliveService.stop();
+    };
+  }, []);
+
   return (
     <>
       <Navigation currentTheme={currentTheme} onThemeChange={setCurrentTheme} />
@@ -700,7 +712,7 @@ function App() {
           <p className="page-footer-text">Designed by Matt O'Connor</p>
           <p className="page-footer-email">
             <a href="mailto:Matt.O'Connor012@msd.govt.nz" className="page-footer-link">
-              Email me
+              Any Questions? Email me 🙂
             </a>
           </p>
         </div>

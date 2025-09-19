@@ -3,6 +3,7 @@ import { BeddingFormData } from '../App';
 import IncomeSection, { IncomeLabels } from './IncomeSection';
 import PaymentSection from './PaymentSection';
 import DecisionSection from './DecisionSection';
+import ExpandableSection from './ExpandableSection';
 
 interface BeddingFormDataWithLabels extends BeddingFormData {
   incomeLabels?: {
@@ -109,10 +110,12 @@ const BeddingQuestions: React.FC<BeddingQuestionsProps> = ({ formData, onFormDat
   return (
     <div className="form-sections-container">
       {/* General Questions */}
-      <div className="form-section-card section-visible">
-        <div className="section-header">
-          <h3>General Questions</h3>
-        </div>
+      <ExpandableSection
+        title="General Questions"
+        dataSection="client"
+        isVisible={visibleSections.has('client')}
+        defaultExpanded={true}
+      >
         <div className="form-group">
           <label>Has the client been ID'd?</label>
           <div className="radio-group">
@@ -196,7 +199,7 @@ const BeddingQuestions: React.FC<BeddingQuestionsProps> = ({ formData, onFormDat
             </select>
           </div>
         )}
-      </div>
+      </ExpandableSection>
       {/* Income Section */}
       <IncomeSection
         income={formData.income}

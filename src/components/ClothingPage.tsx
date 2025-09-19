@@ -2,34 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ClothingQuestions from './ClothingQuestions';
 import NoteOutput from './NoteOutput';
-
-interface ClothingFormData {
-  clientId: boolean | null;
-  whyNeedClothing: string;
-  reasonableSteps: string;
-  canMeetNeedOtherWay: string;
-  supplierName: string;
-  supplierId: string;
-  amount: number;
-  recoveryRate: number;
-  directCredit: string;
-  paymentReference: string;
-  paymentCardNumber: string;
-  income: {
-    benefit: number;
-    employment: number;
-    familyTaxCredit: number;
-    childSupport: number;
-    childDisabilityAllowance: number;
-    otherIncome: number;
-  };
-  costs: Array<{
-    amount: number;
-    cost: string;
-  }>;
-  decision: string;
-  decisionReason: string;
-}
+import { ClothingFormData } from '../App';
 
 const ClothingPage: React.FC = () => {
   const navigate = useNavigate();
@@ -74,7 +47,7 @@ const ClothingPage: React.FC = () => {
       recoveryRate: 0,
       directCredit: '',
       paymentReference: '',
-    paymentCardNumber: '',
+      paymentCardNumber: '',
       income: {
         benefit: 0,
         employment: 0,
@@ -109,7 +82,7 @@ const ClothingPage: React.FC = () => {
       <div className="header">
         <div className="header-top">
           <div className="greeting-section">
-            <h1 className="greeting">Clothing</h1>
+            <h1 className="greeting">Clothing Assistance</h1>
             <p className="date">{getCurrentDate()}</p>
           </div>
         </div>
@@ -133,4 +106,4 @@ const ClothingPage: React.FC = () => {
   );
 };
 
-export default ClothingPage; 
+export default ClothingPage;

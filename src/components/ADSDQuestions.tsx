@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import IncomeSection, { IncomeLabels } from './IncomeSection';
 import ADSDPaymentSection from './ADSDPaymentSection';
 import DecisionSection from './DecisionSection';
+import ExpandableSection from './ExpandableSection';
 
 interface ADSDFormData {
   clientId: boolean | null;
@@ -122,10 +123,12 @@ const ADSDQuestions: React.FC<ADSDQuestionsProps> = ({ formData, onFormDataChang
     <div className="form-sections-container">
 
       {/* General Questions */}
-      <div className="form-section-card section-visible">
-        <div className="section-header">
-          <h3>General Questions</h3>
-        </div>
+      <ExpandableSection
+        title="General Questions"
+        dataSection="client"
+        isVisible={visibleSections.has('client')}
+        defaultExpanded={true}
+      >
         <div className="form-group">
           <label>Has the client been ID'd?</label>
           <div className="radio-group">
@@ -172,7 +175,7 @@ const ADSDQuestions: React.FC<ADSDQuestionsProps> = ({ formData, onFormDataChang
             onInput={e => autoResizeTextarea(e.currentTarget)}
           />
         </div>
-      </div>
+      </ExpandableSection>
 
       {/* Income Section */}
       <IncomeSection

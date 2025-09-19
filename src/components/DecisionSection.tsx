@@ -1,4 +1,5 @@
 import React from 'react';
+import ExpandableSection from './ExpandableSection';
 
 interface DecisionSectionProps {
   decision: string;
@@ -30,15 +31,12 @@ const DecisionSection: React.FC<DecisionSectionProps> = ({
   isVisible = false
 }) => {
   return (
-    <div 
-      data-section="decision"
-      className={`form-section-card ${isVisible ? 'section-visible' : ''}`}
+    <ExpandableSection
+      title="Decision"
+      dataSection="decision"
+      isVisible={isVisible}
+      defaultExpanded={true}
     >
-      <div className="section-header">
-        <h3>Decision</h3>
-        <div className="section-number">{sectionNumber}</div>
-      </div>
-      
       <div className="form-group">
         <label>Do you want to approve or decline this application?</label>
         <div className="decision-buttons">
@@ -70,7 +68,7 @@ const DecisionSection: React.FC<DecisionSectionProps> = ({
           />
         </div>
       )}
-    </div>
+    </ExpandableSection>
   );
 };
 

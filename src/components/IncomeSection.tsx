@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import CostInput from './CostInput';
 import IncomePieChart from './IncomePieChart';
+import ExpandableSection from './ExpandableSection';
 
 export interface IncomeData {
   benefit: number;
@@ -188,14 +189,12 @@ const IncomeSection: React.FC<IncomeSectionProps> = ({
   };
 
   return (
-    <div 
-      data-section="income"
-      className={`form-section-card ${isVisible ? 'section-visible' : ''}`}
+    <ExpandableSection
+      title={sectionTitle || 'Income'}
+      dataSection="income"
+      isVisible={isVisible}
+      defaultExpanded={true}
     >
-      <div className="section-header">
-        <h3>{sectionTitle || 'Income'}</h3>
-        <div className="section-number">{sectionNumber}</div>
-      </div>
       <div className="income-section">
         <div>
           <div className="form-group">
@@ -380,7 +379,7 @@ const IncomeSection: React.FC<IncomeSectionProps> = ({
           </a>
         </div>
       </div>
-    </div>
+    </ExpandableSection>
   );
 };
 

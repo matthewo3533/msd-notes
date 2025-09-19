@@ -1,7 +1,7 @@
 {
-  "name": "msd-notes-app",
+  "name": "msd-note-grid",
   "version": "1.0.0",
-  "description": "MSD Notes Application for Social Development Assistance",
+  "description": "MSD Note Grid Application for Social Development Assistance",
   "type": "module",
   "scripts": {
     "dev": "vite",

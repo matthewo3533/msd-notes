@@ -3,6 +3,7 @@ import { BedsFormData } from '../App';
 import IncomeSection, { IncomeLabels } from './IncomeSection';
 import PaymentSection from './PaymentSection';
 import DecisionSection from './DecisionSection';
+import ExpandableSection from './ExpandableSection';
 
 interface BedsFormDataWithLabels extends BedsFormData {
   incomeLabels?: {
@@ -107,10 +108,12 @@ const BedsQuestions: React.FC<BedsQuestionsProps> = ({ formData, onFormDataChang
   return (
     <div className="form-sections-container">
       {/* General Questions */}
-      <div className="form-section-card section-visible">
-        <div className="section-header">
-          <h3>General Questions</h3>
-        </div>
+      <ExpandableSection
+        title="General Questions"
+        dataSection="client"
+        isVisible={visibleSections.has('client')}
+        defaultExpanded={true}
+      >
         <div className="form-group">
           <label>Has the client been ID'd?</label>
           <div className="radio-group">
@@ -157,7 +160,7 @@ const BedsQuestions: React.FC<BedsQuestionsProps> = ({ formData, onFormDataChang
             onInput={e => autoResizeTextarea(e.currentTarget)}
           />
         </div>
-      </div>
+      </ExpandableSection>
       {/* Income Section */}
       <IncomeSection
         income={formData.income}
