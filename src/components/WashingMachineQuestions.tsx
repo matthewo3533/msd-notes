@@ -329,7 +329,6 @@ const WashingMachineQuestions: React.FC<WashingMachineQuestionsProps> = ({ formD
         onCostChange={handleCostChange}
         onAddCost={addCost}
         onRemoveCost={removeCost}
-        sectionNumber={2}
         isVisible={visibleSections.has('income')}
       />
 
@@ -349,7 +348,6 @@ const WashingMachineQuestions: React.FC<WashingMachineQuestionsProps> = ({ formD
         onDirectCreditChange={(credit) => handleInputChange('directCredit', credit)}
         onPaymentReferenceChange={(reference) => handleInputChange('paymentReference', reference)}
         onPaymentCardNumberChange={(cardNumber) => handleInputChange('paymentCardNumber', cardNumber)}
-        sectionNumber={4}
         isVisible={visibleSections.has('payment')}
       />
 
@@ -359,7 +357,6 @@ const WashingMachineQuestions: React.FC<WashingMachineQuestionsProps> = ({ formD
         decisionReason={formData.decisionReason}
         onDecisionChange={(decision) => handleInputChange('decision', decision)}
         onDecisionReasonChange={(reason) => handleInputChange('decisionReason', reason)}
-        sectionNumber={5}
         isVisible={visibleSections.has('decision')}
       />
     </div>

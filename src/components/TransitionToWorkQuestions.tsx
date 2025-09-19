@@ -737,7 +737,6 @@ const TransitionToWorkQuestions: React.FC<TransitionToWorkQuestionsProps> = ({ f
         onCostChange={handleCostChange}
         onAddCost={addCost}
         onRemoveCost={removeCost}
-        sectionNumber={formData.petrolAssistance === 'yes' ? 4 : 3}
         isVisible={visibleSections.has('income')}
       />
 
@@ -757,7 +756,6 @@ const TransitionToWorkQuestions: React.FC<TransitionToWorkQuestionsProps> = ({ f
         onDirectCreditChange={(credit) => handleInputChange('directCredit', credit)}
         onPaymentReferenceChange={(reference) => handleInputChange('paymentReference', reference)}
         onPaymentCardNumberChange={(cardNumber) => handleInputChange('paymentCardNumber', cardNumber)}
-        sectionNumber={formData.petrolAssistance === 'yes' ? 5 : 4}
         isVisible={visibleSections.has('payment')}
       />
 
@@ -767,7 +765,6 @@ const TransitionToWorkQuestions: React.FC<TransitionToWorkQuestionsProps> = ({ f
         decisionReason={formData.decisionReason}
         onDecisionChange={(decision) => handleInputChange('decision', decision)}
         onDecisionReasonChange={(reason) => handleInputChange('decisionReason', reason)}
-        sectionNumber={formData.petrolAssistance === 'yes' ? 6 : 5}
         isVisible={visibleSections.has('decision')}
       />
     </div>

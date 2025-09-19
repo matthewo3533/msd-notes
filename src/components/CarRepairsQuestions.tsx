@@ -387,7 +387,6 @@ const CarRepairsQuestions: React.FC<CarRepairsQuestionsProps> = ({ formData, onF
         onCostChange={handleCostChange}
         onAddCost={addCost}
         onRemoveCost={removeCost}
-        sectionNumber={3}
         isVisible={visibleSections.has('income')}
       />
 
@@ -407,7 +406,6 @@ const CarRepairsQuestions: React.FC<CarRepairsQuestionsProps> = ({ formData, onF
         onDirectCreditChange={(credit) => handleInputChange('directCredit', credit)}
         onPaymentReferenceChange={(reference) => handleInputChange('paymentReference', reference)}
         onPaymentCardNumberChange={(cardNumber) => handleInputChange('paymentCardNumber', cardNumber)}
-        sectionNumber={4}
         isVisible={visibleSections.has('payment')}
       />
 
@@ -417,7 +415,6 @@ const CarRepairsQuestions: React.FC<CarRepairsQuestionsProps> = ({ formData, onF
         decisionReason={formData.decisionReason}
         onDecisionChange={(decision) => handleInputChange('decision', decision)}
         onDecisionReasonChange={(reason) => handleInputChange('decisionReason', reason)}
-        sectionNumber={5}
         isVisible={visibleSections.has('decision')}
       />
     </div>

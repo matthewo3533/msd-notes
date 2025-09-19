@@ -220,7 +220,6 @@ const FurnitureQuestions: React.FC<FurnitureQuestionsProps> = ({ formData, onFor
         onCostChange={handleCostChange}
         onAddCost={addCost}
         onRemoveCost={removeCost}
-        sectionNumber={2}
         isVisible={visibleSections.has('income')}
       />
       {/* Payment Section */}
@@ -239,7 +238,6 @@ const FurnitureQuestions: React.FC<FurnitureQuestionsProps> = ({ formData, onFor
         onDirectCreditChange={(credit) => handleInputChange('directCredit', credit)}
         onPaymentReferenceChange={(reference) => handleInputChange('paymentReference', reference)}
         onPaymentCardNumberChange={(cardNumber) => handleInputChange('paymentCardNumber', cardNumber)}
-        sectionNumber={3}
         isVisible={visibleSections.has('payment')}
       />
       {/* Decision Section */}
@@ -248,7 +246,6 @@ const FurnitureQuestions: React.FC<FurnitureQuestionsProps> = ({ formData, onFor
         decisionReason={formData.decisionReason}
         onDecisionChange={(decision) => handleInputChange('decision', decision)}
         onDecisionReasonChange={(reason) => handleInputChange('decisionReason', reason)}
-        sectionNumber={4}
         isVisible={visibleSections.has('decision')}
       />
     </div>

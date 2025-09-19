@@ -817,7 +817,6 @@ const StrandedTravelQuestions: React.FC<StrandedTravelQuestionsProps> = ({ formD
         onCostChange={handleCostChange}
         onAddCost={addCost}
         onRemoveCost={removeCost}
-        sectionNumber={formData.petrolAssistance === 'yes' ? 3 : 2}
         isVisible={visibleSections.has('income')}
       />
 
@@ -837,7 +836,6 @@ const StrandedTravelQuestions: React.FC<StrandedTravelQuestionsProps> = ({ formD
         onDirectCreditChange={(credit) => handleInputChange('directCredit', credit)}
         onPaymentReferenceChange={(reference) => handleInputChange('paymentReference', reference)}
         onPaymentCardNumberChange={(cardNumber) => handleInputChange('paymentCardNumber', cardNumber)}
-        sectionNumber={formData.petrolAssistance === 'yes' ? 4 : 3}
         isVisible={visibleSections.has('payment')}
       />
 
@@ -847,7 +845,6 @@ const StrandedTravelQuestions: React.FC<StrandedTravelQuestionsProps> = ({ formD
         decisionReason={formData.decisionReason}
         onDecisionChange={(decision) => handleInputChange('decision', decision)}
         onDecisionReasonChange={(reason) => handleInputChange('decisionReason', reason)}
-        sectionNumber={formData.petrolAssistance === 'yes' ? 5 : 4}
         isVisible={visibleSections.has('decision')}
       />
     </div>

@@ -262,7 +262,6 @@ const BondRentQuestions: React.FC<BondRentQuestionsProps> = ({ formData, onFormD
         onCostChange={handleCostChange}
         onAddCost={addCost}
         onRemoveCost={removeCost}
-        sectionNumber={2}
         isVisible={visibleSections.has('income')}
         sectionTitle="Tenancy Affordability"
       />
@@ -283,7 +282,6 @@ const BondRentQuestions: React.FC<BondRentQuestionsProps> = ({ formData, onFormD
         onRecoveryRateChange={(rate) => handleInputChange('recoveryRate', rate)}
         onDirectCreditChange={(credit) => handleInputChange('directCredit', credit)}
         onPaymentReferenceChange={(reference) => handleInputChange('paymentReference', reference)}
-        sectionNumber={3}
         isVisible={visibleSections.has('payment')}
       />
 
@@ -293,7 +291,6 @@ const BondRentQuestions: React.FC<BondRentQuestionsProps> = ({ formData, onFormD
         decisionReason={formData.decisionReason}
         onDecisionChange={(decision) => handleInputChange('decision', decision)}
         onDecisionReasonChange={(reason) => handleInputChange('decisionReason', reason)}
-        sectionNumber={4}
         isVisible={visibleSections.has('decision')}
       />
     </div>
