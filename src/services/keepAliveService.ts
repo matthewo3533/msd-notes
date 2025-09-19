@@ -5,7 +5,7 @@
  */
 
 class KeepAliveService {
-  private intervalId: NodeJS.Timeout | null = null;
+  private intervalId: number | null = null;
   private isActive = false;
   private readonly minInterval = 5 * 60 * 1000; // 5 minutes in milliseconds
   private readonly maxInterval = 15 * 60 * 1000; // 15 minutes in milliseconds

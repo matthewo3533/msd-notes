@@ -35,7 +35,6 @@ interface IncomeSectionProps {
   onCostChange: (index: number, field: 'amount' | 'cost', value: any) => void;
   onAddCost: () => void;
   onRemoveCost: (index: number) => void;
-  sectionNumber?: number;
   isVisible?: boolean;
   sectionTitle?: string;
 }
@@ -49,7 +48,6 @@ const IncomeSection: React.FC<IncomeSectionProps> = ({
   onCostChange,
   onAddCost,
   onRemoveCost,
-  sectionNumber = 2,
   isVisible = false,
   sectionTitle
 }) => {

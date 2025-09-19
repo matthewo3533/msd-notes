@@ -6,7 +6,6 @@ interface DecisionSectionProps {
   decisionReason: string;
   onDecisionChange: (decision: string) => void;
   onDecisionReasonChange: (reason: string) => void;
-  sectionNumber?: number;
   isVisible?: boolean;
 }
 
@@ -27,7 +26,6 @@ const DecisionSection: React.FC<DecisionSectionProps> = ({
   decisionReason,
   onDecisionChange,
   onDecisionReasonChange,
-  sectionNumber = 3,
   isVisible = false
 }) => {
   return (

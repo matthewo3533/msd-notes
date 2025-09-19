@@ -16,7 +16,6 @@ interface PaymentSectionProps {
   onDirectCreditChange: (credit: string) => void;
   onPaymentReferenceChange: (reference: string) => void;
   onPaymentCardNumberChange: (cardNumber: string) => void;
-  sectionNumber?: number;
   isVisible?: boolean;
   totalAmount?: number;
   showBondRentInputs?: boolean;
@@ -45,7 +44,6 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
   onDirectCreditChange,
   onPaymentReferenceChange,
   onPaymentCardNumberChange,
-  sectionNumber = 3,
   isVisible = false,
   totalAmount,
   showBondRentInputs = false,
