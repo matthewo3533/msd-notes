@@ -3,6 +3,7 @@ import IncomeSection, { IncomeLabels } from './IncomeSection';
 import PaymentSection from './PaymentSection';
 import DecisionSection from './DecisionSection';
 import ExpandableSection from './ExpandableSection';
+import FormattedTextarea from './FormattedTextarea';
 
 interface ElectricityFormData {
   clientId: boolean | null;
@@ -151,12 +152,12 @@ const ElectricityQuestions: React.FC<ElectricityQuestionsProps> = ({ formData, o
           </div>
         </div>
         <div className="form-group">
-          <label>1. Why is the client needing power assistance?</label>
-          <textarea
-            className="form-control"
+          <FormattedTextarea
+            label="1. Why is the client needing power assistance?"
             value={formData.whyNeedPower}
-            onChange={e => handleInputChange('whyNeedPower', e.target.value)}
+            onChange={(value) => handleInputChange('whyNeedPower', value)}
             placeholder="Please describe the client's situation..."
+            className="form-control"
           />
         </div>
         <div className="form-group">
@@ -183,12 +184,12 @@ const ElectricityQuestions: React.FC<ElectricityQuestionsProps> = ({ formData, o
           </div>
         </div>
         <div className="form-group">
-          <label>3. What reasonable steps is the client taken to improve their situation?</label>
-          <textarea
-            className="form-control"
+          <FormattedTextarea
+            label="3. What reasonable steps is the client taken to improve their situation?"
             value={formData.reasonableSteps}
-            onChange={e => handleInputChange('reasonableSteps', e.target.value)}
+            onChange={(value) => handleInputChange('reasonableSteps', value)}
             placeholder="Describe steps taken..."
+            className="form-control"
           />
         </div>
         <div className="form-group">

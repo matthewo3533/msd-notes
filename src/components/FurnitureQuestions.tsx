@@ -3,6 +3,7 @@ import IncomeSection, { IncomeLabels } from './IncomeSection';
 import PaymentSection from './PaymentSection';
 import DecisionSection from './DecisionSection';
 import ExpandableSection from './ExpandableSection';
+import FormattedTextarea from './FormattedTextarea';
 
 export interface FurnitureFormData {
   clientId: boolean | null;
@@ -36,18 +37,6 @@ export interface FurnitureFormData {
 interface FurnitureQuestionsProps {
   formData: FurnitureFormData;
   onFormDataChange: (data: Partial<FurnitureFormData>) => void;
-}
-
-function autoResizeTextarea(el: HTMLTextAreaElement | null) {
-  if (el) {
-    el.style.height = 'auto';
-    el.style.height = el.scrollHeight + 'px';
-    if (el.scrollHeight > 800) {
-      el.style.overflowY = 'auto';
-    } else {
-      el.style.overflowY = 'hidden';
-    }
-  }
 }
 
 const FurnitureQuestions: React.FC<FurnitureQuestionsProps> = ({ formData, onFormDataChange }) => {
@@ -155,14 +144,12 @@ const FurnitureQuestions: React.FC<FurnitureQuestionsProps> = ({ formData, onFor
           </div>
         </div>
         <div className="form-group">
-          <label>1. Why is the client needing furniture?</label>
-          <textarea
-            className="form-control"
+          <FormattedTextarea
+            label="1. Why is the client needing furniture?"
             value={formData.whyNeedFurniture}
-            onChange={e => handleInputChange('whyNeedFurniture', e.target.value)}
+            onChange={(value) => handleInputChange('whyNeedFurniture', value)}
             placeholder="Please describe the client's situation..."
-            ref={el => autoResizeTextarea(el)}
-            onInput={e => autoResizeTextarea(e.currentTarget)}
+            className="form-control"
           />
         </div>
         <div className="form-group">
@@ -199,14 +186,12 @@ const FurnitureQuestions: React.FC<FurnitureQuestionsProps> = ({ formData, onFor
           </div>
         </div>
         <div className="form-group">
-          <label>4. What reasonable steps is the client taken to improve their situation?</label>
-          <textarea
-            className="form-control"
+          <FormattedTextarea
+            label="4. What reasonable steps is the client taken to improve their situation?"
             value={formData.reasonableSteps}
-            onChange={e => handleInputChange('reasonableSteps', e.target.value)}
+            onChange={(value) => handleInputChange('reasonableSteps', value)}
             placeholder="Describe steps taken..."
-            ref={el => autoResizeTextarea(el)}
-            onInput={e => autoResizeTextarea(e.currentTarget)}
+            className="form-control"
           />
         </div>
       </ExpandableSection>

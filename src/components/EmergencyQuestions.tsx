@@ -4,22 +4,11 @@ import PaymentSection from './PaymentSection';
 import DecisionSection from './DecisionSection';
 import ExpandableSection from './ExpandableSection';
 import { EmergencyFormData } from '../App';
+import FormattedTextarea from './FormattedTextarea';
 
 interface EmergencyQuestionsProps {
   formData: EmergencyFormData;
   onFormDataChange: (data: Partial<EmergencyFormData>) => void;
-}
-
-function autoResizeTextarea(el: HTMLTextAreaElement | null) {
-  if (el) {
-    el.style.height = 'auto';
-    el.style.height = el.scrollHeight + 'px';
-    if (el.scrollHeight > 800) {
-      el.style.overflowY = 'auto';
-    } else {
-      el.style.overflowY = 'hidden';
-    }
-  }
 }
 
 const EmergencyQuestions: React.FC<EmergencyQuestionsProps> = ({ formData, onFormDataChange }) => {
@@ -128,26 +117,22 @@ const EmergencyQuestions: React.FC<EmergencyQuestionsProps> = ({ formData, onFor
           </div>
         </div>
         <div className="form-group">
-          <label>1. Why is the client needing emergency payment assistance?</label>
-          <textarea
-            className="form-control"
+          <FormattedTextarea
+            label="1. Why is the client needing emergency payment assistance?"
             value={formData.whyNeedEmergencyPayment}
-            onChange={e => handleInputChange('whyNeedEmergencyPayment', e.target.value)}
+            onChange={(value) => handleInputChange('whyNeedEmergencyPayment', value)}
             placeholder="Please describe the client's emergency situation..."
-            ref={el => autoResizeTextarea(el)}
-            onInput={e => autoResizeTextarea(e.currentTarget)}
+            className="form-control"
           />
         </div>
 
         <div className="form-group">
-          <label>2. What reasonable steps is the client taken to improve their situation?</label>
-          <textarea
-            className="form-control"
+          <FormattedTextarea
+            label="2. What reasonable steps is the client taken to improve their situation?"
             value={formData.reasonableSteps}
-            onChange={e => handleInputChange('reasonableSteps', e.target.value)}
+            onChange={(value) => handleInputChange('reasonableSteps', value)}
             placeholder="Describe steps taken to address the emergency..."
-            ref={el => autoResizeTextarea(el)}
-            onInput={e => autoResizeTextarea(e.currentTarget)}
+            className="form-control"
           />
         </div>
       </ExpandableSection>

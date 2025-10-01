@@ -2,23 +2,12 @@ import React, { useState, useEffect, useRef } from 'react';
 import IncomeSection, { IncomeLabels } from './IncomeSection';
 import DecisionSection from './DecisionSection';
 import FoodPaymentSection from './FoodPaymentSection';
+import FormattedTextarea from './FormattedTextarea';
 import { FoodFormData } from '../App';
 
 interface FoodQuestionsProps {
   formData: FoodFormData;
   onFormDataChange: (data: Partial<FoodFormData>) => void;
-}
-
-function autoResizeTextarea(el: HTMLTextAreaElement | null) {
-  if (el) {
-    el.style.height = 'auto';
-    el.style.height = el.scrollHeight + 'px';
-    if (el.scrollHeight > 800) {
-      el.style.overflowY = 'auto';
-    } else {
-      el.style.overflowY = 'hidden';
-    }
-  }
 }
 
 const FoodQuestions: React.FC<FoodQuestionsProps> = ({ formData, onFormDataChange }) => {
@@ -94,6 +83,13 @@ const FoodQuestions: React.FC<FoodQuestionsProps> = ({ formData, onFormDataChang
     setIncomeLabels(labels);
   };
 
+  // Auto-fill Total Cost with foodAmountRequested
+  useEffect(() => {
+    if (formData.foodAmountRequested !== undefined && formData.foodAmountRequested !== formData.amount) {
+      onFormDataChange({ amount: formData.foodAmountRequested });
+    }
+  }, [formData.foodAmountRequested]);
+
   const handleCostChange = (index: number, field: 'amount' | 'cost', value: any) => {
     const newCosts = [...formData.costs];
     newCosts[index] = { ...newCosts[index], [field]: value };
@@ -150,14 +146,12 @@ const FoodQuestions: React.FC<FoodQuestionsProps> = ({ formData, onFormDataChang
         </div>
 
         <div className="form-group">
-          <label>1. Why is the client needing food?</label>
-          <textarea
-            className="form-control"
+          <FormattedTextarea
+            label="1. Why is the client needing food?"
             value={formData.whyNeedFood}
-            onChange={(e) => handleInputChange('whyNeedFood', e.target.value)}
+            onChange={(value) => handleInputChange('whyNeedFood', value)}
             placeholder="Please describe the client's situation..."
-            ref={el => autoResizeTextarea(el)}
-            onInput={e => autoResizeTextarea(e.currentTarget)}
+            className="form-control"
           />
         </div>
 
@@ -188,7 +182,6 @@ const FoodQuestions: React.FC<FoodQuestionsProps> = ({ formData, onFormDataChang
               onChange={(e) => handleInputChange('currentFoodBalance', parseFloat(e.target.value) || 0)}
               placeholder="0.00"
               step="0.01"
-              min="0"
             />
           </div>
         </div>
@@ -221,27 +214,23 @@ const FoodQuestions: React.FC<FoodQuestionsProps> = ({ formData, onFormDataChang
 
         {formData.hardshipUnforeseen === 'yes' && (
           <div className="form-group">
-            <label>4.6. What is the unforeseen circumstance?</label>
-            <textarea
-              className="form-control"
+            <FormattedTextarea
+              label="4.6. What is the unforeseen circumstance?"
               value={formData.unforeseenCircumstance}
-              onChange={(e) => handleInputChange('unforeseenCircumstance', e.target.value)}
+              onChange={(value) => handleInputChange('unforeseenCircumstance', value)}
               placeholder="Please describe the unforeseen circumstance..."
-              ref={el => autoResizeTextarea(el)}
-              onInput={e => autoResizeTextarea(e.currentTarget)}
+              className="form-control"
             />
           </div>
         )}
 
         <div className="form-group">
-          <label>5. What reasonable steps is the client taken to improve their situation?</label>
-          <textarea
-            className="form-control"
+          <FormattedTextarea
+            label="5. What reasonable steps is the client taken to improve their situation?"
             value={formData.reasonableSteps}
-            onChange={(e) => handleInputChange('reasonableSteps', e.target.value)}
+            onChange={(value) => handleInputChange('reasonableSteps', value)}
             placeholder="Describe steps taken..."
-            ref={el => autoResizeTextarea(el)}
-            onInput={e => autoResizeTextarea(e.currentTarget)}
+            className="form-control"
           />
         </div>
       </div>

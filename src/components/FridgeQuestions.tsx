@@ -3,22 +3,11 @@ import IncomeSection, { IncomeLabels } from './IncomeSection';
 import PaymentSection from './PaymentSection';
 import DecisionSection from './DecisionSection';
 import { FridgeFormData } from '../App';
+import FormattedTextarea from './FormattedTextarea';
 
 interface FridgeQuestionsProps {
   formData: FridgeFormData;
   onFormDataChange: (data: Partial<FridgeFormData>) => void;
-}
-
-function autoResizeTextarea(el: HTMLTextAreaElement | null) {
-  if (el) {
-    el.style.height = 'auto';
-    el.style.height = el.scrollHeight + 'px';
-    if (el.scrollHeight > 800) {
-      el.style.overflowY = 'auto';
-    } else {
-      el.style.overflowY = 'hidden';
-    }
-  }
 }
 
 const FridgeQuestions: React.FC<FridgeQuestionsProps> = ({ formData, onFormDataChange }) => {
@@ -132,14 +121,12 @@ const FridgeQuestions: React.FC<FridgeQuestionsProps> = ({ formData, onFormDataC
           </div>
         </div>
         <div className="form-group">
-          <label>1. Why is the client needing a fridge?</label>
-          <textarea
-            className="form-control"
+          <FormattedTextarea
+            label="1. Why is the client needing a fridge?"
             value={formData.whyNeedFridge}
-            onChange={e => handleInputChange('whyNeedFridge', e.target.value)}
+            onChange={(value) => handleInputChange('whyNeedFridge', value)}
             placeholder="Please describe the client's situation..."
-            ref={el => autoResizeTextarea(el)}
-            onInput={e => autoResizeTextarea(e.currentTarget)}
+            className="form-control"
           />
         </div>
         <div className="form-group">
@@ -166,14 +153,12 @@ const FridgeQuestions: React.FC<FridgeQuestionsProps> = ({ formData, onFormDataC
           </div>
         </div>
         <div className="form-group">
-          <label>3. What reasonable steps is the client taken to improve their situation?</label>
-          <textarea
-            className="form-control"
+          <FormattedTextarea
+            label="3. What reasonable steps is the client taken to improve their situation?"
             value={formData.reasonableSteps}
-            onChange={e => handleInputChange('reasonableSteps', e.target.value)}
+            onChange={(value) => handleInputChange('reasonableSteps', value)}
             placeholder="Describe steps taken..."
-            ref={el => autoResizeTextarea(el)}
-            onInput={e => autoResizeTextarea(e.currentTarget)}
+            className="form-control"
           />
         </div>
       </div>
@@ -305,14 +290,12 @@ const FridgeQuestions: React.FC<FridgeQuestionsProps> = ({ formData, onFormDataC
           </div>
           {formData.specialDeliveryInstructions === 'yes' && (
             <div className="form-group">
-              <label>Please outline the delivery instructions.</label>
-              <textarea
-                className="form-control"
+              <FormattedTextarea
+                label="Please outline the delivery instructions."
                 value={formData.deliveryInstructionsDetails || ''}
-                onChange={e => handleInputChange('deliveryInstructionsDetails', e.target.value)}
+                onChange={(value) => handleInputChange('deliveryInstructionsDetails', value)}
                 placeholder="Enter delivery instructions..."
-                ref={el => autoResizeTextarea(el)}
-                onInput={e => autoResizeTextarea(e.currentTarget)}
+                className="form-control"
               />
             </div>
           )}

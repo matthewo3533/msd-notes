@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import IncomeSection, { IncomeLabels } from './IncomeSection';
 import PaymentSection from './PaymentSection';
 import DecisionSection from './DecisionSection';
+import FormattedTextarea from './FormattedTextarea';
 
 interface CarData {
   Model: string;
@@ -44,18 +45,6 @@ interface CarRepairsFormData {
 interface CarRepairsQuestionsProps {
   formData: CarRepairsFormData;
   onFormDataChange: (data: Partial<CarRepairsFormData>) => void;
-}
-
-function autoResizeTextarea(el: HTMLTextAreaElement | null) {
-  if (el) {
-    el.style.height = 'auto';
-    el.style.height = el.scrollHeight + 'px';
-    if (el.scrollHeight > 800) {
-      el.style.overflowY = 'auto';
-    } else {
-      el.style.overflowY = 'hidden';
-    }
-  }
 }
 
 const CarRepairsQuestions: React.FC<CarRepairsQuestionsProps> = ({ formData, onFormDataChange }) => {
@@ -249,26 +238,22 @@ const CarRepairsQuestions: React.FC<CarRepairsQuestionsProps> = ({ formData, onF
           </div>
         </div>
         <div className="form-group">
-          <label>1. Why is the client needing car repairs?</label>
-          <textarea
-            className="form-control"
+          <FormattedTextarea
+            label="1. Why is the client needing car repairs?"
             value={formData.whyNeedCarRepairs}
-            onChange={e => handleInputChange('whyNeedCarRepairs', e.target.value)}
+            onChange={(value) => handleInputChange('whyNeedCarRepairs', value)}
             placeholder="Please describe the client's situation..."
-            ref={el => autoResizeTextarea(el)}
-            onInput={e => autoResizeTextarea(e.currentTarget)}
+            className="form-control"
           />
         </div>
 
         <div className="form-group">
-          <label>2. What reasonable steps is the client taken to improve their situation?</label>
-          <textarea
-            className="form-control"
+          <FormattedTextarea
+            label="2. What reasonable steps is the client taken to improve their situation?"
             value={formData.reasonableSteps}
-            onChange={e => handleInputChange('reasonableSteps', e.target.value)}
+            onChange={(value) => handleInputChange('reasonableSteps', value)}
             placeholder="Describe steps taken..."
-            ref={el => autoResizeTextarea(el)}
-            onInput={e => autoResizeTextarea(e.currentTarget)}
+            className="form-control"
           />
         </div>
       </div>
@@ -355,14 +340,12 @@ const CarRepairsQuestions: React.FC<CarRepairsQuestionsProps> = ({ formData, onF
         </div>
 
         <div className="form-group">
-          <label>NZTA verification:</label>
-          <textarea
-            className="form-control"
+          <FormattedTextarea
+            label="NZTA verification:"
             value={formData.nztaVerification}
-            onChange={e => handleInputChange('nztaVerification', e.target.value)}
+            onChange={(value) => handleInputChange('nztaVerification', value)}
             placeholder="Enter NZTA verification details..."
-            ref={el => autoResizeTextarea(el)}
-            onInput={e => autoResizeTextarea(e.currentTarget)}
+            className="form-control"
           />
           <div style={{ marginTop: '0.5rem' }}>
             <a 

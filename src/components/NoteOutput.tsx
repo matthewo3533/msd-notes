@@ -8,6 +8,28 @@ interface NoteOutputProps {
 }
 
 const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onReset }) => {
+  // Helper function to format dates from Calendar component (DD/MM/YYYY format)
+  const formatCalendarDate = (dateString: string): string => {
+    if (!dateString) return '';
+    
+    // Handle DD/MM/YYYY format from Calendar component
+    const parts = dateString.split('/');
+    if (parts.length === 3) {
+      return dateString; // Already in correct format
+    } else {
+      // Fallback for other date formats
+      const date = new Date(dateString);
+      if (!isNaN(date.getTime())) {
+        const day = date.getDate().toString().padStart(2, '0');
+        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+        const year = date.getFullYear();
+        return `${day}/${month}/${year}`;
+      } else {
+        return dateString; // Return as-is if can't parse
+      }
+    }
+  };
+
   const generateNote = () => {
     if (service === 'declare-income') {
       // Declare Income note output
@@ -222,7 +244,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       }
       
       if (t.helpType.includes('Bridging costs') && t.firstPayday) {
-        note += `\nDate of first payday: ${t.firstPayday}\n`;
+        note += `\nDate of first payday: ${formatCalendarDate(t.firstPayday)}\n`;
       }
       
       if (t.whyNeedTransitionToWork) {
@@ -236,7 +258,9 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       if (t.employerName || t.startDate || t.hoursPerWeek > 0) {
         note += '\n~~~ Employment Info ~~~\n';
         if (t.employerName) note += `Employer: ${t.employerName}\n`;
-        if (t.startDate) note += `Start date: ${t.startDate}\n`;
+        if (t.startDate) {
+          note += `Start date: ${formatCalendarDate(t.startDate)}\n`;
+        }
         if (t.hoursPerWeek > 0) note += `Hours per week: ${t.hoursPerWeek}\n`;
       }
 
@@ -649,11 +673,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       if (b.newAddress) note += `Address: ${b.newAddress}\n`;
       if (b.weeklyRent) note += `Weekly Rent: ${b.weeklyRent.toFixed(2)}\n`;
       if (b.tenancyStartDate) {
-        const date = new Date(b.tenancyStartDate);
-        const day = date.getDate().toString().padStart(2, '0');
-        const month = (date.getMonth() + 1).toString().padStart(2, '0');
-        const year = date.getFullYear();
-        note += `Tenancy start date: ${day}/${month}/${year}\n`;
+        note += `Tenancy start date: ${formatCalendarDate(b.tenancyStartDate)}\n`;
       }
       
       note += '\n~~~ Payment ~~~\n';

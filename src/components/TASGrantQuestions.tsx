@@ -1,22 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { TASGrantFormData } from '../App';
 import Calendar from './Calendar';
+import FormattedTextarea from './FormattedTextarea';
 
 interface TASGrantQuestionsProps {
   formData: TASGrantFormData;
   onFormDataChange: (data: Partial<TASGrantFormData>) => void;
-}
-
-function autoResizeTextarea(el: HTMLTextAreaElement | null) {
-  if (el) {
-    el.style.height = 'auto';
-    el.style.height = el.scrollHeight + 'px';
-    if (el.scrollHeight > 800) {
-      el.style.overflowY = 'auto';
-    } else {
-      el.style.overflowY = 'hidden';
-    }
-  }
 }
 
 const TASGrantQuestions: React.FC<TASGrantQuestionsProps> = ({ formData, onFormDataChange }) => {
@@ -482,14 +471,12 @@ const TASGrantQuestions: React.FC<TASGrantQuestionsProps> = ({ formData, onFormD
         </div>
 
         <div className="form-group">
-          <label>Has a necessary and reasonable step been discussed?</label>
-          <textarea
-            className="form-control"
+          <FormattedTextarea
+            label="Has a necessary and reasonable step been discussed?"
             value={formData.necessaryReasonableSteps}
-            onChange={(e) => handleInputChange('necessaryReasonableSteps', e.target.value)}
+            onChange={(value) => handleInputChange('necessaryReasonableSteps', value)}
             placeholder="Please describe the necessary and reasonable steps discussed..."
-            ref={el => autoResizeTextarea(el)}
-            onInput={e => autoResizeTextarea(e.currentTarget)}
+            className="form-control"
           />
         </div>
 
@@ -574,14 +561,12 @@ const TASGrantQuestions: React.FC<TASGrantQuestionsProps> = ({ formData, onFormD
 
         {formData.outcome === 'not-regranted' && (
           <div className="form-group">
-            <label>What further action is needed?</label>
-            <textarea
-              className="form-control"
+            <FormattedTextarea
+              label="What further action is needed?"
               value={formData.furtherActionNeeded}
-              onChange={(e) => handleInputChange('furtherActionNeeded', e.target.value)}
+              onChange={(value) => handleInputChange('furtherActionNeeded', value)}
               placeholder="Please describe what further action is needed..."
-              ref={el => autoResizeTextarea(el)}
-              onInput={e => autoResizeTextarea(e.currentTarget)}
+              className="form-control"
             />
           </div>
         )}

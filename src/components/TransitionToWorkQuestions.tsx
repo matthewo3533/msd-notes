@@ -4,6 +4,7 @@ import PaymentSection from './PaymentSection';
 import DecisionSection from './DecisionSection';
 import Calendar from './Calendar';
 import { TransitionToWorkFormData } from '../App';
+import FormattedTextarea from './FormattedTextarea';
 
 interface TransitionToWorkQuestionsProps {
   formData: TransitionToWorkFormData;
@@ -19,18 +20,6 @@ interface Location {
   placeId: string;
   description: string;
   coordinates?: { lat: number; lng: number };
-}
-
-function autoResizeTextarea(el: HTMLTextAreaElement | null) {
-  if (el) {
-    el.style.height = 'auto';
-    el.style.height = el.scrollHeight + 'px';
-    if (el.scrollHeight > 800) {
-      el.style.overflowY = 'auto';
-    } else {
-      el.style.overflowY = 'hidden';
-    }
-  }
 }
 
 const TransitionToWorkQuestions: React.FC<TransitionToWorkQuestionsProps> = ({ formData, onFormDataChange }) => {
@@ -421,14 +410,12 @@ const TransitionToWorkQuestions: React.FC<TransitionToWorkQuestionsProps> = ({ f
         )}
 
         <div className="form-group">
-          <label>2. Why is the client needing Transition to Work assistance?</label>
-          <textarea
-            className="form-control"
+          <FormattedTextarea
+            label="2. Why is the client needing Transition to Work assistance?"
             value={formData.whyNeedTransitionToWork}
-            onChange={e => handleInputChange('whyNeedTransitionToWork', e.target.value)}
+            onChange={(value) => handleInputChange('whyNeedTransitionToWork', value)}
             placeholder="Please describe the client's situation..."
-            ref={el => autoResizeTextarea(el)}
-            onInput={e => autoResizeTextarea(e.currentTarget)}
+            className="form-control"
           />
         </div>
 

@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import IncomeSection, { IncomeLabels } from './IncomeSection';
 import PaymentSection from './PaymentSection';
 import DecisionSection from './DecisionSection';
+import FormattedTextarea from './FormattedTextarea';
 
 // Google Maps API TypeScript declarations
 declare global {
@@ -84,18 +85,6 @@ interface StrandedTravelFormData {
 interface StrandedTravelQuestionsProps {
   formData: StrandedTravelFormData;
   onFormDataChange: (data: Partial<StrandedTravelFormData>) => void;
-}
-
-function autoResizeTextarea(el: HTMLTextAreaElement | null) {
-  if (el) {
-    el.style.height = 'auto';
-    el.style.height = el.scrollHeight + 'px';
-    if (el.scrollHeight > 800) {
-      el.style.overflowY = 'auto';
-    } else {
-      el.style.overflowY = 'hidden';
-    }
-  }
 }
 
 const StrandedTravelQuestions: React.FC<StrandedTravelQuestionsProps> = ({ formData, onFormDataChange }) => {
@@ -538,26 +527,22 @@ const StrandedTravelQuestions: React.FC<StrandedTravelQuestionsProps> = ({ formD
           </div>
         </div>
         <div className="form-group">
-          <label>1. Why is the client needing stranded travel assistance?</label>
-          <textarea
-            className="form-control"
+          <FormattedTextarea
+            label="1. Why is the client needing stranded travel assistance?"
             value={formData.whyNeedStrandedTravelAssistance}
-            onChange={e => handleInputChange('whyNeedStrandedTravelAssistance', e.target.value)}
+            onChange={(value) => handleInputChange('whyNeedStrandedTravelAssistance', value)}
             placeholder="Please describe the client's situation and why they are stranded..."
-            ref={el => autoResizeTextarea(el)}
-            onInput={e => autoResizeTextarea(e.currentTarget)}
+            className="form-control"
           />
         </div>
 
         <div className="form-group">
-          <label>2. What reasonable steps has the client taken to improve their situation?</label>
-          <textarea
-            className="form-control"
+          <FormattedTextarea
+            label="2. What reasonable steps has the client taken to improve their situation?"
             value={formData.reasonableSteps}
-            onChange={e => handleInputChange('reasonableSteps', e.target.value)}
+            onChange={(value) => handleInputChange('reasonableSteps', value)}
             placeholder="Describe steps taken to resolve the stranded situation..."
-            ref={el => autoResizeTextarea(el)}
-            onInput={e => autoResizeTextarea(e.currentTarget)}
+            className="form-control"
           />
         </div>
 

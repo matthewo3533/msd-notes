@@ -1,5 +1,6 @@
 import React from 'react';
 import ExpandableSection from './ExpandableSection';
+import FormattedTextarea from './FormattedTextarea';
 
 interface DecisionSectionProps {
   decision: string;
@@ -7,18 +8,6 @@ interface DecisionSectionProps {
   onDecisionChange: (decision: string) => void;
   onDecisionReasonChange: (reason: string) => void;
   isVisible?: boolean;
-}
-
-function autoResizeTextarea(el: HTMLTextAreaElement | null) {
-  if (el) {
-    el.style.height = 'auto';
-    el.style.height = el.scrollHeight + 'px';
-    if (el.scrollHeight > 800) {
-      el.style.overflowY = 'auto';
-    } else {
-      el.style.overflowY = 'hidden';
-    }
-  }
 }
 
 const DecisionSection: React.FC<DecisionSectionProps> = ({
@@ -55,14 +44,12 @@ const DecisionSection: React.FC<DecisionSectionProps> = ({
 
       {decision && (
         <div className="form-group">
-          <label>Why are you choosing to help/not help this client?</label>
-          <textarea
-            className="form-control"
+          <FormattedTextarea
+            label="Why are you choosing to help/not help this client?"
             value={decisionReason}
-            onChange={(e) => onDecisionReasonChange(e.target.value)}
+            onChange={(value) => onDecisionReasonChange(value)}
             placeholder="Please provide your reasoning..."
-            ref={el => autoResizeTextarea(el)}
-            onInput={e => autoResizeTextarea(e.currentTarget)}
+            className="form-control"
           />
         </div>
       )}
