@@ -1188,7 +1188,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       if (f.whyNeedFood) note += `${f.whyNeedFood}\n`;
 
       note += '\n';
-      if (f.currentFoodBalance > 0) {
+      if (f.currentFoodBalance !== 0 && f.currentFoodBalance !== undefined) {
         note += `Food balance: $${f.currentFoodBalance.toFixed(2)}\n`;
         if (f.hardshipUnforeseen === 'yes' && f.unforeseenCircumstance) {
           note += `Client is in hardship due to the following unforeseen circumstance: ${f.unforeseenCircumstance}\n`;
