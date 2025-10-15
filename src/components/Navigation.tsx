@@ -67,12 +67,10 @@ const Navigation: React.FC<NavigationProps> = ({ currentTheme, onThemeChange }) 
           // Close global search if open
           setIsGlobalSearchOpen(false);
           setGlobalSearchQuery('');
-          document.body.classList.remove('nav-dropdown-open');
         } else {
           // Open global search if closed
           setIsGlobalSearchOpen(true);
           setGlobalSearchQuery('');
-          document.body.classList.add('nav-dropdown-open');
           // Focus search input after a short delay
           setTimeout(() => {
             globalSearchRef.current?.focus();
@@ -97,17 +95,17 @@ const Navigation: React.FC<NavigationProps> = ({ currentTheme, onThemeChange }) 
 
   // Prevent scrolling when dropdown is open
   useEffect(() => {
-    if (activeDropdown === 'hardships' || activeDropdown === 'tools') {
-      document.body.style.overflow = 'hidden';
+    if (activeDropdown === 'hardships' || activeDropdown === 'tools' || isGlobalSearchOpen) {
+      document.body.classList.add('dropdown-active');
     } else {
-      document.body.style.overflow = '';
+      document.body.classList.remove('dropdown-active');
     }
 
     // Cleanup function to restore scrolling
     return () => {
-      document.body.style.overflow = '';
+      document.body.classList.remove('dropdown-active');
     };
-  }, [activeDropdown]);
+  }, [activeDropdown, isGlobalSearchOpen]);
 
   // Handle scroll for sticky effect
   useEffect(() => {
@@ -118,8 +116,6 @@ const Navigation: React.FC<NavigationProps> = ({ currentTheme, onThemeChange }) 
     window.addEventListener('scroll', handleScroll);
     return () => {
       window.removeEventListener('scroll', handleScroll);
-      // Clean up blur effect on unmount
-      document.body.classList.remove('nav-dropdown-open');
     };
   }, []);
 
@@ -127,11 +123,10 @@ const Navigation: React.FC<NavigationProps> = ({ currentTheme, onThemeChange }) 
   useEffect(() => {
     const handleVisibilityChange = () => {
       // If the page becomes hidden (user switches tabs) and we have an active dropdown,
-      // clean up the blur effect to prevent it from staying stuck
+      // clean up to prevent it from staying stuck
       if (document.hidden && activeDropdown) {
         setActiveDropdown(null);
         setIsNavHovered(false);
-        document.body.classList.remove('nav-dropdown-open');
         // Clear any pending timeouts
         if (timeoutRef.current) {
           clearTimeout(timeoutRef.current);
@@ -153,8 +148,6 @@ const Navigation: React.FC<NavigationProps> = ({ currentTheme, onThemeChange }) 
         const dropdown = dropdownRefs.current[activeDropdown];
         if (dropdown && !dropdown.contains(event.target as Node)) {
           setActiveDropdown(null);
-          // Remove blur effect from body
-          document.body.classList.remove('nav-dropdown-open');
           // Clear nav hover state
           setIsNavHovered(false);
         }
@@ -172,10 +165,6 @@ const Navigation: React.FC<NavigationProps> = ({ currentTheme, onThemeChange }) 
     }
     setActiveDropdown(dropdown);
     setIsNavHovered(true);
-    // Add blur effect to body only for dropdown menus
-    if (dropdown === 'hardships' || dropdown === 'tools') {
-      document.body.classList.add('nav-dropdown-open');
-    }
   };
 
   const handleMouseLeave = () => {
@@ -190,8 +179,6 @@ const Navigation: React.FC<NavigationProps> = ({ currentTheme, onThemeChange }) 
     timeoutRef.current = setTimeout(() => {
       if (!isNavHovered) {
         setActiveDropdown(null);
-        // Remove blur effect from body
-        document.body.classList.remove('nav-dropdown-open');
       }
     }, 100);
   };
@@ -217,8 +204,6 @@ const Navigation: React.FC<NavigationProps> = ({ currentTheme, onThemeChange }) 
     timeoutRef.current = setTimeout(() => {
       if (!isNavHovered) {
         setActiveDropdown(null);
-        // Remove blur effect from body
-        document.body.classList.remove('nav-dropdown-open');
       }
     }, 100);
   };
@@ -226,8 +211,6 @@ const Navigation: React.FC<NavigationProps> = ({ currentTheme, onThemeChange }) 
   const handleNavItemClick = (path: string) => {
     navigate(path);
     setActiveDropdown(null);
-    // Remove blur effect from body
-    document.body.classList.remove('nav-dropdown-open');
   };
 
   const getGlobalSearchHint = () => {
@@ -260,13 +243,11 @@ const Navigation: React.FC<NavigationProps> = ({ currentTheme, onThemeChange }) 
   const handleGlobalSearchClose = () => {
     setIsGlobalSearchOpen(false);
     setGlobalSearchQuery('');
-    document.body.classList.remove('nav-dropdown-open');
   };
 
   const handleSearchIconClick = () => {
     setIsGlobalSearchOpen(true);
     setGlobalSearchQuery('');
-    document.body.classList.add('nav-dropdown-open');
     setTimeout(() => {
       globalSearchRef.current?.focus();
     }, 50);
@@ -356,7 +337,6 @@ const Navigation: React.FC<NavigationProps> = ({ currentTheme, onThemeChange }) 
           timeoutRef.current = setTimeout(() => {
             if (!isNavHovered) {
               setActiveDropdown(null);
-              document.body.classList.remove('nav-dropdown-open');
             }
           }, 100);
         }}

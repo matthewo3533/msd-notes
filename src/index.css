@@ -932,15 +932,22 @@ input[type="number"]:focus {
 /* Add top padding to body to account for fixed navigation */
 body {
   padding-top: 64px;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
-body.nav-dropdown-open .container {
+/* Prevent page scroll when dropdown is open */
+body.dropdown-active {
+  overflow: hidden !important;
+}
+
+/* Blur effect disabled - was causing usability issues */
+/* body.nav-dropdown-open .container {
   filter: blur(12px);
   transition: filter 0.5s cubic-bezier(0.4, 0, 0.2, 1);
   will-change: filter;
   transform: translate3d(0, 0, 0);
   backface-visibility: hidden;
-  /* Prevent layout shifts */
   position: relative;
   left: 0;
   right: 0;
@@ -954,19 +961,12 @@ body:not(.nav-dropdown-open) .container {
   will-change: filter;
   transform: translate3d(0, 0, 0);
   backface-visibility: hidden;
-  /* Prevent layout shifts */
   position: relative;
   left: 0;
   right: 0;
   width: 100%;
   box-sizing: border-box;
-}
-
-/* Ensure body scrolling is restored when dropdown is closed */
-body:not(.nav-dropdown-open) {
-  overflow-x: hidden !important;
-  overflow-y: auto !important;
-}
+} */
 
 /* Ensure navigation stays stable */
 .navigation {
