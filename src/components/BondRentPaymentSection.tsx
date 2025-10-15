@@ -20,7 +20,7 @@ interface BondRentPaymentSectionProps {
 }
 
 function roundToNearest50Cents(value: number) {
-  return Math.round(value * 2) / 2;
+  return Math.ceil(value * 2) / 2;
 }
 
 const BondRentPaymentSection: React.FC<BondRentPaymentSectionProps> = ({

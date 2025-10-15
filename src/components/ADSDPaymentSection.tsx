@@ -16,7 +16,7 @@ interface ADSDPaymentSectionProps {
 }
 
 function roundToNearest50Cents(value: number) {
-  return Math.round(value * 2) / 2;
+  return Math.ceil(value * 2) / 2;
 }
 
 const ADSDPaymentSection: React.FC<ADSDPaymentSectionProps> = ({

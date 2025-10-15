@@ -4,16 +4,19 @@ import { BrowserRouter } from 'react-router-dom'
 import App from './App.tsx'
 import './index.css'
 
-// Prevent scroll wheel from changing number input values
+// Prevent scroll wheel from changing number input values by blurring on scroll
 document.addEventListener('DOMContentLoaded', () => {
-  const preventScrollOnNumberInputs = (e: WheelEvent) => {
+  const handleScrollOverNumberInputs = (e: WheelEvent) => {
     const target = e.target as HTMLElement
+    // If scrolling over a focused number input, blur it to allow smooth scrolling
     if (target && target.tagName === 'INPUT' && (target as HTMLInputElement).type === 'number') {
-      e.preventDefault()
+      if (document.activeElement === target) {
+        (target as HTMLInputElement).blur()
+      }
     }
   }
   
-  document.addEventListener('wheel', preventScrollOnNumberInputs, { passive: false })
+  document.addEventListener('wheel', handleScrollOverNumberInputs, { passive: true })
 })
 
 try {
