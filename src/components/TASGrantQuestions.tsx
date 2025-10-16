@@ -14,7 +14,7 @@ const TASGrantQuestions: React.FC<TASGrantQuestionsProps> = ({ formData, onFormD
   // Intersection Observer for scroll animations
   useEffect(() => {
     // Make the first section visible immediately
-    setVisibleSections(new Set(['general']));
+    setVisibleSections(new Set(['client-consent']));
     
     const observer = new IntersectionObserver(
       (entries) => {
@@ -60,13 +60,13 @@ const TASGrantQuestions: React.FC<TASGrantQuestionsProps> = ({ formData, onFormD
 
   return (
     <div className="form-sections-container">
-      {/* General Questions Section */}
+      {/* Client Consent Section */}
       <div 
-        data-section="general"
-        className={`form-section-card ${visibleSections.has('general') ? 'section-visible' : ''}`}
+        data-section="client-consent"
+        className={`form-section-card ${visibleSections.has('client-consent') ? 'section-visible' : ''}`}
       >
         <div className="section-header">
-          <h3>TAS Grant/Reapplication Questions</h3>
+          <h3>Client Consent</h3>
           <div className="section-number">1</div>
         </div>
         
@@ -104,56 +104,17 @@ const TASGrantQuestions: React.FC<TASGrantQuestionsProps> = ({ formData, onFormD
             </label>
           </div>
         </div>
+      </div>
 
-        <div className="form-group">
-          <label>Does the client have Child Support liable costs?</label>
-          <div className="radio-group">
-            <label className={`radio-btn ${formData.childSupportLiableCosts === 'yes' ? 'selected' : ''}`}>Yes
-              <input
-                type="checkbox"
-                name="childSupportLiableCostsYes"
-                checked={formData.childSupportLiableCosts === 'yes'}
-                onChange={() => handleInputChange('childSupportLiableCosts', formData.childSupportLiableCosts === 'yes' ? '' : 'yes')}
-                className="visually-hidden"
-              />
-            </label>
-            <label className={`radio-btn ${formData.childSupportLiableCosts === 'no' ? 'selected' : ''}`}>No
-              <input
-                type="checkbox"
-                name="childSupportLiableCostsNo"
-                checked={formData.childSupportLiableCosts === 'no'}
-                onChange={() => handleInputChange('childSupportLiableCosts', formData.childSupportLiableCosts === 'no' ? '' : 'no')}
-                className="visually-hidden"
-              />
-            </label>
-          </div>
+      {/* Address/Rent Info Section */}
+      <div 
+        data-section="address-rent"
+        className={`form-section-card ${visibleSections.has('address-rent') ? 'section-visible' : ''}`}
+      >
+        <div className="section-header">
+          <h3>Address/Rent Info</h3>
+          <div className="section-number">2</div>
         </div>
-
-        {formData.childSupportLiableCosts === 'yes' && (
-          <div className="form-group">
-            <label>Child Support API consent given?</label>
-            <div className="radio-group">
-              <label className={`radio-btn ${formData.childSupportAPIConsent === 'yes' ? 'selected' : ''}`}>Yes
-                <input
-                  type="checkbox"
-                  name="childSupportAPIConsentYes"
-                  checked={formData.childSupportAPIConsent === 'yes'}
-                  onChange={() => handleInputChange('childSupportAPIConsent', formData.childSupportAPIConsent === 'yes' ? '' : 'yes')}
-                  className="visually-hidden"
-                />
-              </label>
-              <label className={`radio-btn ${formData.childSupportAPIConsent === 'no' ? 'selected' : ''}`}>No
-                <input
-                  type="checkbox"
-                  name="childSupportAPIConsentNo"
-                  checked={formData.childSupportAPIConsent === 'no'}
-                  onChange={() => handleInputChange('childSupportAPIConsent', formData.childSupportAPIConsent === 'no' ? '' : 'no')}
-                  className="visually-hidden"
-                />
-              </label>
-            </div>
-          </div>
-        )}
 
         <div className="form-group">
           <label>Are the client's address details correct?</label>
@@ -270,6 +231,41 @@ const TASGrantQuestions: React.FC<TASGrantQuestionsProps> = ({ formData, onFormD
         </div>
 
         <div className="form-group">
+          <label>If updated, has verification been received for allowable costs?</label>
+          <div className="radio-group">
+            <label className={`radio-btn ${formData.verificationReceived === 'yes' ? 'selected' : ''}`}>Yes
+              <input
+                type="checkbox"
+                name="verificationReceivedYes"
+                checked={formData.verificationReceived === 'yes'}
+                onChange={() => handleInputChange('verificationReceived', formData.verificationReceived === 'yes' ? '' : 'yes')}
+                className="visually-hidden"
+              />
+            </label>
+            <label className={`radio-btn ${formData.verificationReceived === 'no' ? 'selected' : ''}`}>No
+              <input
+                type="checkbox"
+                name="verificationReceivedNo"
+                checked={formData.verificationReceived === 'no'}
+                onChange={() => handleInputChange('verificationReceived', formData.verificationReceived === 'no' ? '' : 'no')}
+                className="visually-hidden"
+              />
+            </label>
+          </div>
+        </div>
+      </div>
+
+      {/* Disability Costs, TAS Costs and Income Section */}
+      <div 
+        data-section="costs-income"
+        className={`form-section-card ${visibleSections.has('costs-income') ? 'section-visible' : ''}`}
+      >
+        <div className="section-header">
+          <h3>Disability Costs, TAS Costs and Income</h3>
+          <div className="section-number">3</div>
+        </div>
+
+        <div className="form-group">
           <label>Have the client's disability costs changed?</label>
           <div className="radio-group">
             <label className={`radio-btn ${formData.disabilityCostsChanged === 'yes' ? 'selected' : ''}`}>Yes
@@ -314,33 +310,6 @@ const TASGrantQuestions: React.FC<TASGrantQuestionsProps> = ({ formData, onFormD
                 className="visually-hidden"
               />
             </label>
-          </div>
-        </div>
-
-        <div className="form-group">
-          <label>If client's Family Tax Credits are paid by IRD, is the amount correct?</label>
-          <div className="radio-group">
-            <label className={`radio-btn ${formData.familyTaxCreditsCorrect === 'yes' ? 'selected' : ''}`}>Yes
-              <input
-                type="checkbox"
-                name="familyTaxCreditsCorrectYes"
-                checked={formData.familyTaxCreditsCorrect === 'yes'}
-                onChange={() => handleInputChange('familyTaxCreditsCorrect', formData.familyTaxCreditsCorrect === 'yes' ? '' : 'yes')}
-                className="visually-hidden"
-              />
-            </label>
-            <label className={`radio-btn ${formData.familyTaxCreditsCorrect === 'no' ? 'selected' : ''}`}>No
-              <input
-                type="checkbox"
-                name="familyTaxCreditsCorrectNo"
-                checked={formData.familyTaxCreditsCorrect === 'no'}
-                onChange={() => handleInputChange('familyTaxCreditsCorrect', formData.familyTaxCreditsCorrect === 'no' ? '' : 'no')}
-                className="visually-hidden"
-              />
-            </label>
-          </div>
-          <div className="tip-box">
-            <strong>Tip:</strong> Be sure to look for IRD verification on the client's file.
           </div>
         </div>
 
@@ -391,6 +360,17 @@ const TASGrantQuestions: React.FC<TASGrantQuestionsProps> = ({ formData, onFormD
             </label>
           </div>
         </div>
+      </div>
+
+      {/* Relationship and Child Support Section */}
+      <div 
+        data-section="relationship-cs"
+        className={`form-section-card ${visibleSections.has('relationship-cs') ? 'section-visible' : ''}`}
+      >
+        <div className="section-header">
+          <h3>Relationship and Child Support</h3>
+          <div className="section-number">4</div>
+        </div>
 
         <div className="form-group">
           <label>Are the client's relationship details correct?</label>
@@ -417,27 +397,91 @@ const TASGrantQuestions: React.FC<TASGrantQuestionsProps> = ({ formData, onFormD
         </div>
 
         <div className="form-group">
-          <label>If updated, has verification been received for allowable costs?</label>
+          <label>If client's Family Tax Credits are paid by IRD, is the amount correct?</label>
           <div className="radio-group">
-            <label className={`radio-btn ${formData.verificationReceived === 'yes' ? 'selected' : ''}`}>Yes
+            <label className={`radio-btn ${formData.familyTaxCreditsCorrect === 'yes' ? 'selected' : ''}`}>Yes
               <input
                 type="checkbox"
-                name="verificationReceivedYes"
-                checked={formData.verificationReceived === 'yes'}
-                onChange={() => handleInputChange('verificationReceived', formData.verificationReceived === 'yes' ? '' : 'yes')}
+                name="familyTaxCreditsCorrectYes"
+                checked={formData.familyTaxCreditsCorrect === 'yes'}
+                onChange={() => handleInputChange('familyTaxCreditsCorrect', formData.familyTaxCreditsCorrect === 'yes' ? '' : 'yes')}
                 className="visually-hidden"
               />
             </label>
-            <label className={`radio-btn ${formData.verificationReceived === 'no' ? 'selected' : ''}`}>No
+            <label className={`radio-btn ${formData.familyTaxCreditsCorrect === 'no' ? 'selected' : ''}`}>No
               <input
                 type="checkbox"
-                name="verificationReceivedNo"
-                checked={formData.verificationReceived === 'no'}
-                onChange={() => handleInputChange('verificationReceived', formData.verificationReceived === 'no' ? '' : 'no')}
+                name="familyTaxCreditsCorrectNo"
+                checked={formData.familyTaxCreditsCorrect === 'no'}
+                onChange={() => handleInputChange('familyTaxCreditsCorrect', formData.familyTaxCreditsCorrect === 'no' ? '' : 'no')}
                 className="visually-hidden"
               />
             </label>
           </div>
+          <div className="tip-box">
+            <strong>Tip:</strong> Be sure to look for IRD verification on the client's file.
+          </div>
+        </div>
+
+        <div className="form-group">
+          <label>Does the client have Child Support liable costs?</label>
+          <div className="radio-group">
+            <label className={`radio-btn ${formData.childSupportLiableCosts === 'yes' ? 'selected' : ''}`}>Yes
+              <input
+                type="checkbox"
+                name="childSupportLiableCostsYes"
+                checked={formData.childSupportLiableCosts === 'yes'}
+                onChange={() => handleInputChange('childSupportLiableCosts', formData.childSupportLiableCosts === 'yes' ? '' : 'yes')}
+                className="visually-hidden"
+              />
+            </label>
+            <label className={`radio-btn ${formData.childSupportLiableCosts === 'no' ? 'selected' : ''}`}>No
+              <input
+                type="checkbox"
+                name="childSupportLiableCostsNo"
+                checked={formData.childSupportLiableCosts === 'no'}
+                onChange={() => handleInputChange('childSupportLiableCosts', formData.childSupportLiableCosts === 'no' ? '' : 'no')}
+                className="visually-hidden"
+              />
+            </label>
+          </div>
+        </div>
+
+        {formData.childSupportLiableCosts === 'yes' && (
+          <div className="form-group">
+            <label>Child Support API consent given?</label>
+            <div className="radio-group">
+              <label className={`radio-btn ${formData.childSupportAPIConsent === 'yes' ? 'selected' : ''}`}>Yes
+                <input
+                  type="checkbox"
+                  name="childSupportAPIConsentYes"
+                  checked={formData.childSupportAPIConsent === 'yes'}
+                  onChange={() => handleInputChange('childSupportAPIConsent', formData.childSupportAPIConsent === 'yes' ? '' : 'yes')}
+                  className="visually-hidden"
+                />
+              </label>
+              <label className={`radio-btn ${formData.childSupportAPIConsent === 'no' ? 'selected' : ''}`}>No
+                <input
+                  type="checkbox"
+                  name="childSupportAPIConsentNo"
+                  checked={formData.childSupportAPIConsent === 'no'}
+                  onChange={() => handleInputChange('childSupportAPIConsent', formData.childSupportAPIConsent === 'no' ? '' : 'no')}
+                  className="visually-hidden"
+                />
+              </label>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Deficiency and Rate Section */}
+      <div 
+        data-section="deficiency-rate"
+        className={`form-section-card ${visibleSections.has('deficiency-rate') ? 'section-visible' : ''}`}
+      >
+        <div className="section-header">
+          <h3>Deficiency and Rate</h3>
+          <div className="section-number">5</div>
         </div>
 
         <div className="form-group">
@@ -503,10 +547,30 @@ const TASGrantQuestions: React.FC<TASGrantQuestionsProps> = ({ formData, onFormD
             </label>
           </div>
         </div>
+      </div>
+
+      {/* Outcome, LSUM Sent and Arrears Section */}
+      <div 
+        data-section="outcome"
+        className={`form-section-card ${visibleSections.has('outcome') ? 'section-visible' : ''}`}
+      >
+        <div className="section-header">
+          <h3>Outcome</h3>
+          <div className="section-number">6</div>
+        </div>
 
         <div className="form-group">
           <label>Outcome:</label>
           <div className="radio-group vertical">
+            <label className={`radio-btn ${formData.outcome === 'granted' ? 'selected' : ''}`}>Granted
+              <input
+                type="checkbox"
+                name="outcomeGranted"
+                checked={formData.outcome === 'granted'}
+                onChange={() => handleInputChange('outcome', formData.outcome === 'granted' ? '' : 'granted')}
+                className="visually-hidden"
+              />
+            </label>
             <label className={`radio-btn ${formData.outcome === 'regranted' ? 'selected' : ''}`}>Regranted
               <input
                 type="checkbox"
@@ -546,15 +610,15 @@ const TASGrantQuestions: React.FC<TASGrantQuestionsProps> = ({ formData, onFormD
           </div>
         </div>
 
-        {formData.outcome === 'regranted' && (
+        {(formData.outcome === 'regranted' || formData.outcome === 'granted') && (
           <div className="form-group">
-            <label>Regrant date:</label>
+            <label>Grant/Regrant date:</label>
             <Calendar
               value={formData.regrantDate}
               onChange={(date) => {
                 handleInputChange('regrantDate', date);
               }}
-              placeholder="Select regrant date"
+              placeholder="Select grant/regrant date"
             />
           </div>
         )}
@@ -614,4 +678,4 @@ const TASGrantQuestions: React.FC<TASGrantQuestionsProps> = ({ formData, onFormD
   );
 };
 
-export default TASGrantQuestions; 
+export default TASGrantQuestions;

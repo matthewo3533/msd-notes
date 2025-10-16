@@ -42,6 +42,7 @@ const navigationItems: NavItem[] = [
   // Tools
   { id: 'tas-grant', title: 'TAS Grant', path: '/tas-grant', emoji: '📋', category: 'tools' },
   { id: 'declare-income', title: 'Declare Income', path: '/declare-income', emoji: '💰', category: 'tools' },
+  { id: 'absence-from-nz', title: 'Absence from NZ', path: '/absence-from-nz', emoji: '✈️', category: 'tools' },
   { id: 'petrol-calculator', title: 'Petrol Calculator', path: '/petrol-calculator', emoji: '⛽', category: 'tools' },
 ];
 

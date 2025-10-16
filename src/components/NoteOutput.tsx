@@ -1,9 +1,9 @@
 import React from 'react';
-import { FoodFormData, ClothingFormData, RentArrearsFormData, CarRepairsFormData, FuneralAssistanceFormData, StrandedTravelFormData, TASGrantFormData, DeclareIncomeFormData, ADSDFormData, EmergencyFormData, TransitionToWorkFormData } from '../App';
+import { FoodFormData, ClothingFormData, RentArrearsFormData, CarRepairsFormData, FuneralAssistanceFormData, StrandedTravelFormData, TASGrantFormData, DeclareIncomeFormData, ADSDFormData, EmergencyFormData, TransitionToWorkFormData, AbsenceFromNZFormData } from '../App';
 
 interface NoteOutputProps {
   formData: any;
-  service?: 'food' | 'clothing' | 'electricity' | 'dental' | 'beds' | 'bedding' | 'furniture' | 'glasses' | 'fridge' | 'washing' | 'tas-grant' | 'declare-income' | 'bond-rent' | 'rent-arrears' | 'car-repairs' | 'funeral-assistance' | 'stranded-travel' | 'adsd' | 'emergency' | 'transition-to-work' | 'petrol-calculator';
+  service?: 'food' | 'clothing' | 'electricity' | 'dental' | 'beds' | 'bedding' | 'furniture' | 'glasses' | 'fridge' | 'washing' | 'tas-grant' | 'declare-income' | 'bond-rent' | 'rent-arrears' | 'car-repairs' | 'funeral-assistance' | 'stranded-travel' | 'adsd' | 'emergency' | 'transition-to-work' | 'petrol-calculator' | 'absence-from-nz';
   onReset: () => void;
 }
 
@@ -31,7 +31,61 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
   };
 
   const generateNote = () => {
-    if (service === 'declare-income') {
+    if (service === 'absence-from-nz') {
+      // Absence from NZ note output
+      const a: AbsenceFromNZFormData = formData;
+      let note = '';
+      
+      if (a.leavingDate) {
+        note += `Leaving date: ${formatCalendarDate(a.leavingDate)}\n`;
+      }
+      
+      if (a.returnDate) {
+        note += `Return date: ${formatCalendarDate(a.returnDate)}\n`;
+      }
+      
+      if (a.reasonForTravel && a.reasonForTravel.trim()) {
+        note += `Reason for travel: ${a.reasonForTravel}\n`;
+      }
+      
+      // Calculate total days between leaving and return date
+      if (a.leavingDate && a.returnDate) {
+        const parseDateDDMMYYYY = (dateStr: string) => {
+          const parts = dateStr.split('/');
+          if (parts.length === 3) {
+            const day = parseInt(parts[0]);
+            const month = parseInt(parts[1]) - 1; // JavaScript months are 0-indexed
+            const year = parseInt(parts[2]);
+            return new Date(year, month, day);
+          }
+          return null;
+        };
+        
+        const leavingDateObj = parseDateDDMMYYYY(a.leavingDate);
+        const returnDateObj = parseDateDDMMYYYY(a.returnDate);
+        
+        if (leavingDateObj && returnDateObj) {
+          const diffTime = returnDateObj.getTime() - leavingDateObj.getTime();
+          const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+          note += `Total days: ${diffDays}\n`;
+        }
+      }
+      
+      if (a.benefitToContinue !== null) {
+        note += `Benefit to continue: ${a.benefitToContinue ? 'Yes' : 'No'}\n`;
+      }
+      
+      if (a.arrearsIssued !== null && a.arrearsIssued) {
+        note += `Arrears issued: Yes\n`;
+        if (a.arrearsAmount && a.arrearsAmount > 0) {
+          note += `Arrears amount: $${a.arrearsAmount.toFixed(2)}\n`;
+        }
+      } else if (a.arrearsIssued === false) {
+        note += `Arrears issued: No\n`;
+      }
+      
+      return note;
+    } else if (service === 'declare-income') {
       // Declare Income note output
       const d: DeclareIncomeFormData = formData;
       let note = '';
@@ -80,47 +134,113 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       // TAS Grant/Reapplication note output
       const t: TASGrantFormData = formData;
       let note = '';
-      note += `Date of first contact: ${t.dateOfFirstContact || '-'}\n`;
-      note += `Client consented to re-application being completed on their behalf: ${t.clientConsent === 'yes' ? 'Yes' : t.clientConsent === 'no' ? 'No' : '-'}\n`;
-      note += `Does the client have Child Support liable costs? ${t.childSupportLiableCosts === 'yes' ? 'Yes' : t.childSupportLiableCosts === 'no' ? 'No' : '-'}\n`;
-      if (t.childSupportLiableCosts === 'yes') {
-        note += `Child Support API consent given? ${t.childSupportAPIConsent === 'yes' ? 'Yes' : t.childSupportAPIConsent === 'no' ? 'No' : '-'}\n`;
+      
+      // Only show fields that have been filled in
+      if (t.dateOfFirstContact) {
+        note += `Date of first contact: ${t.dateOfFirstContact}\n`;
       }
-      note += `Address details correct: ${t.addressDetailsCorrect === 'yes' ? 'Yes' : t.addressDetailsCorrect === 'no' ? 'No' : '-'}\n`;
-      note += `Contact details correct: ${t.contactDetailsCorrect === 'yes' ? 'Yes' : t.contactDetailsCorrect === 'no' ? 'No' : '-'}\n`;
-      note += `SWIFTT Accommodation costs: $${t.accommodationCosts?.toFixed(2) || '0.00'}\n`;
-      note += `Checked if Rent/Board costs include utilities: ${t.rentBoardIncludesUtilities === 'yes' ? 'Yes' : t.rentBoardIncludesUtilities === 'no' ? 'No' : '-'}\n`;
-      note += `Checked if Home Ownership costs have changed: ${t.homeOwnershipCostsChanged === 'yes' ? 'Yes' : t.homeOwnershipCostsChanged === 'no' ? 'No' : '-'}\n`;
-      note += `SWIFTT Disability costs: $ [${t.disabilityCostsChanged === 'yes' ? 'updated' : 'no change'}]\n`;
-      note += `SWIFTT TAS costs: ${t.tasCostsChanged === 'yes' ? 'Yes' : t.tasCostsChanged === 'no' ? 'No' : '-'}\n`;
-      note += `If FTC is paid by IRD is SWIFTT amount correct: ${t.familyTaxCreditsCorrect === 'yes' ? 'Yes' : t.familyTaxCreditsCorrect === 'no' ? 'No' : '-'}\n`;
-      note += `SWIFTT Income is correct: ${t.incomeCorrect === 'yes' ? 'Yes' : t.incomeCorrect === 'no' ? 'No' : '-'}\n`;
-      note += `SWIFTT Assets are correct: ${t.assetsCorrect === 'yes' ? 'Yes' : t.assetsCorrect === 'no' ? 'No' : '-'}\n`;
-      note += `Relationship details are correct: ${t.relationshipDetailsCorrect === 'yes' ? 'Yes' : t.relationshipDetailsCorrect === 'no' ? 'No' : '-'}\n`;
-      note += `If allowable costs are updated has verification been received? ${t.verificationReceived === 'yes' ? 'Yes' : t.verificationReceived === 'no' ? 'No' : '-'}\n`;
-      note += `Deficiency: $${t.deficiency?.toFixed(2) || '0.00'}\n`;
-      note += `TAS rate payable: $${t.tasRatePayable?.toFixed(2) || '0.00'}\n`;
-      note += `Necessary and reasonable steps discussed: ${t.necessaryReasonableSteps || '-'}\n`;
-      note += `Read obligations to client, client understands: ${t.clientUnderstandsObligations === 'yes' ? 'Yes' : t.clientUnderstandsObligations === 'no' ? 'No' : '-'}\n`;
+      
+      if (t.clientConsent) {
+        note += `Client consented to re-application being completed on their behalf: ${t.clientConsent === 'yes' ? 'Yes' : 'No'}\n`;
+      }
+      
+      if (t.addressDetailsCorrect) {
+        note += `Address details correct: ${t.addressDetailsCorrect === 'yes' ? 'Yes' : 'No'}\n`;
+      }
+      
+      if (t.contactDetailsCorrect) {
+        note += `Contact details correct: ${t.contactDetailsCorrect === 'yes' ? 'Yes' : 'No'}\n`;
+      }
+      
+      if (t.accommodationCosts && t.accommodationCosts > 0) {
+        note += `SWIFTT Accommodation costs: $${t.accommodationCosts.toFixed(2)}\n`;
+      }
+      
+      if (t.rentBoardIncludesUtilities) {
+        note += `Checked if Rent/Board costs include utilities: ${t.rentBoardIncludesUtilities === 'yes' ? 'Yes' : 'No'}\n`;
+      }
+      
+      if (t.homeOwnershipCostsChanged) {
+        note += `Checked if Home Ownership costs have changed: ${t.homeOwnershipCostsChanged === 'yes' ? 'Yes' : 'No'}\n`;
+      }
+      
+      if (t.verificationReceived) {
+        note += `If allowable costs are updated has verification been received? ${t.verificationReceived === 'yes' ? 'Yes' : 'No'}\n`;
+      }
+      
+      if (t.disabilityCostsChanged) {
+        note += `SWIFTT Disability costs: $ [${t.disabilityCostsChanged === 'yes' ? 'updated' : 'no change'}]\n`;
+      }
+      
+      if (t.tasCostsChanged) {
+        note += `SWIFTT TAS costs: ${t.tasCostsChanged === 'yes' ? 'Yes' : 'No'}\n`;
+      }
+      
+      if (t.familyTaxCreditsCorrect) {
+        note += `If FTC is paid by IRD is SWIFTT amount correct: ${t.familyTaxCreditsCorrect === 'yes' ? 'Yes' : 'No'}\n`;
+      }
+      
+      if (t.incomeCorrect) {
+        note += `SWIFTT Income is correct: ${t.incomeCorrect === 'yes' ? 'Yes' : 'No'}\n`;
+      }
+      
+      if (t.assetsCorrect) {
+        note += `SWIFTT Assets are correct: ${t.assetsCorrect === 'yes' ? 'Yes' : 'No'}\n`;
+      }
+      
+      if (t.relationshipDetailsCorrect) {
+        note += `Relationship details are correct: ${t.relationshipDetailsCorrect === 'yes' ? 'Yes' : 'No'}\n`;
+      }
+      
+      if (t.childSupportLiableCosts) {
+        note += `Does the client have Child Support liable costs? ${t.childSupportLiableCosts === 'yes' ? 'Yes' : 'No'}\n`;
+        if (t.childSupportLiableCosts === 'yes' && t.childSupportAPIConsent) {
+          note += `Child Support API consent given? ${t.childSupportAPIConsent === 'yes' ? 'Yes' : 'No'}\n`;
+        }
+      }
+      
+      if (t.deficiency && t.deficiency > 0) {
+        note += `Deficiency: $${t.deficiency.toFixed(2)}\n`;
+      }
+      
+      if (t.tasRatePayable && t.tasRatePayable > 0) {
+        note += `TAS rate payable: $${t.tasRatePayable.toFixed(2)}\n`;
+      }
+      
+      if (t.necessaryReasonableSteps && t.necessaryReasonableSteps.trim()) {
+        note += `Necessary and reasonable steps discussed: ${t.necessaryReasonableSteps}\n`;
+      }
+      
+      if (t.clientUnderstandsObligations) {
+        note += `Read obligations to client, client understands: ${t.clientUnderstandsObligations === 'yes' ? 'Yes' : 'No'}\n`;
+      }
       
       // Outcome section
-      let outcomeText = '';
-      if (t.outcome === 'regranted') {
-        outcomeText = `re-granted from ${t.regrantDate || t.dateOfFirstContact}`;
-      } else if (t.outcome === 'no-entitlement') {
-        outcomeText = 'no entitlement';
-      } else if (t.outcome === 'client-declined') {
-        outcomeText = 'client declined to re-apply';
-      } else if (t.outcome === 'not-regranted') {
-        outcomeText = 'not re-granted - further action needed';
+      if (t.outcome) {
+        let outcomeText = '';
+        if (t.outcome === 'granted') {
+          outcomeText = `granted from ${t.regrantDate || t.dateOfFirstContact}`;
+        } else if (t.outcome === 'regranted') {
+          outcomeText = `re-granted from ${t.regrantDate || t.dateOfFirstContact}`;
+        } else if (t.outcome === 'no-entitlement') {
+          outcomeText = 'no entitlement';
+        } else if (t.outcome === 'client-declined') {
+          outcomeText = 'client declined to re-apply';
+        } else if (t.outcome === 'not-regranted') {
+          outcomeText = 'not re-granted - further action needed';
+        }
+        if (outcomeText) {
+          note += `Outcome: ${outcomeText}\n`;
+        }
       }
-      note += `Outcome: ${outcomeText}\n`;
       
-      if (t.outcome === 'not-regranted' && t.furtherActionNeeded) {
+      if (t.outcome === 'not-regranted' && t.furtherActionNeeded && t.furtherActionNeeded.trim()) {
         note += `Further action needed: ${t.furtherActionNeeded}\n`;
       }
       
-      note += `LSUM sent: ${t.lsumSent === 'yes' ? 'Yes' : t.lsumSent === 'no' ? 'No' : '-'}\n`;
+      if (t.lsumSent) {
+        note += `LSUM sent: ${t.lsumSent === 'yes' ? 'Yes' : 'No'}\n`;
+      }
       
       // Only show Arrears issued if it has a value greater than 0
       if (t.arrearsIssued && t.arrearsIssued > 0) {

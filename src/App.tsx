@@ -26,6 +26,7 @@ const TASGrantPage = lazy(() => import('./components/TASGrantPage'));
 const DeclareIncomePage = lazy(() => import('./components/DeclareIncomePage'));
 const ADSDPage = lazy(() => import('./components/ADSDPage'));
 const PetrolCalculator = lazy(() => import('./components/PetrolCalculator'));
+const AbsenceFromNZPage = lazy(() => import('./components/AbsenceFromNZPage'));
 
 export interface Service {
   id: string;
@@ -641,6 +642,15 @@ export interface DeclareIncomeFormData {
   }>;
 }
 
+export interface AbsenceFromNZFormData {
+  leavingDate: string;
+  returnDate: string;
+  reasonForTravel: string;
+  benefitToContinue: boolean | null;
+  arrearsIssued: boolean | null;
+  arrearsAmount: number;
+}
+
 function App() {
   
   // Initialize theme from localStorage or default to 'dark-blue'
@@ -702,6 +712,7 @@ function App() {
         <Route path="/declare-income" element={<DeclareIncomePage />} />
         <Route path="/adsd" element={<ADSDPage />} />
                   <Route path="/petrol-calculator" element={<PetrolCalculator />} />
+        <Route path="/absence-from-nz" element={<AbsenceFromNZPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Suspense>
