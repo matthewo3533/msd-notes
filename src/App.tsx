@@ -583,6 +583,7 @@ export interface ElectricityFormData {
   directCredit: string;
   paymentReference: string;
   paymentCardNumber: string;
+  powerAccountNumber: string;
   income: {
     benefit: number;
     employment: number;
@@ -597,6 +598,11 @@ export interface ElectricityFormData {
   }>;
   decision: string;
   decisionReason: string;
+  emailYourName: string;
+  emailPaymentDate: string;
+  emailAccountName: string;
+  emailAccountNumber: string;
+  emailAmount: number;
 }
 
 export interface TASGrantFormData {

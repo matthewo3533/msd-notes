@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ElectricityQuestions from './ElectricityQuestions';
 import NoteOutput from './NoteOutput';
+import EmailOutput from './EmailOutput';
 
 interface ElectricityFormData {
   clientId: boolean | null;
@@ -30,10 +31,32 @@ interface ElectricityFormData {
   }>;
   decision: string;
   decisionReason: string;
+  emailYourName: string;
+  emailPaymentDate: string;
+  emailAccountName: string;
+  emailAccountNumber: string;
+  emailAmount: number;
 }
 
 const ElectricityPage: React.FC = () => {
   const navigate = useNavigate();
+  const emailOutputRef = useRef<HTMLDivElement>(null);
+  
+  // Get today's date in YYYY-MM-DD format for default
+  const getTodayDate = () => {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  const handleEmailFieldFocus = () => {
+    if (emailOutputRef.current) {
+      emailOutputRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+  
   const [formData, setFormData] = useState<ElectricityFormData>({
     clientId: null,
     whyNeedPower: '',
@@ -58,6 +81,11 @@ const ElectricityPage: React.FC = () => {
     costs: [],
     decision: '',
     decisionReason: '',
+    emailYourName: '',
+    emailPaymentDate: getTodayDate(),
+    emailAccountName: '',
+    emailAccountNumber: '',
+    emailAmount: 0,
   });
 
   const handleFormDataChange = (data: Partial<ElectricityFormData>) => {
@@ -76,7 +104,7 @@ const ElectricityPage: React.FC = () => {
       recoveryRate: 0,
       directCredit: '',
       paymentReference: '',
-    paymentCardNumber: '',
+      paymentCardNumber: '',
       powerAccountNumber: '',
       income: {
         benefit: 0,
@@ -89,6 +117,11 @@ const ElectricityPage: React.FC = () => {
       costs: [],
       decision: '',
       decisionReason: '',
+      emailYourName: '',
+      emailPaymentDate: getTodayDate(),
+      emailAccountName: '',
+      emailAccountNumber: '',
+      emailAmount: 0,
     });
     navigate('/');
   };
@@ -127,9 +160,18 @@ const ElectricityPage: React.FC = () => {
         <ElectricityQuestions 
           formData={formData} 
           onFormDataChange={handleFormDataChange}
+          onEmailFieldFocus={handleEmailFieldFocus}
         />
         <div className="note-section">
           <NoteOutput formData={formData} service="electricity" onReset={resetForm} />
+          <EmailOutput 
+            ref={emailOutputRef}
+            yourName={formData.emailYourName}
+            paymentDate={formData.emailPaymentDate}
+            accountName={formData.emailAccountName}
+            accountNumber={formData.emailAccountNumber}
+            amount={formData.emailAmount}
+          />
         </div>
       </div>
     </div>

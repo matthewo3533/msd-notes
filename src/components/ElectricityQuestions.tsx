@@ -32,14 +32,24 @@ interface ElectricityFormData {
   }>;
   decision: string;
   decisionReason: string;
+  emailYourName: string;
+  emailPaymentDate: string;
+  emailAccountName: string;
+  emailAccountNumber: string;
+  emailAmount: number;
 }
 
-interface ElectricityQuestionsProps {
+export interface ElectricityQuestionsProps {
   formData: ElectricityFormData;
   onFormDataChange: (data: Partial<ElectricityFormData>) => void;
+  onEmailFieldFocus?: () => void;
 }
 
-const ElectricityQuestions: React.FC<ElectricityQuestionsProps> = ({ formData, onFormDataChange }) => {
+const ElectricityQuestions: React.FC<ElectricityQuestionsProps> = ({ 
+  formData, 
+  onFormDataChange, 
+  onEmailFieldFocus 
+}) => {
   const [visibleSections, setVisibleSections] = useState<Set<string>>(new Set(['client']));
   const [incomeLabels, setIncomeLabels] = useState<IncomeLabels>({
     benefit: 'Benefit',
@@ -86,6 +96,21 @@ const ElectricityQuestions: React.FC<ElectricityQuestionsProps> = ({ formData, o
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formData.powerAccountNumber]);
+
+  // Autofill email fields from payment section
+  useEffect(() => {
+    if (formData.paymentReference !== formData.emailAccountNumber) {
+      onFormDataChange({ emailAccountNumber: formData.paymentReference });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [formData.paymentReference]);
+
+  useEffect(() => {
+    if (formData.amount !== formData.emailAmount) {
+      onFormDataChange({ emailAmount: formData.amount });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [formData.amount]);
 
   const handleInputChange = (field: keyof ElectricityFormData, value: any) => {
     onFormDataChange({ [field]: value });
@@ -244,6 +269,77 @@ const ElectricityQuestions: React.FC<ElectricityQuestionsProps> = ({ formData, o
         onDecisionReasonChange={reason => handleInputChange('decisionReason', reason)}
         isVisible={visibleSections.has('decision')}
       />
+
+      {/* Email for Power Company Section */}
+      <ExpandableSection
+        title="Email for power company"
+        dataSection="email"
+        isVisible={visibleSections.has('email')}
+        defaultExpanded={false}
+      >
+        <div className="form-group">
+          <label>Your name:</label>
+          <input
+            type="text"
+            className="form-control"
+            value={formData.emailYourName || ''}
+            onChange={e => handleInputChange('emailYourName', e.target.value)}
+            onFocus={onEmailFieldFocus}
+            placeholder="Enter your name"
+          />
+        </div>
+
+        <div className="form-group">
+          <label>Payment date:</label>
+          <input
+            type="date"
+            className="form-control"
+            value={formData.emailPaymentDate || ''}
+            onChange={e => handleInputChange('emailPaymentDate', e.target.value)}
+            onFocus={onEmailFieldFocus}
+          />
+        </div>
+
+        <div className="form-group">
+          <label>Account name:</label>
+          <input
+            type="text"
+            className="form-control"
+            value={formData.emailAccountName || ''}
+            onChange={e => handleInputChange('emailAccountName', e.target.value)}
+            onFocus={onEmailFieldFocus}
+            placeholder="Enter account name"
+          />
+        </div>
+
+        <div className="form-group">
+          <label>Account number:</label>
+          <input
+            type="text"
+            className="form-control"
+            value={formData.emailAccountNumber || ''}
+            onChange={e => handleInputChange('emailAccountNumber', e.target.value)}
+            onFocus={onEmailFieldFocus}
+            placeholder="Account number"
+          />
+        </div>
+
+        <div className="form-group">
+          <label>Amount:</label>
+          <div className="dollar-input">
+            <input
+              type="number"
+              className="form-control"
+              value={formData.emailAmount || ''}
+              onChange={e => handleInputChange('emailAmount', parseFloat(e.target.value) || 0)}
+              onFocus={onEmailFieldFocus}
+              placeholder="0.00"
+              step="0.01"
+              min="0"
+            />
+          </div>
+        </div>
+      </ExpandableSection>
     </div>
   );
 };
