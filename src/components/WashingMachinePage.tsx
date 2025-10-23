@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import WashingMachineQuestions from './WashingMachineQuestions';
 import NoteOutput from './NoteOutput';
+import { useSettings } from '../contexts/SettingsContext';
 import { WashingMachineFormData } from '../App';
 
 const WashingMachinePage: React.FC = () => {
   const navigate = useNavigate();
+  const { customHeadingFormat } = useSettings();
   const [formData, setFormData] = useState<WashingMachineFormData>({
     clientId: null,
     whyNeedWashingMachine: '',
@@ -113,7 +115,7 @@ const WashingMachinePage: React.FC = () => {
           onFormDataChange={handleFormDataChange}
         />
         <div className="note-section">
-          <NoteOutput formData={formData} service="washing" onReset={resetForm} />
+          <NoteOutput formData={formData} service="washing" onReset={resetForm} customHeadingFormat={customHeadingFormat} />
         </div>
       </div>
     </div>

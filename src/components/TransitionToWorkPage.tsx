@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import TransitionToWorkQuestions from './TransitionToWorkQuestions';
 import NoteOutput from './NoteOutput';
+import { useSettings } from '../contexts/SettingsContext';
 import { TransitionToWorkFormData } from '../App';
 
 const TransitionToWorkPage: React.FC = () => {
   const navigate = useNavigate();
+  const { customHeadingFormat } = useSettings();
   const [formData, setFormData] = useState<TransitionToWorkFormData>({
     clientId: null,
     helpType: '',
@@ -119,7 +121,7 @@ const TransitionToWorkPage: React.FC = () => {
           onFormDataChange={handleFormDataChange}
         />
         <div className="note-section">
-          <NoteOutput formData={formData} service="transition-to-work" onReset={resetForm} />
+          <NoteOutput formData={formData} service="transition-to-work" onReset={resetForm} customHeadingFormat={customHeadingFormat} />
         </div>
       </div>
     </div>

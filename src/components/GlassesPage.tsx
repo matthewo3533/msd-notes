@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import GlassesQuestions from './GlassesQuestions';
 import NoteOutput from './NoteOutput';
+import { useSettings } from '../contexts/SettingsContext';
 import { GlassesFormData } from '../App';
 
 const GlassesPage: React.FC = () => {
   const navigate = useNavigate();
+  const { customHeadingFormat } = useSettings();
   const [formData, setFormData] = useState<GlassesFormData>({
     clientId: null,
     whyNeedGlasses: '',
@@ -99,7 +101,7 @@ const GlassesPage: React.FC = () => {
           onFormDataChange={handleFormDataChange}
         />
         <div className="note-section">
-          <NoteOutput formData={formData} service="glasses" onReset={resetForm} />
+          <NoteOutput formData={formData} service="glasses" onReset={resetForm} customHeadingFormat={customHeadingFormat} />
         </div>
       </div>
     </div>

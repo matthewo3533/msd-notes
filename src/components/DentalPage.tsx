@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DentalQuestions from './DentalQuestions';
 import NoteOutput from './NoteOutput';
+import { useSettings } from '../contexts/SettingsContext';
 
 interface DentalFormData {
   clientId: boolean | null;
@@ -35,6 +36,7 @@ interface DentalFormData {
 
 const DentalPage: React.FC = () => {
   const navigate = useNavigate();
+  const { customHeadingFormat } = useSettings();
   const [formData, setFormData] = useState<DentalFormData>({
     clientId: null,
     whyNeedDental: '',
@@ -132,7 +134,7 @@ const DentalPage: React.FC = () => {
           onFormDataChange={handleFormDataChange}
         />
         <div className="note-section">
-          <NoteOutput formData={formData} service="dental" onReset={resetForm} />
+          <NoteOutput formData={formData} service="dental" onReset={resetForm} customHeadingFormat={customHeadingFormat} />
         </div>
       </div>
     </div>

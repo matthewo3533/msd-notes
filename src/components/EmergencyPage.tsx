@@ -3,9 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import EmergencyQuestions from './EmergencyQuestions';
 import NoteOutput from './NoteOutput';
 import { EmergencyFormData } from '../App';
+import { useSettings } from '../contexts/SettingsContext';
 
 const EmergencyPage: React.FC = () => {
   const navigate = useNavigate();
+  const { customHeadingFormat } = useSettings();
   const [formData, setFormData] = useState<EmergencyFormData>({
     clientId: null,
     whyNeedEmergencyPayment: '',
@@ -99,7 +101,7 @@ const EmergencyPage: React.FC = () => {
           onFormDataChange={handleFormDataChange}
         />
         <div className="note-section">
-          <NoteOutput formData={formData} service="emergency" onReset={resetForm} />
+          <NoteOutput formData={formData} service="emergency" onReset={resetForm} customHeadingFormat={customHeadingFormat} />
         </div>
       </div>
     </div>

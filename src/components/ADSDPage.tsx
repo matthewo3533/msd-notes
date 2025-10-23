@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ADSDQuestions from './ADSDQuestions';
 import NoteOutput from './NoteOutput';
+import { useSettings } from '../contexts/SettingsContext';
 import { ADSDFormData } from '../App';
 
 const ADSDPage: React.FC = () => {
   const navigate = useNavigate();
+  const { customHeadingFormat } = useSettings();
   const [formData, setFormData] = useState<ADSDFormData>({
     clientId: null,
     whyNeedADSD: '',
@@ -97,7 +99,7 @@ const ADSDPage: React.FC = () => {
           onFormDataChange={handleFormDataChange}
         />
         <div className="note-section">
-          <NoteOutput formData={formData} service="adsd" onReset={resetForm} />
+          <NoteOutput formData={formData} service="adsd" onReset={resetForm} customHeadingFormat={customHeadingFormat} />
         </div>
       </div>
     </div>

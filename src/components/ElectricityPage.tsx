@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import ElectricityQuestions from './ElectricityQuestions';
 import NoteOutput from './NoteOutput';
 import EmailOutput from './EmailOutput';
+import { useSettings } from '../contexts/SettingsContext';
 
 interface ElectricityFormData {
   clientId: boolean | null;
@@ -41,6 +42,7 @@ interface ElectricityFormData {
 const ElectricityPage: React.FC = () => {
   const navigate = useNavigate();
   const emailOutputRef = useRef<HTMLDivElement>(null);
+  const { customHeadingFormat } = useSettings();
   
   // Get today's date in YYYY-MM-DD format for default
   const getTodayDate = () => {
@@ -163,7 +165,7 @@ const ElectricityPage: React.FC = () => {
           onEmailFieldFocus={handleEmailFieldFocus}
         />
         <div className="note-section">
-          <NoteOutput formData={formData} service="electricity" onReset={resetForm} />
+          <NoteOutput formData={formData} service="electricity" onReset={resetForm} customHeadingFormat={customHeadingFormat} />
           <EmailOutput 
             ref={emailOutputRef}
             yourName={formData.emailYourName}

@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import FridgeQuestions from './FridgeQuestions';
 import NoteOutput from './NoteOutput';
+import { useSettings } from '../contexts/SettingsContext';
 import { FridgeFormData } from '../App';
 
 const FridgePage: React.FC = () => {
   const navigate = useNavigate();
+  const { customHeadingFormat } = useSettings();
   const [formData, setFormData] = useState<FridgeFormData>({
     clientId: null,
     whyNeedFridge: '',
@@ -113,7 +115,7 @@ const FridgePage: React.FC = () => {
           onFormDataChange={handleFormDataChange}
         />
         <div className="note-section">
-          <NoteOutput formData={formData} service="fridge" onReset={resetForm} />
+          <NoteOutput formData={formData} service="fridge" onReset={resetForm} customHeadingFormat={customHeadingFormat} />
         </div>
       </div>
     </div>

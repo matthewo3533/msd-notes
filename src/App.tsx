@@ -1,8 +1,9 @@
-import { useEffect, useState, lazy, Suspense } from 'react';
+import { useEffect, lazy, Suspense } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Navigation from './components/Navigation';
 import Home from './components/Home';
 import { keepAliveService } from './services/keepAliveService';
+import { SettingsProvider, useSettings } from './contexts/SettingsContext';
 
 // Lazy load components for better performance
 const FoodPage = lazy(() => import('./components/FoodPage'));
@@ -657,28 +658,8 @@ export interface AbsenceFromNZFormData {
   arrearsAmount: number;
 }
 
-function App() {
-  
-  // Initialize theme from localStorage or default to 'dark-blue'
-  const [currentTheme, setCurrentTheme] = useState(() => {
-    const savedTheme = localStorage.getItem('msd-theme');
-    return savedTheme || 'dark-blue';
-  });
-
-  // Apply theme class to body
-  useEffect(() => {
-    // Remove all existing theme classes and dark-mode class
-    document.body.classList.remove(
-      'theme-dark-blue', 'theme-light', 'dark-mode'
-    );
-    // Add the current theme class
-    document.body.classList.add(`theme-${currentTheme}`);
-  }, [currentTheme]);
-
-  // Save theme to localStorage whenever it changes
-  useEffect(() => {
-    localStorage.setItem('msd-theme', currentTheme);
-  }, [currentTheme]);
+function AppContent() {
+  const { currentTheme, setCurrentTheme, customHeadingFormat, setCustomHeadingFormat } = useSettings();
 
   // Initialize keep-alive service
   useEffect(() => {
@@ -693,7 +674,12 @@ function App() {
 
   return (
     <>
-      <Navigation currentTheme={currentTheme} onThemeChange={setCurrentTheme} />
+      <Navigation 
+        currentTheme={currentTheme} 
+        onThemeChange={setCurrentTheme}
+        customHeadingFormat={customHeadingFormat}
+        onCustomHeadingFormatChange={setCustomHeadingFormat}
+      />
       <Suspense fallback={<div className="loading">Loading...</div>}>
         <Routes>
         <Route path="/" element={<Home />} />
@@ -735,6 +721,14 @@ function App() {
         </div>
       </footer>
     </>
+  );
+}
+
+function App() {
+  return (
+    <SettingsProvider>
+      <AppContent />
+    </SettingsProvider>
   );
 }
 

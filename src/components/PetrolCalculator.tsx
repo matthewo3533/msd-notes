@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import NoteOutput from './NoteOutput';
+import { useSettings } from '../contexts/SettingsContext';
 
 // Google Maps API TypeScript declarations
 declare global {
@@ -59,6 +60,7 @@ interface PetrolCalculatorFormData {
 
 const PetrolCalculator: React.FC = () => {
   const navigate = useNavigate();
+  const { customHeadingFormat } = useSettings();
   const [formData, setFormData] = useState<PetrolCalculatorFormData>({
     startLocation: '',
     destination: '',
@@ -655,7 +657,7 @@ const PetrolCalculator: React.FC = () => {
         </div>
         
         <div className="note-section">
-          <NoteOutput formData={formData} service="petrol-calculator" onReset={resetForm} />
+          <NoteOutput formData={formData} service="petrol-calculator" onReset={resetForm} customHeadingFormat={customHeadingFormat} />
         </div>
       </div>
     </div>

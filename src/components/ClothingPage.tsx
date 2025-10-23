@@ -3,9 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import ClothingQuestions from './ClothingQuestions';
 import NoteOutput from './NoteOutput';
 import { ClothingFormData } from '../App';
+import { useSettings } from '../contexts/SettingsContext';
 
 const ClothingPage: React.FC = () => {
   const navigate = useNavigate();
+  const { customHeadingFormat } = useSettings();
   const [formData, setFormData] = useState<ClothingFormData>({
     clientId: null,
     whyNeedClothing: '',
@@ -99,7 +101,7 @@ const ClothingPage: React.FC = () => {
           onFormDataChange={handleFormDataChange}
         />
         <div className="note-section">
-          <NoteOutput formData={formData} service="clothing" onReset={resetForm} />
+          <NoteOutput formData={formData} service="clothing" onReset={resetForm} customHeadingFormat={customHeadingFormat} />
         </div>
       </div>
     </div>

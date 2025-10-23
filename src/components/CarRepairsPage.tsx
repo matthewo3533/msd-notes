@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import CarRepairsQuestions from './CarRepairsQuestions';
 import NoteOutput from './NoteOutput';
+import { useSettings } from '../contexts/SettingsContext';
 import { CarRepairsFormData } from '../App';
 
 const CarRepairsPage: React.FC = () => {
   const navigate = useNavigate();
+  const { customHeadingFormat } = useSettings();
   const [formData, setFormData] = useState<CarRepairsFormData>({
     clientId: null,
     whyNeedCarRepairs: '',
@@ -109,7 +111,7 @@ const CarRepairsPage: React.FC = () => {
           onFormDataChange={handleFormDataChange}
         />
         <div className="note-section">
-          <NoteOutput formData={formData} service="car-repairs" onReset={resetForm} />
+          <NoteOutput formData={formData} service="car-repairs" onReset={resetForm} customHeadingFormat={customHeadingFormat} />
         </div>
       </div>
     </div>

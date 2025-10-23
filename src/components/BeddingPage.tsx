@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import BeddingQuestions from './BeddingQuestions';
 import NoteOutput from './NoteOutput';
+import { useSettings } from '../contexts/SettingsContext';
 
 interface BeddingFormData {
   clientId: boolean | null;
@@ -33,6 +34,7 @@ interface BeddingFormData {
 
 const BeddingPage: React.FC = () => {
   const navigate = useNavigate();
+  const { customHeadingFormat } = useSettings();
   const [formData, setFormData] = useState<BeddingFormData>({
     clientId: null,
     whyNeedBedding: '',
@@ -126,7 +128,7 @@ const BeddingPage: React.FC = () => {
           onFormDataChange={handleFormDataChange}
         />
         <div className="note-section">
-          <NoteOutput formData={formData} service="bedding" onReset={resetForm} />
+          <NoteOutput formData={formData} service="bedding" onReset={resetForm} customHeadingFormat={customHeadingFormat} />
         </div>
       </div>
     </div>

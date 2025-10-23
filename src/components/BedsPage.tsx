@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import BedsQuestions from './BedsQuestions';
 import NoteOutput from './NoteOutput';
+import { useSettings } from '../contexts/SettingsContext';
 
 interface BedsFormData {
   clientId: boolean | null;
@@ -41,6 +42,7 @@ interface BedsFormData {
 
 const BedsPage: React.FC = () => {
   const navigate = useNavigate();
+  const { customHeadingFormat } = useSettings();
   const [formData, setFormData] = useState<BedsFormData>({
     clientId: null,
     whyNeedBeds: '',
@@ -150,7 +152,7 @@ const BedsPage: React.FC = () => {
           onFormDataChange={handleFormDataChange}
         />
         <div className="note-section">
-          <NoteOutput formData={formData} service="beds" onReset={resetForm} />
+          <NoteOutput formData={formData} service="beds" onReset={resetForm} customHeadingFormat={customHeadingFormat} />
         </div>
       </div>
     </div>

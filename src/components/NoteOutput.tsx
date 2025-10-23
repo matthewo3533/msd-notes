@@ -1,13 +1,15 @@
 import React from 'react';
 import { FoodFormData, ClothingFormData, RentArrearsFormData, CarRepairsFormData, FuneralAssistanceFormData, StrandedTravelFormData, TASGrantFormData, DeclareIncomeFormData, ADSDFormData, EmergencyFormData, TransitionToWorkFormData, AbsenceFromNZFormData } from '../App';
+import { formatHeading, CustomHeadingFormat } from '../utils/headingFormatter';
 
 interface NoteOutputProps {
   formData: any;
   service?: 'food' | 'clothing' | 'electricity' | 'dental' | 'beds' | 'bedding' | 'furniture' | 'glasses' | 'fridge' | 'washing' | 'tas-grant' | 'declare-income' | 'bond-rent' | 'rent-arrears' | 'car-repairs' | 'funeral-assistance' | 'stranded-travel' | 'adsd' | 'emergency' | 'transition-to-work' | 'petrol-calculator' | 'absence-from-nz';
   onReset: () => void;
+  customHeadingFormat?: CustomHeadingFormat;
 }
 
-const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onReset }) => {
+const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onReset, customHeadingFormat = { useTildes: true, useCapitals: false, useBold: false } }) => {
   // Helper function to format dates from Calendar component (DD/MM/YYYY format)
   const formatCalendarDate = (dateString: string): string => {
     if (!dateString) return '';
@@ -89,7 +91,6 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       // Declare Income note output
       const d: DeclareIncomeFormData = formData;
       let note = '';
-      note += '=== INCOME DECLARATION ===\n\n';
       
       if (d.weeks.length === 0) {
         note += 'No income declared.\n';
@@ -253,12 +254,12 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       const c: ClothingFormData = formData;
       let note = '';
       note += `CCID: ${c.clientId === false ? 'No' : 'Yes'}\n\n`;
-      note += '~~~ Need ~~~\n';
+      note += `${formatHeading('Need', 'custom', customHeadingFormat)}\n`;
       if (c.whyNeedClothing) {
         note += `${c.whyNeedClothing}\n`;
       }
 
-      note += '\n~~~ Payment ~~~\n';
+      note += `\n${formatHeading('Payment', 'custom', customHeadingFormat)}\n`;
       if (c.supplierName && c.supplierName.trim()) {
         note += `Supplier Name: ${c.supplierName}\n`;
       }
@@ -277,7 +278,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       if (c.directCredit === 'yes' && c.paymentReference) {
         note += `Reference number: ${c.paymentReference}\n`;
       }
-      note += '\n~~~ Income ~~~\n';
+      note += `\n${formatHeading('Income', 'custom', customHeadingFormat)}\n`;
       if (c.income.benefit > 0) note += `$${c.income.benefit.toFixed(2)} Benefit\n`;
       if (c.income.employment > 0) note += `$${c.income.employment.toFixed(2)} Employment\n`;
       if (c.income.childSupport > 0) note += `$${c.income.childSupport.toFixed(2)} Child Support\n`;
@@ -292,9 +293,9 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
         note += '--------------\n';
         note += `Client is left with $${remainingIncome.toFixed(2)}\n`;
       }
-      note += '\n~~~ Reasonable Steps ~~~\n';
+      note += `\n${formatHeading('Reasonable Steps', 'custom', customHeadingFormat)}\n`;
       if (c.reasonableSteps) note += `${c.reasonableSteps}\n`;
-      note += '\n~~~ Outcome ~~~\n';
+      note += `\n${formatHeading('Outcome', 'custom', customHeadingFormat)}\n`;
       if (c.decision === 'approved') note += 'APPLICATION APPROVED\n';
       else if (c.decision === 'declined') note += 'APPLICATION DECLINED\n';
       if (c.decisionReason) note += `${c.decisionReason}\n`;
@@ -304,12 +305,12 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       const e: EmergencyFormData = formData;
       let note = '';
       note += `CCID: ${e.clientId === false ? 'No' : 'Yes'}\n\n`;
-      note += '~~~ Need ~~~\n';
+      note += `${formatHeading('Need', 'custom', customHeadingFormat)}\n`;
       if (e.whyNeedEmergencyPayment) {
         note += `${e.whyNeedEmergencyPayment}\n`;
       }
 
-      note += '\n~~~ Payment ~~~\n';
+      note += `\n${formatHeading('Payment', 'custom', customHeadingFormat)}\n`;
       if (e.supplierName && e.supplierName.trim()) {
         note += `Supplier Name: ${e.supplierName}\n`;
       }
@@ -328,7 +329,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       if (e.directCredit === 'yes' && e.paymentReference) {
         note += `Reference number: ${e.paymentReference}\n`;
       }
-      note += '\n~~~ Income ~~~\n';
+      note += `\n${formatHeading('Income', 'custom', customHeadingFormat)}\n`;
       if (e.income.benefit > 0) note += `$${e.income.benefit.toFixed(2)} Benefit\n`;
       if (e.income.employment > 0) note += `$${e.income.employment.toFixed(2)} Employment\n`;
       if (e.income.familyTaxCredit > 0) note += `$${e.income.familyTaxCredit.toFixed(2)} Family Tax Credit\n`;
@@ -345,9 +346,9 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
         note += '--------------\n';
         note += `Client is left with $${remainingIncome.toFixed(2)}\n`;
       }
-      note += '\n~~~ Reasonable Steps ~~~\n';
+      note += `\n${formatHeading('Reasonable Steps', 'custom', customHeadingFormat)}\n`;
       if (e.reasonableSteps) note += `${e.reasonableSteps}\n`;
-      note += '\n~~~ Outcome ~~~\n';
+      note += `\n${formatHeading('Outcome', 'custom', customHeadingFormat)}\n`;
       if (e.decision === 'approved') note += 'APPLICATION APPROVED\n';
       else if (e.decision === 'declined') note += 'APPLICATION DECLINED\n';
       if (e.decisionReason) note += `${e.decisionReason}\n`;
@@ -358,7 +359,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       let note = '';
       note += `CCID: ${t.clientId === false ? 'No' : 'Yes'}\n\n`;
       
-      note += '~~~ Need ~~~\n';
+      note += `${formatHeading('Need', 'custom', customHeadingFormat)}\n`;
       if (t.helpType) {
         note += `Client is requesting help with ${t.helpType}\n`;
       }
@@ -376,7 +377,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       }
 
       if (t.employerName || t.startDate || t.hoursPerWeek > 0) {
-        note += '\n~~~ Employment Info ~~~\n';
+        note += `\n${formatHeading('Employment Info', 'custom', customHeadingFormat)}\n`;
         if (t.employerName) note += `Employer: ${t.employerName}\n`;
         if (t.startDate) {
           note += `Start date: ${formatCalendarDate(t.startDate)}\n`;
@@ -385,7 +386,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       }
 
       if (t.petrolAssistance === 'yes' && (t.startLocation || t.destination)) {
-        note += '\n~~~ Travel Details ~~~\n';
+        note += `\n${formatHeading('Travel Details', 'custom', customHeadingFormat)}\n`;
         if (t.startLocation && t.destination) {
           note += `Travelling from: ${t.startLocation} to ${t.destination}\n`;
         }
@@ -400,7 +401,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
         }
       }
 
-      note += '\n~~~ Payment ~~~\n';
+      note += `\n${formatHeading('Payment', 'custom', customHeadingFormat)}\n`;
       if (t.supplierName && t.supplierName.trim()) {
         note += `Supplier Name: ${t.supplierName}\n`;
       }
@@ -419,7 +420,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       if (t.directCredit === 'yes' && t.paymentReference) {
         note += `Reference number: ${t.paymentReference}\n`;
       }
-      note += '\n~~~ Income ~~~\n';
+      note += `\n${formatHeading('Income', 'custom', customHeadingFormat)}\n`;
       if (t.income.benefit > 0) note += `$${t.income.benefit.toFixed(2)} Benefit\n`;
       if (t.income.employment > 0) note += `$${t.income.employment.toFixed(2)} Employment\n`;
       if (t.income.familyTaxCredit > 0) note += `$${t.income.familyTaxCredit.toFixed(2)} Family Tax Credit\n`;
@@ -437,7 +438,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
         note += `Client is left with $${remainingIncome.toFixed(2)}\n`;
       }
       
-      note += '\n~~~ Outcome ~~~\n';
+      note += `\n${formatHeading('Outcome', 'custom', customHeadingFormat)}\n`;
       if (t.decision === 'approved') note += 'APPLICATION APPROVED\n';
       else if (t.decision === 'declined') note += 'APPLICATION DECLINED\n';
       if (t.decisionReason) note += `${t.decisionReason}\n`;
@@ -447,7 +448,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       const p = formData;
       let note = '';
       
-      note += '~~~ Travel Details ~~~\n';
+      note += `${formatHeading('Travel Details', 'custom', customHeadingFormat)}\n`;
       if (p.startLocation && p.destination) {
         note += `Travelling from: ${p.startLocation} to ${p.destination}\n`;
       }
@@ -477,12 +478,12 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       const a: ADSDFormData = formData;
       let note = '';
       note += `CCID: ${a.clientId === false ? 'No' : 'Yes'}\n\n`;
-      note += '~~~ Need ~~~\n';
+      note += `${formatHeading('Need', 'custom', customHeadingFormat)}\n`;
       if (a.whyNeedADSD) {
         note += `${a.whyNeedADSD}\n`;
       }
 
-      note += '\n~~~ Payment ~~~\n';
+      note += `\n${formatHeading('Payment', 'custom', customHeadingFormat)}\n`;
       if (a.amount && a.amount > 0) {
         note += `Amount: $${a.amount.toFixed(2)}\n`;
       }
@@ -495,7 +496,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       if (a.directCredit === 'yes' && a.paymentReference) {
         note += `Reference number: ${a.paymentReference}\n`;
       }
-      note += '\n~~~ Income ~~~\n';
+      note += `\n${formatHeading('Income', 'custom', customHeadingFormat)}\n`;
       if (a.income.benefit > 0) note += `$${a.income.benefit.toFixed(2)} Benefit\n`;
       if (a.income.employment > 0) note += `$${a.income.employment.toFixed(2)} Employment\n`;
       if (a.income.familyTaxCredit > 0) note += `$${a.income.familyTaxCredit.toFixed(2)} Family Tax Credit\n`;
@@ -512,9 +513,9 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
         note += '--------------\n';
         note += `Client is left with $${remainingIncome.toFixed(2)}\n`;
       }
-      note += '\n~~~ Reasonable Steps ~~~\n';
+      note += `\n${formatHeading('Reasonable Steps', 'custom', customHeadingFormat)}\n`;
       if (a.reasonableSteps) note += `${a.reasonableSteps}\n`;
-      note += '\n~~~ Outcome ~~~\n';
+      note += `\n${formatHeading('Outcome', 'custom', customHeadingFormat)}\n`;
       if (a.decision === 'approved') note += 'APPLICATION APPROVED\n';
       else if (a.decision === 'declined') note += 'APPLICATION DECLINED\n';
       if (a.decisionReason) note += `${a.decisionReason}\n`;
@@ -524,7 +525,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       const r: RentArrearsFormData = formData;
       let note = '';
       note += `CCID: ${r.clientId === false ? 'No' : 'Yes'}\n\n`;
-      note += '~~~ Need ~~~\n';
+      note += `${formatHeading('Need', 'custom', customHeadingFormat)}\n`;
       if (r.whyNeedRentArrears) {
         note += `${r.whyNeedRentArrears}\n`;
       }
@@ -532,7 +533,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
         note += 'Rent arrears verification provided\n';
       }
 
-      note += '\n~~~ Payment ~~~\n';
+      note += `\n${formatHeading('Payment', 'custom', customHeadingFormat)}\n`;
       if (r.supplierName && r.supplierName.trim()) {
         note += `Supplier Name: ${r.supplierName}\n`;
       }
@@ -551,7 +552,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       if (r.directCredit === 'yes' && r.paymentReference) {
         note += `Reference number: ${r.paymentReference}\n`;
       }
-      note += '\n~~~ Tenancy Affordability ~~~\n';
+      note += `\n${formatHeading('Tenancy Affordability', 'custom', customHeadingFormat)}\n`;
       if (r.income.benefit > 0) note += `$${r.income.benefit.toFixed(2)} Benefit\n`;
       if (r.income.employment > 0) note += `$${r.income.employment.toFixed(2)} Employment\n`;
       if (r.income.familyTaxCredit > 0) note += `$${r.income.familyTaxCredit.toFixed(2)} Family Tax Credit\n`;
@@ -569,9 +570,9 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
         note += `Client is left with $${remainingIncome.toFixed(2)}\n`;
       }
       
-      note += '\n~~~ Reasonable Steps ~~~\n';
+      note += `\n${formatHeading('Reasonable Steps', 'custom', customHeadingFormat)}\n`;
       if (r.reasonableSteps) note += `${r.reasonableSteps}\n`;
-      note += '\n~~~ Outcome ~~~\n';
+      note += `\n${formatHeading('Outcome', 'custom', customHeadingFormat)}\n`;
       if (r.decision === 'approved') note += 'APPLICATION APPROVED\n';
       else if (r.decision === 'declined') note += 'APPLICATION DECLINED\n';
       if (r.decisionReason) note += `${r.decisionReason}\n`;
@@ -581,12 +582,12 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       const c: CarRepairsFormData = formData;
       let note = '';
       note += `CCID: ${c.clientId === false ? 'No' : 'Yes'}\n\n`;
-      note += '~~~ Need ~~~\n';
+      note += `${formatHeading('Need', 'custom', customHeadingFormat)}\n`;
       if (c.whyNeedCarRepairs) {
         note += `${c.whyNeedCarRepairs}\n`;
       }
 
-      note += '\n~~~ Car Details ~~~\n';
+      note += `\n${formatHeading('Car Details', 'custom', customHeadingFormat)}\n`;
       if (c.vehicleMakeModel) note += `Vehicle: ${c.vehicleMakeModel}\n`;
       if (c.licensePlate) note += `License plate: ${c.licensePlate}\n`;
       if (c.odometer) note += `Odometer: ${c.odometer}\n`;
@@ -596,7 +597,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
         note += `${c.nztaVerification}\n`;
       }
 
-      note += '\n~~~ Payment ~~~\n';
+      note += `\n${formatHeading('Payment', 'custom', customHeadingFormat)}\n`;
       if (c.supplierName && c.supplierName.trim()) {
         note += `Supplier Name: ${c.supplierName}\n`;
       }
@@ -615,7 +616,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       if (c.directCredit === 'yes' && c.paymentReference) {
         note += `Reference number: ${c.paymentReference}\n`;
       }
-      note += '\n~~~ Income ~~~\n';
+      note += `\n${formatHeading('Income', 'custom', customHeadingFormat)}\n`;
       if (c.income.benefit > 0) note += `$${c.income.benefit.toFixed(2)} Benefit\n`;
       if (c.income.employment > 0) note += `$${c.income.employment.toFixed(2)} Employment\n`;
       if (c.income.familyTaxCredit > 0) note += `$${c.income.familyTaxCredit.toFixed(2)} Family Tax Credit\n`;
@@ -633,9 +634,9 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
         note += `Client is left with $${remainingIncome.toFixed(2)}\n`;
       }
       
-      note += '\n~~~ Reasonable Steps ~~~\n';
+      note += `\n${formatHeading('Reasonable Steps', 'custom', customHeadingFormat)}\n`;
       if (c.reasonableSteps) note += `${c.reasonableSteps}\n`;
-      note += '\n~~~ Outcome ~~~\n';
+      note += `\n${formatHeading('Outcome', 'custom', customHeadingFormat)}\n`;
       if (c.decision === 'approved') note += 'APPLICATION APPROVED\n';
       else if (c.decision === 'declined') note += 'APPLICATION DECLINED\n';
       if (c.decisionReason) note += `${c.decisionReason}\n`;
@@ -645,13 +646,13 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       const f: FuneralAssistanceFormData = formData;
       let note = '';
       note += `CCID: ${f.clientId === false ? 'No' : 'Yes'}\n\n`;
-      note += '~~~ Need ~~~\n';
+      note += `${formatHeading('Need', 'custom', customHeadingFormat)}\n`;
       if (f.whyNeedFuneralAssistance) {
         note += `${f.whyNeedFuneralAssistance}\n`;
       }
 
       if (f.petrolAssistance === 'yes') {
-        note += '\n~~~ Travel Details ~~~\n';
+        note += `\n${formatHeading('Travel Details', 'custom', customHeadingFormat)}\n`;
         if (f.startLocation && f.destination) {
           note += `Travelling from: ${f.startLocation} to ${f.destination}\n`;
         }
@@ -666,7 +667,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
         }
       }
 
-      note += '\n~~~ Payment ~~~\n';
+      note += `\n${formatHeading('Payment', 'custom', customHeadingFormat)}\n`;
       if (f.supplierName && f.supplierName.trim()) {
         note += `Supplier Name: ${f.supplierName}\n`;
       }
@@ -685,7 +686,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       if (f.directCredit === 'yes' && f.paymentReference) {
         note += `Reference number: ${f.paymentReference}\n`;
       }
-      note += '\n~~~ Income ~~~\n';
+      note += `\n${formatHeading('Income', 'custom', customHeadingFormat)}\n`;
       if (f.income.benefit > 0) note += `$${f.income.benefit.toFixed(2)} Benefit\n`;
       if (f.income.employment > 0) note += `$${f.income.employment.toFixed(2)} Employment\n`;
       if (f.income.familyTaxCredit > 0) note += `$${f.income.familyTaxCredit.toFixed(2)} Family Tax Credit\n`;
@@ -703,9 +704,9 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
         note += `Client is left with $${remainingIncome.toFixed(2)}\n`;
       }
       
-      note += '\n~~~ Reasonable Steps ~~~\n';
+      note += `\n${formatHeading('Reasonable Steps', 'custom', customHeadingFormat)}\n`;
       if (f.reasonableSteps) note += `${f.reasonableSteps}\n`;
-      note += '\n~~~ Outcome ~~~\n';
+      note += `\n${formatHeading('Outcome', 'custom', customHeadingFormat)}\n`;
       if (f.decision === 'approved') note += 'APPLICATION APPROVED\n';
       else if (f.decision === 'declined') note += 'APPLICATION DECLINED\n';
       if (f.decisionReason) note += `${f.decisionReason}\n`;
@@ -715,13 +716,13 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       const s: StrandedTravelFormData = formData;
       let note = '';
       note += `CCID: ${s.clientId === false ? 'No' : 'Yes'}\n\n`;
-      note += '~~~ Need ~~~\n';
+      note += `${formatHeading('Need', 'custom', customHeadingFormat)}\n`;
       if (s.whyNeedStrandedTravelAssistance) {
         note += `${s.whyNeedStrandedTravelAssistance}\n`;
       }
 
       if (s.petrolAssistance === 'yes') {
-        note += '\n~~~ Travel Details ~~~\n';
+        note += `\n${formatHeading('Travel Details', 'custom', customHeadingFormat)}\n`;
         if (s.startLocation && s.destination) {
           note += `Travelling from: ${s.startLocation} to ${s.destination}\n`;
         }
@@ -736,7 +737,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
         }
       }
 
-      note += '\n~~~ Payment ~~~\n';
+      note += `\n${formatHeading('Payment', 'custom', customHeadingFormat)}\n`;
       if (s.supplierName && s.supplierName.trim()) {
         note += `Supplier Name: ${s.supplierName}\n`;
       }
@@ -755,7 +756,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       if (s.directCredit === 'yes' && s.paymentReference) {
         note += `Reference number: ${s.paymentReference}\n`;
       }
-      note += '\n~~~ Income ~~~\n';
+      note += `\n${formatHeading('Income', 'custom', customHeadingFormat)}\n`;
       if (s.income.benefit > 0) note += `$${s.income.benefit.toFixed(2)} Benefit\n`;
       if (s.income.employment > 0) note += `$${s.income.employment.toFixed(2)} Employment\n`;
       if (s.income.familyTaxCredit > 0) note += `$${s.income.familyTaxCredit.toFixed(2)} Family Tax Credit\n`;
@@ -773,9 +774,9 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
         note += `Client is left with $${remainingIncome.toFixed(2)}\n`;
       }
       
-      note += '\n~~~ Reasonable Steps ~~~\n';
+      note += `\n${formatHeading('Reasonable Steps', 'custom', customHeadingFormat)}\n`;
       if (s.reasonableSteps) note += `${s.reasonableSteps}\n`;
-      note += '\n~~~ Outcome ~~~\n';
+      note += `\n${formatHeading('Outcome', 'custom', customHeadingFormat)}\n`;
       if (s.decision === 'approved') note += 'APPLICATION APPROVED\n';
       else if (s.decision === 'declined') note += 'APPLICATION DECLINED\n';
       if (s.decisionReason) note += `${s.decisionReason}\n`;
@@ -785,10 +786,10 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       const b = formData;
       let note = '';
       note += `CCID: ${b.clientId === false ? 'No' : 'Yes'}\n\n`;
-      note += '~~~ Need ~~~\n';
+      note += `${formatHeading('Need', 'custom', customHeadingFormat)}\n`;
       if (b.whyNeedAccommodation) note += `${b.whyNeedAccommodation}\n`;
 
-      note += '\n~~~ Tenancy Details ~~~\n';
+      note += `\n${formatHeading('Tenancy Details', 'custom', customHeadingFormat)}\n`;
       if (b.asZone) note += `AS Zone: ${b.asZone}\n`;
       if (b.newAddress) note += `Address: ${b.newAddress}\n`;
       if (b.weeklyRent) note += `Weekly Rent: ${b.weeklyRent.toFixed(2)}\n`;
@@ -796,7 +797,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
         note += `Tenancy start date: ${formatCalendarDate(b.tenancyStartDate)}\n`;
       }
       
-      note += '\n~~~ Payment ~~~\n';
+      note += `\n${formatHeading('Payment', 'custom', customHeadingFormat)}\n`;
       if (b.supplierName && b.supplierName.trim()) {
         note += `Supplier Name: ${b.supplierName}\n`;
       }
@@ -823,7 +824,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
         note += `Reference number: ${b.paymentReference}\n`;
       }
       
-      note += '\n~~~ Tenancy Affordability ~~~\n';
+      note += `\n${formatHeading('Tenancy Affordability', 'custom', customHeadingFormat)}\n`;
       if (b.income.benefit > 0) note += `$${b.income.benefit.toFixed(2)} Benefit\n`;
       if (b.income.employment > 0) note += `$${b.income.employment.toFixed(2)} Employment\n`;
       if (b.income.familyTaxCredit > 0) note += `$${b.income.familyTaxCredit.toFixed(2)} Family Tax Credit\n`;
@@ -841,9 +842,9 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
         note += `Client is left with $${remainingIncome.toFixed(2)}\n`;
       }
       
-      note += '\n~~~ Reasonable Steps ~~~\n';
+      note += `\n${formatHeading('Reasonable Steps', 'custom', customHeadingFormat)}\n`;
       if (b.reasonableSteps) note += `${b.reasonableSteps}\n`;
-      note += '\n~~~ Outcome ~~~\n';
+      note += `\n${formatHeading('Outcome', 'custom', customHeadingFormat)}\n`;
       if (b.decision === 'approved') note += 'APPLICATION APPROVED\n';
       else if (b.decision === 'declined') note += 'APPLICATION DECLINED\n';
       if (b.decisionReason) note += `${b.decisionReason}\n`;
@@ -853,11 +854,11 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       const e = formData;
       let note = '';
       note += `CCID: ${e.clientId === false ? 'No' : 'Yes'}\n\n`;
-      note += '~~~ Need ~~~\n';
+      note += `${formatHeading('Need', 'custom', customHeadingFormat)}\n`;
       if (e.whyNeedPower) note += `${e.whyNeedPower}\n`;
 
       note += `Power Account Number: ${e.powerAccountNumber || '-'}\n`;
-      note += '\n~~~ Payment ~~~\n';
+      note += `\n${formatHeading('Payment', 'custom', customHeadingFormat)}\n`;
       if (e.supplierName && e.supplierName.trim()) {
         note += `Supplier Name: ${e.supplierName}\n`;
       }
@@ -876,7 +877,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       if (e.directCredit === 'yes' && e.paymentReference) {
         note += `Reference number: ${e.paymentReference}\n`;
       }
-      note += '\n~~~ Income ~~~\n';
+      note += `\n${formatHeading('Income', 'custom', customHeadingFormat)}\n`;
       if (e.income.benefit > 0) note += `$${e.income.benefit.toFixed(2)} Benefit\n`;
       if (e.income.employment > 0) note += `$${e.income.employment.toFixed(2)} Employment\n`;
       if (e.income.familyTaxCredit > 0) note += `$${e.income.familyTaxCredit.toFixed(2)} Family Tax Credit\n`;
@@ -893,9 +894,9 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
         note += '--------------\n';
         note += `Client is left with $${remainingIncome.toFixed(2)}\n`;
       }
-      note += '\n~~~ Reasonable Steps ~~~\n';
+      note += `\n${formatHeading('Reasonable Steps', 'custom', customHeadingFormat)}\n`;
       if (e.reasonableSteps) note += `${e.reasonableSteps}\n`;
-      note += '\n~~~ Outcome ~~~\n';
+      note += `\n${formatHeading('Outcome', 'custom', customHeadingFormat)}\n`;
       if (e.decision === 'approved') note += 'APPLICATION APPROVED\n';
       else if (e.decision === 'declined') note += 'APPLICATION DECLINED\n';
       if (e.decisionReason) note += `${e.decisionReason}\n`;
@@ -905,10 +906,10 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       const d = formData;
       let note = '';
       note += `CCID: ${d.clientId === false ? 'No' : 'Yes'}\n\n`;
-      note += '~~~ Need ~~~\n';
+      note += `${formatHeading('Need', 'custom', customHeadingFormat)}\n`;
       if (d.whyNeedDental) note += `${d.whyNeedDental}\n`;
 
-      note += '\n~~~ Payment ~~~\n';
+      note += `\n${formatHeading('Payment', 'custom', customHeadingFormat)}\n`;
       if (d.supplierName && d.supplierName.trim()) {
         note += `Supplier Name: ${d.supplierName}\n`;
       }
@@ -933,7 +934,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       if (d.directCredit === 'yes' && d.paymentReference) {
         note += `Reference number: ${d.paymentReference}\n`;
       }
-      note += '\n~~~ Income ~~~\n';
+      note += `\n${formatHeading('Income', 'custom', customHeadingFormat)}\n`;
       if (d.income.benefit > 0) note += `$${d.income.benefit.toFixed(2)} Benefit\n`;
       if (d.income.employment > 0) note += `$${d.income.employment.toFixed(2)} Employment\n`;
       if (d.income.familyTaxCredit > 0) note += `$${d.income.familyTaxCredit.toFixed(2)} Family Tax Credit\n`;
@@ -950,9 +951,9 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
         note += '--------------\n';
         note += `Client is left with $${remainingIncome.toFixed(2)}\n`;
       }
-      note += '\n~~~ Reasonable Steps ~~~\n';
+      note += `\n${formatHeading('Reasonable Steps', 'custom', customHeadingFormat)}\n`;
       if (d.reasonableSteps) note += `${d.reasonableSteps}\n`;
-      note += '\n~~~ Outcome ~~~\n';
+      note += `\n${formatHeading('Outcome', 'custom', customHeadingFormat)}\n`;
       if (d.decision === 'approved') note += 'APPLICATION APPROVED\n';
       else if (d.decision === 'declined') note += 'APPLICATION DECLINED\n';
       if (d.decisionReason) note += `${d.decisionReason}\n`;
@@ -962,10 +963,10 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       const b = formData;
       let note = '';
       note += `CCID: ${b.clientId === false ? 'No' : 'Yes'}\n\n`;
-      note += '~~~ Need ~~~\n';
+      note += `${formatHeading('Need', 'custom', customHeadingFormat)}\n`;
       if (b.whyNeedBeds) note += `${b.whyNeedBeds}\n`;
 
-      note += '\n~~~ Payment ~~~\n';
+      note += `\n${formatHeading('Payment', 'custom', customHeadingFormat)}\n`;
       if (b.supplierName && b.supplierName.trim()) {
         note += `Supplier Name: ${b.supplierName}\n`;
       }
@@ -984,7 +985,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       if (b.directCredit === 'yes' && b.paymentReference) {
         note += `Reference number: ${b.paymentReference}\n`;
       }
-      note += '\n~~~ Income ~~~\n';
+      note += `\n${formatHeading('Income', 'custom', customHeadingFormat)}\n`;
       if (b.income.benefit > 0) note += `$${b.income.benefit.toFixed(2)} Benefit\n`;
       if (b.income.employment > 0) note += `$${b.income.employment.toFixed(2)} Employment\n`;
       if (b.income.familyTaxCredit > 0) note += `$${b.income.familyTaxCredit.toFixed(2)} Family Tax Credit\n`;
@@ -1001,9 +1002,9 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
         note += '--------------\n';
         note += `Client is left with $${remainingIncome.toFixed(2)}\n`;
       }
-      note += '\n~~~ Reasonable Steps ~~~\n';
+      note += `\n${formatHeading('Reasonable Steps', 'custom', customHeadingFormat)}\n`;
       if (b.reasonableSteps) note += `${b.reasonableSteps}\n`;
-      note += '\n~~~ Outcome ~~~\n';
+      note += `\n${formatHeading('Outcome', 'custom', customHeadingFormat)}\n`;
       if (b.decision === 'approved') note += 'APPLICATION APPROVED\n';
       else if (b.decision === 'declined') note += 'APPLICATION DECLINED\n';
       if (b.decisionReason) note += `${b.decisionReason}\n`;
@@ -1013,11 +1014,11 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       const f = formData;
       let note = '';
       note += `CCID: ${f.clientId === false ? 'No' : 'Yes'}\n\n`;
-      note += '~~~ Need ~~~\n';
+      note += `${formatHeading('Need', 'custom', customHeadingFormat)}\n`;
       if (f.whyNeedFurniture) note += `${f.whyNeedFurniture}\n`;
       if (f.furnitureType) note += `Client is requesting help with a ${f.furnitureType}\n`;
 
-      note += '\n~~~ Payment ~~~\n';
+      note += `\n${formatHeading('Payment', 'custom', customHeadingFormat)}\n`;
       if (f.supplierName && f.supplierName.trim()) {
         note += `Supplier Name: ${f.supplierName}\n`;
       }
@@ -1036,7 +1037,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       if (f.directCredit === 'yes' && f.paymentReference) {
         note += `Reference number: ${f.paymentReference}\n`;
       }
-      note += '\n~~~ Income ~~~\n';
+      note += `\n${formatHeading('Income', 'custom', customHeadingFormat)}\n`;
       if (f.income.benefit > 0) note += `$${f.income.benefit.toFixed(2)} Benefit\n`;
       if (f.income.employment > 0) note += `$${f.income.employment.toFixed(2)} Employment\n`;
       if (f.income.familyTaxCredit > 0) note += `$${f.income.familyTaxCredit.toFixed(2)} Family Tax Credit\n`;
@@ -1053,9 +1054,9 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
         note += '--------------\n';
         note += `Client is left with $${remainingIncome.toFixed(2)}\n`;
       }
-      note += '\n~~~ Reasonable Steps ~~~\n';
+      note += `\n${formatHeading('Reasonable Steps', 'custom', customHeadingFormat)}\n`;
       if (f.reasonableSteps) note += `${f.reasonableSteps}\n`;
-      note += '\n~~~ Outcome ~~~\n';
+      note += `\n${formatHeading('Outcome', 'custom', customHeadingFormat)}\n`;
       if (f.decision === 'approved') note += 'APPLICATION APPROVED\n';
       else if (f.decision === 'declined') note += 'APPLICATION DECLINED\n';
       if (f.decisionReason) note += `${f.decisionReason}\n`;
@@ -1065,14 +1066,14 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       const b = formData;
       let note = '';
       note += `CCID: ${b.clientId === false ? 'No' : 'Yes'}\n\n`;
-      note += '~~~ Need ~~~\n';
+      note += `${formatHeading('Need', 'custom', customHeadingFormat)}\n`;
       if (b.whyNeedBedding) note += `${b.whyNeedBedding}\n`;
 
       if (b.beddingSngEligible === 'yes') {
         note += '\nClient qualifies for bedding SNG\n';
         if (b.beddingSngReason) note += `Reason: ${b.beddingSngReason}\n`;
       }
-      note += '\n~~~ Payment ~~~\n';
+      note += `\n${formatHeading('Payment', 'custom', customHeadingFormat)}\n`;
       if (b.supplierName && b.supplierName.trim()) {
         note += `Supplier Name: ${b.supplierName}\n`;
       }
@@ -1091,7 +1092,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       if (b.directCredit === 'yes' && b.paymentReference) {
         note += `Reference number: ${b.paymentReference}\n`;
       }
-      note += '\n~~~ Income ~~~\n';
+      note += `\n${formatHeading('Income', 'custom', customHeadingFormat)}\n`;
       if (b.income.benefit > 0) note += `$${b.income.benefit.toFixed(2)} Benefit\n`;
       if (b.income.employment > 0) note += `$${b.income.employment.toFixed(2)} Employment\n`;
       if (b.income.familyTaxCredit > 0) note += `$${b.income.familyTaxCredit.toFixed(2)} Family Tax Credit\n`;
@@ -1108,9 +1109,9 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
         note += '--------------\n';
         note += `Client is left with $${remainingIncome.toFixed(2)}\n`;
       }
-      note += '\n~~~ Reasonable Steps ~~~\n';
+      note += `\n${formatHeading('Reasonable Steps', 'custom', customHeadingFormat)}\n`;
       if (b.reasonableSteps) note += `${b.reasonableSteps}\n`;
-      note += '\n~~~ Outcome ~~~\n';
+      note += `\n${formatHeading('Outcome', 'custom', customHeadingFormat)}\n`;
       if (b.decision === 'approved') note += 'APPLICATION APPROVED\n';
       else if (b.decision === 'declined') note += 'APPLICATION DECLINED\n';
       if (b.decisionReason) note += `${b.decisionReason}\n`;
@@ -1120,10 +1121,10 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       const g = formData;
       let note = '';
       note += `CCID: ${g.clientId === false ? 'No' : 'Yes'}\n\n`;
-      note += '~~~ Need ~~~\n';
+      note += `${formatHeading('Need', 'custom', customHeadingFormat)}\n`;
       if (g.whyNeedGlasses) note += `${g.whyNeedGlasses}\n`;
 
-      note += '\n~~~ Payment ~~~\n';
+      note += `\n${formatHeading('Payment', 'custom', customHeadingFormat)}\n`;
       if (g.supplierName && g.supplierName.trim()) {
         note += `Supplier Name: ${g.supplierName}\n`;
       }
@@ -1142,7 +1143,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       if (g.directCredit === 'yes' && g.paymentReference) {
         note += `Reference number: ${g.paymentReference}\n`;
       }
-      note += '\n~~~ Income ~~~\n';
+      note += `\n${formatHeading('Income', 'custom', customHeadingFormat)}\n`;
       if (g.income.benefit > 0) note += `$${g.income.benefit.toFixed(2)} Benefit\n`;
       if (g.income.employment > 0) note += `$${g.income.employment.toFixed(2)} Employment\n`;
       if (g.income.childSupport > 0) note += `$${g.income.childSupport.toFixed(2)} Child Support\n`;
@@ -1157,9 +1158,9 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
         note += '--------------\n';
         note += `Client is left with $${remainingIncome.toFixed(2)}\n`;
       }
-      note += '\n~~~ Reasonable Steps ~~~\n';
+      note += `\n${formatHeading('Reasonable Steps', 'custom', customHeadingFormat)}\n`;
       if (g.reasonableSteps) note += `${g.reasonableSteps}\n`;
-      note += '\n~~~ Outcome ~~~\n';
+      note += `\n${formatHeading('Outcome', 'custom', customHeadingFormat)}\n`;
       if (g.decision === 'approved') note += 'APPLICATION APPROVED\n';
       else if (g.decision === 'declined') note += 'APPLICATION DECLINED\n';
       if (g.decisionReason) note += `${g.decisionReason}\n`;
@@ -1169,7 +1170,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       const f = formData;
       let note = '';
       note += `CCID: ${f.clientId === false ? 'No' : 'Yes'}\n\n`;
-      note += '~~~ Need ~~~\n';
+      note += `${formatHeading('Need', 'custom', customHeadingFormat)}\n`;
       if (f.whyNeedFridge) note += `${f.whyNeedFridge}\n`;
 
       if (f.reasonableSteps) note += `What reasonable steps is the client taken to improve their situation?\n${f.reasonableSteps}\n`;
@@ -1189,7 +1190,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
         note += 'Special delivery instructions:\n' + f.deliveryInstructionsDetails + '\n';
       }
       
-      note += '\n~~~ Payment ~~~\n';
+      note += `\n${formatHeading('Payment', 'custom', customHeadingFormat)}\n`;
       if (f.supplierName && f.supplierName.trim()) {
         note += `Supplier Name: ${f.supplierName}\n`;
       }
@@ -1208,7 +1209,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       if (f.directCredit === 'yes' && f.paymentReference) {
         note += `Reference number: ${f.paymentReference}\n`;
       }
-      note += '\n~~~ Income ~~~\n';
+      note += `\n${formatHeading('Income', 'custom', customHeadingFormat)}\n`;
       if (f.income.benefit > 0) note += `$${f.income.benefit.toFixed(2)} Benefit\n`;
       if (f.income.employment > 0) note += `$${f.income.employment.toFixed(2)} Employment\n`;
       if (f.income.childSupport > 0) note += `$${f.income.childSupport.toFixed(2)} Child Support\n`;
@@ -1223,9 +1224,9 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
         note += '--------------\n';
         note += `Client is left with $${remainingIncome.toFixed(2)}\n`;
       }
-      note += '\n~~~ Reasonable Steps ~~~\n';
+      note += `\n${formatHeading('Reasonable Steps', 'custom', customHeadingFormat)}\n`;
       if (f.reasonableSteps) note += `${f.reasonableSteps}\n`;
-      note += '\n~~~ Outcome ~~~\n';
+      note += `\n${formatHeading('Outcome', 'custom', customHeadingFormat)}\n`;
       if (f.decision === 'approved') note += 'APPLICATION APPROVED\n';
       else if (f.decision === 'declined') note += 'APPLICATION DECLINED\n';
       if (f.decisionReason) note += `${f.decisionReason}\n`;
@@ -1235,7 +1236,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       const w = formData;
       let note = '';
       note += `CCID: ${w.clientId === false ? 'No' : 'Yes'}\n\n`;
-      note += '~~~ Need ~~~\n';
+      note += `${formatHeading('Need', 'custom', customHeadingFormat)}\n`;
       if (w.whyNeedWashingMachine) note += `${w.whyNeedWashingMachine}\n`;
 
       if (w.reasonableSteps) note += `What reasonable steps is the client taken to improve their situation?\n${w.reasonableSteps}\n`;
@@ -1255,7 +1256,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
         note += 'Special delivery instructions:\n' + w.deliveryInstructionsDetails + '\n';
       }
       
-      note += '\n~~~ Payment ~~~\n';
+      note += `\n${formatHeading('Payment', 'custom', customHeadingFormat)}\n`;
       if (w.supplierName && w.supplierName.trim()) {
         note += `Supplier Name: ${w.supplierName}\n`;
       }
@@ -1274,7 +1275,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       if (w.directCredit === 'yes' && w.paymentReference) {
         note += `Reference number: ${w.paymentReference}\n`;
       }
-      note += '\n~~~ Income ~~~\n';
+      note += `\n${formatHeading('Income', 'custom', customHeadingFormat)}\n`;
       if (w.income.benefit > 0) note += `$${w.income.benefit.toFixed(2)} Benefit\n`;
       if (w.income.employment > 0) note += `$${w.income.employment.toFixed(2)} Employment\n`;
       if (w.income.childSupport > 0) note += `$${w.income.childSupport.toFixed(2)} Child Support\n`;
@@ -1289,9 +1290,9 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
         note += '--------------\n';
         note += `Client is left with $${remainingIncome.toFixed(2)}\n`;
       }
-      note += '\n~~~ Reasonable Steps ~~~\n';
+      note += `\n${formatHeading('Reasonable Steps', 'custom', customHeadingFormat)}\n`;
       if (w.reasonableSteps) note += `${w.reasonableSteps}\n`;
-      note += '\n~~~ Outcome ~~~\n';
+      note += `\n${formatHeading('Outcome', 'custom', customHeadingFormat)}\n`;
       if (w.decision === 'approved') note += 'APPLICATION APPROVED\n';
       else if (w.decision === 'declined') note += 'APPLICATION DECLINED\n';
       if (w.decisionReason) note += `${w.decisionReason}\n`;
@@ -1304,7 +1305,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       const remainingIncome = totalIncome - totalCosts;
       let note = '';
       note += `CCID: ${f.clientId === false ? 'No' : 'Yes'}\n\n`;
-      note += '~~~ Need ~~~\n';
+      note += `${formatHeading('Need', 'custom', customHeadingFormat)}\n`;
       if (f.whyNeedFood) note += `${f.whyNeedFood}\n`;
 
       note += '\n';
@@ -1316,11 +1317,11 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       }
       if (f.foodAmountRequested > 0) note += `Amount requesting: $${f.foodAmountRequested.toFixed(2)}\n`;
       
-      note += '\n~~~ Payment ~~~\n';
+      note += `\n${formatHeading('Payment', 'custom', customHeadingFormat)}\n`;
       note += `Supplier Name: Food Supplier Group\n`;
       if (f.amount > 0) note += `Total Cost: $${f.amount.toFixed(2)}\n`;
       
-      note += '\n~~~ Income ~~~\n';
+      note += `\n${formatHeading('Income', 'custom', customHeadingFormat)}\n`;
       if (f.income.benefit > 0) note += `$${f.income.benefit.toFixed(2)} Benefit\n`;
       if (f.income.employment > 0) note += `$${f.income.employment.toFixed(2)} Employment\n`;
       if (f.income.childSupport > 0) note += `$${f.income.childSupport.toFixed(2)} Child Support\n`;
@@ -1334,10 +1335,10 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       }
       note += '\n';
       if (f.reasonableSteps) {
-        note += '~~~ Reasonable Steps ~~~\n';
+        note += `${formatHeading('Reasonable Steps', 'custom', customHeadingFormat)}\n`;
         note += `${f.reasonableSteps}\n\n`;
       }
-      note += '~~~ Outcome ~~~\n';
+      note += `${formatHeading('Outcome', 'custom', customHeadingFormat)}\n`;
       if (f.decision === 'approved') note += 'APPLICATION APPROVED\n';
       else if (f.decision === 'declined') note += 'APPLICATION DECLINED\n';
       if (f.decisionReason) note += `${f.decisionReason}\n`;

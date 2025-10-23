@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import StrandedTravelQuestions from './StrandedTravelQuestions';
 import NoteOutput from './NoteOutput';
+import { useSettings } from '../contexts/SettingsContext';
 import { StrandedTravelFormData } from '../App';
 
 const StrandedTravelPage: React.FC = () => {
   const navigate = useNavigate();
+  const { customHeadingFormat } = useSettings();
   const [formData, setFormData] = useState<StrandedTravelFormData>({
     clientId: null,
     whyNeedStrandedTravelAssistance: '',
@@ -111,7 +113,7 @@ const StrandedTravelPage: React.FC = () => {
           onFormDataChange={handleFormDataChange}
         />
         <div className="note-section">
-          <NoteOutput formData={formData} service="stranded-travel" onReset={resetForm} />
+          <NoteOutput formData={formData} service="stranded-travel" onReset={resetForm} customHeadingFormat={customHeadingFormat} />
         </div>
       </div>
     </div>

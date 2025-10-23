@@ -1114,13 +1114,13 @@ body {
   letter-spacing: -0.025em;
 }
 
-/* Theme Selector */
-.theme-selector {
+/* Settings Selector */
+.settings-selector {
   position: relative;
   z-index: 1000;
 }
 
-.theme-selector-button {
+.settings-selector-button {
   background: var(--bg-secondary);
   border: 2px solid var(--border-primary);
   border-radius: 50px;
@@ -1135,27 +1135,26 @@ body {
   font-family: inherit;
 }
 
-.theme-selector-button:hover {
+.settings-selector-button:hover {
   border-color: var(--accent-gradient);
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
   transform: translateY(-1px);
 }
 
-.theme-preview-circle {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
+.settings-icon {
+  width: 20px;
+  height: 20px;
+  color: var(--text-primary);
   flex-shrink: 0;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.theme-selector-text {
+.settings-selector-text {
   font-size: 14px;
   font-weight: 500;
   color: var(--text-primary);
 }
 
-.theme-dropdown {
+.settings-dropdown {
   position: absolute;
   top: 100%;
   right: 0;
@@ -1163,19 +1162,42 @@ body {
   border: 2px solid var(--border-primary);
   border-radius: 12px;
   box-shadow: var(--shadow-hover);
-  padding: 8px;
-  min-width: 220px;
+  padding: 16px;
+  min-width: 280px;
   z-index: 1001;
   margin-top: 4px;
   animation: fadeIn 0.2s ease-out;
 }
 
-.theme-option {
+.settings-section {
+  margin-bottom: 20px;
+}
+
+.settings-section:last-child {
+  margin-bottom: 0;
+}
+
+.settings-section-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 12px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.settings-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.settings-option {
   display: flex;
   align-items: center;
   gap: 12px;
   width: 100%;
-  padding: 8px 12px;
+  padding: 12px;
   border: none;
   background: transparent;
   border-radius: 8px;
@@ -1184,14 +1206,15 @@ body {
   text-align: left;
   font-family: inherit;
   font-size: 14px;
+  color: var(--text-primary);
 }
 
-.theme-option:hover {
+.settings-option:hover {
   background: var(--bg-tertiary);
   transform: translateX(2px);
 }
 
-.theme-option.selected {
+.settings-option.selected {
   background: var(--accent-gradient);
   color: white;
   font-weight: 600;
@@ -1205,10 +1228,97 @@ body {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
-.theme-name {
+.settings-option .theme-circle {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.heading-preview {
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+  font-size: 12px;
+  background: var(--bg-tertiary);
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid var(--border-secondary);
+  flex-shrink: 0;
+  min-width: 80px;
+  text-align: center;
+  color: var(--text-primary);
+}
+
+.settings-option.selected .heading-preview {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.option-name {
   font-size: 14px;
   font-weight: 500;
   flex: 1;
+  color: var(--text-primary);
+}
+
+/* Custom Format Controls */
+.custom-format-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.custom-format-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 6px;
+  transition: background-color 0.2s ease;
+}
+
+.custom-format-option:hover {
+  background: var(--bg-tertiary);
+}
+
+.custom-format-option input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--accent-primary);
+  cursor: pointer;
+}
+
+.custom-format-label {
+  font-size: 14px;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.custom-preview-section {
+  border-top: 1px solid var(--border-secondary);
+  padding-top: 16px;
+}
+
+.custom-preview-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin: 0 0 8px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.custom-preview-display {
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+  font-size: 14px;
+  background: var(--bg-tertiary);
+  padding: 12px;
+  border-radius: 6px;
+  border: 1px solid var(--border-secondary);
+  color: var(--text-primary);
+  text-align: center;
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* Theme Definitions */

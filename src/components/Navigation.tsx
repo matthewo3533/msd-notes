@@ -1,10 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import ThemeSelector from './ThemeSelector';
+import Settings from './Settings';
 
 interface NavigationProps {
   currentTheme: string;
   onThemeChange: (themeId: string) => void;
+  customHeadingFormat: any;
+  onCustomHeadingFormatChange: (format: any) => void;
 }
 
 interface NavItem {
@@ -46,7 +48,7 @@ const navigationItems: NavItem[] = [
   { id: 'petrol-calculator', title: 'Petrol Calculator', path: '/petrol-calculator', emoji: '⛽', category: 'tools' },
 ];
 
-const Navigation: React.FC<NavigationProps> = ({ currentTheme, onThemeChange }) => {
+const Navigation: React.FC<NavigationProps> = ({ currentTheme, onThemeChange, customHeadingFormat, onCustomHeadingFormatChange }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
@@ -525,7 +527,12 @@ const Navigation: React.FC<NavigationProps> = ({ currentTheme, onThemeChange }) 
               </div>
             )}
           </div>
-          <ThemeSelector currentTheme={currentTheme} onThemeChange={onThemeChange} />
+          <Settings 
+            currentTheme={currentTheme} 
+            onThemeChange={onThemeChange} 
+            customHeadingFormat={customHeadingFormat}
+            onCustomHeadingFormatChange={onCustomHeadingFormatChange}
+          />
         </div>
       </div>
     </nav>

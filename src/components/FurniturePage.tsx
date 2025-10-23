@@ -3,9 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import FurnitureQuestions from './FurnitureQuestions';
 import type { FurnitureFormData } from './FurnitureQuestions';
 import NoteOutput from './NoteOutput';
+import { useSettings } from '../contexts/SettingsContext';
 
 const FurniturePage: React.FC = () => {
   const navigate = useNavigate();
+  const { customHeadingFormat } = useSettings();
   const [formData, setFormData] = useState<FurnitureFormData>({
     clientId: null,
     whyNeedFurniture: '',
@@ -101,7 +103,7 @@ const FurniturePage: React.FC = () => {
           onFormDataChange={handleFormDataChange}
         />
         <div className="note-section">
-          <NoteOutput formData={formData} service="furniture" onReset={resetForm} />
+          <NoteOutput formData={formData} service="furniture" onReset={resetForm} customHeadingFormat={customHeadingFormat} />
         </div>
       </div>
     </div>

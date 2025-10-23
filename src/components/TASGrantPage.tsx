@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import TASGrantQuestions from './TASGrantQuestions';
 import NoteOutput from './NoteOutput';
+import { useSettings } from '../contexts/SettingsContext';
 import { TASGrantFormData } from '../App';
 
 const TASGrantPage: React.FC = () => {
   const navigate = useNavigate();
+  const { customHeadingFormat } = useSettings();
   
   const getTodayDate = () => {
     const today = new Date();
@@ -114,7 +116,7 @@ const TASGrantPage: React.FC = () => {
           onFormDataChange={handleFormDataChange}
         />
         <div className="note-section">
-          <NoteOutput formData={formData} service="tas-grant" onReset={resetForm} />
+          <NoteOutput formData={formData} service="tas-grant" onReset={resetForm} customHeadingFormat={customHeadingFormat} />
         </div>
       </div>
     </div>

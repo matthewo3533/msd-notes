@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import RentArrearsQuestions from './RentArrearsQuestions';
 import NoteOutput from './NoteOutput';
+import { useSettings } from '../contexts/SettingsContext';
 import { RentArrearsFormData } from '../App';
 
 const RentArrearsPage: React.FC = () => {
   const navigate = useNavigate();
+  const { customHeadingFormat } = useSettings();
   const [formData, setFormData] = useState<RentArrearsFormData>({
     clientId: null,
     whyNeedRentArrears: '',
@@ -101,7 +103,7 @@ const RentArrearsPage: React.FC = () => {
           onFormDataChange={handleFormDataChange}
         />
         <div className="note-section">
-          <NoteOutput formData={formData} service="rent-arrears" onReset={resetForm} />
+          <NoteOutput formData={formData} service="rent-arrears" onReset={resetForm} customHeadingFormat={customHeadingFormat} />
         </div>
       </div>
     </div>

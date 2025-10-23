@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import FuneralAssistanceQuestions from './FuneralAssistanceQuestions';
 import NoteOutput from './NoteOutput';
+import { useSettings } from '../contexts/SettingsContext';
 import { FuneralAssistanceFormData } from '../App';
 
 const FuneralAssistancePage: React.FC = () => {
   const navigate = useNavigate();
+  const { customHeadingFormat } = useSettings();
   const [formData, setFormData] = useState<FuneralAssistanceFormData>({
     clientId: null,
     whyNeedFuneralAssistance: '',
@@ -111,7 +113,7 @@ const FuneralAssistancePage: React.FC = () => {
           onFormDataChange={handleFormDataChange}
         />
         <div className="note-section">
-          <NoteOutput formData={formData} service="funeral-assistance" onReset={resetForm} />
+          <NoteOutput formData={formData} service="funeral-assistance" onReset={resetForm} customHeadingFormat={customHeadingFormat} />
         </div>
       </div>
     </div>

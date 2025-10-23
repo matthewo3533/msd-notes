@@ -3,9 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import FoodQuestions from './FoodQuestions';
 import NoteOutput from './NoteOutput';
 import { FoodFormData } from '../App';
+import { useSettings } from '../contexts/SettingsContext';
 
 const FoodPage: React.FC = () => {
   const navigate = useNavigate();
+  const { customHeadingFormat } = useSettings();
   const [formData, setFormData] = useState<FoodFormData>({
     clientId: null,
     whyNeedFood: '',
@@ -105,7 +107,7 @@ const FoodPage: React.FC = () => {
           onFormDataChange={handleFormDataChange}
         />
         <div className="note-section">
-          <NoteOutput formData={formData} service="food" onReset={resetForm} />
+          <NoteOutput formData={formData} service="food" onReset={resetForm} customHeadingFormat={customHeadingFormat} />
         </div>
       </div>
     </div>
