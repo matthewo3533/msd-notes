@@ -4,11 +4,13 @@ import FuneralAssistanceQuestions from './FuneralAssistanceQuestions';
 import NoteOutput from './NoteOutput';
 import { useSettings } from '../contexts/SettingsContext';
 import { FuneralAssistanceFormData } from '../App';
+import { createDefaultIncomeLabels } from './IncomeSection';
+import NeedsInApplication from './multi-need/NeedsInApplication';
 
 const FuneralAssistancePage: React.FC = () => {
   const navigate = useNavigate();
   const { customHeadingFormat } = useSettings();
-  const [formData, setFormData] = useState<FuneralAssistanceFormData>({
+  const [formData, setFormData] = useState<FuneralAssistanceFormData>(() => ({
     clientId: null,
     whyNeedFuneralAssistance: '',
     reasonableSteps: '',
@@ -26,6 +28,7 @@ const FuneralAssistancePage: React.FC = () => {
     directCredit: '',
     paymentReference: '',
     paymentCardNumber: '',
+    incomeLabels: createDefaultIncomeLabels(),
     income: {
       benefit: 0,
       employment: 0,
@@ -37,7 +40,7 @@ const FuneralAssistancePage: React.FC = () => {
     costs: [],
     decision: '',
     decisionReason: '',
-  });
+  }));
 
   const handleFormDataChange = (data: Partial<FuneralAssistanceFormData>) => {
     setFormData(prev => ({ ...prev, ...data }));
@@ -61,7 +64,8 @@ const FuneralAssistancePage: React.FC = () => {
       recoveryRate: 0,
       directCredit: '',
       paymentReference: '',
-    paymentCardNumber: '',
+      paymentCardNumber: '',
+      incomeLabels: createDefaultIncomeLabels(),
       income: {
         benefit: 0,
         employment: 0,
@@ -113,6 +117,7 @@ const FuneralAssistancePage: React.FC = () => {
           onFormDataChange={handleFormDataChange}
         />
         <div className="note-section">
+          <NeedsInApplication formData={formData} needType="funeral-assistance" />
           <NoteOutput formData={formData} service="funeral-assistance" onReset={resetForm} customHeadingFormat={customHeadingFormat} />
         </div>
       </div>

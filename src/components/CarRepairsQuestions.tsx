@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import IncomeSection, { IncomeLabels } from './IncomeSection';
+import IncomeSection, { IncomeLabels, createDefaultIncomeLabels } from './IncomeSection';
 import PaymentSection from './PaymentSection';
 import DecisionSection from './DecisionSection';
 import FormattedTextarea from './FormattedTextarea';
@@ -26,6 +26,7 @@ interface CarRepairsFormData {
   directCredit: string; // 'yes' | 'no' | ''
   paymentReference: string;
   paymentCardNumber: string;
+  incomeLabels?: IncomeLabels;
   income: {
     benefit: number;
     employment: number;
@@ -49,13 +50,11 @@ interface CarRepairsQuestionsProps {
 
 const CarRepairsQuestions: React.FC<CarRepairsQuestionsProps> = ({ formData, onFormDataChange }) => {
   const [visibleSections, setVisibleSections] = useState<Set<string>>(new Set(['client']));
-  const [incomeLabels, setIncomeLabels] = useState<IncomeLabels>({
-    benefit: 'Benefit',
-    employment: 'Employment',
-    childSupport: 'Child Support',
-    otherIncome: 'Other Income',
-    familyTaxCredit: 'Family Tax Credit',
-    childDisabilityAllowance: 'Child Disability Allowance'
+  const [incomeLabels, setIncomeLabels] = useState<IncomeLabels>(() => {
+    if (formData.incomeLabels) {
+      return { ...formData.incomeLabels };
+    }
+    return createDefaultIncomeLabels();
   });
 
   // Car dropdown state
@@ -180,8 +179,18 @@ const CarRepairsQuestions: React.FC<CarRepairsQuestionsProps> = ({ formData, onF
     });
   };
 
+  useEffect(() => {
+    if (formData.incomeLabels) {
+      setIncomeLabels({ ...formData.incomeLabels });
+    } else {
+      setIncomeLabels(createDefaultIncomeLabels());
+    }
+  }, [formData.incomeLabels]);
+
   const handleIncomeLabelsChange = (labels: IncomeLabels) => {
-    setIncomeLabels(labels);
+    const updatedLabels = { ...labels };
+    setIncomeLabels(updatedLabels);
+    onFormDataChange({ incomeLabels: updatedLabels });
   };
 
   const handleCostChange = (index: number, field: 'amount' | 'cost', value: any) => {

@@ -2,13 +2,15 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ADSDQuestions from './ADSDQuestions';
 import NoteOutput from './NoteOutput';
+import NeedsInApplication from './multi-need/NeedsInApplication';
 import { useSettings } from '../contexts/SettingsContext';
 import { ADSDFormData } from '../App';
+import { createDefaultIncomeLabels } from './IncomeSection';
 
 const ADSDPage: React.FC = () => {
   const navigate = useNavigate();
   const { customHeadingFormat } = useSettings();
-  const [formData, setFormData] = useState<ADSDFormData>({
+  const [formData, setFormData] = useState<ADSDFormData>(() => ({
     clientId: null,
     whyNeedADSD: '',
     reasonableSteps: '',
@@ -19,6 +21,7 @@ const ADSDPage: React.FC = () => {
     directCredit: '',
     paymentReference: '',
     paymentCardNumber: '',
+    incomeLabels: createDefaultIncomeLabels(),
     income: {
       benefit: 0,
       employment: 0,
@@ -30,7 +33,7 @@ const ADSDPage: React.FC = () => {
     costs: [],
     decision: '',
     decisionReason: '',
-  });
+  }));
 
   const handleFormDataChange = (data: Partial<ADSDFormData>) => {
     setFormData(prev => ({ ...prev, ...data }));
@@ -47,7 +50,8 @@ const ADSDPage: React.FC = () => {
       recoveryRate: 0,
       directCredit: '',
       paymentReference: '',
-    paymentCardNumber: '',
+      paymentCardNumber: '',
+      incomeLabels: createDefaultIncomeLabels(),
       income: {
         benefit: 0,
         employment: 0,
@@ -99,6 +103,7 @@ const ADSDPage: React.FC = () => {
           onFormDataChange={handleFormDataChange}
         />
         <div className="note-section">
+          <NeedsInApplication formData={formData} needType="adsd" />
           <NoteOutput formData={formData} service="adsd" onReset={resetForm} customHeadingFormat={customHeadingFormat} />
         </div>
       </div>

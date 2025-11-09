@@ -1,16 +1,18 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import FridgeQuestions from './FridgeQuestions';
+import WhitewareQuestions from './WhitewareQuestions';
 import NoteOutput from './NoteOutput';
 import { useSettings } from '../contexts/SettingsContext';
-import { FridgeFormData } from '../App';
+import { WhitewareFormData } from '../App';
+import { createDefaultIncomeLabels } from './IncomeSection';
+import NeedsInApplication from './multi-need/NeedsInApplication';
 
-const FridgePage: React.FC = () => {
+const WhitewarePage: React.FC = () => {
   const navigate = useNavigate();
   const { customHeadingFormat } = useSettings();
-  const [formData, setFormData] = useState<FridgeFormData>({
+  const [formData, setFormData] = useState<WhitewareFormData>(() => ({
     clientId: null,
-    whyNeedFridge: '',
+    whyNeedWhiteware: '',
     reasonableSteps: '',
     canMeetNeedOtherWay: '',
     supplierName: '',
@@ -20,6 +22,7 @@ const FridgePage: React.FC = () => {
     directCredit: '',
     paymentReference: '',
     paymentCardNumber: '',
+    incomeLabels: createDefaultIncomeLabels(),
     householdSize: '',
     addressContactConfirmed: '',
     spaceMeasured: '',
@@ -38,16 +41,16 @@ const FridgePage: React.FC = () => {
     costs: [],
     decision: '',
     decisionReason: '',
-  });
+  }));
 
-  const handleFormDataChange = (data: Partial<FridgeFormData>) => {
+  const handleFormDataChange = (data: Partial<WhitewareFormData>) => {
     setFormData(prev => ({ ...prev, ...data }));
   };
 
   const resetForm = () => {
     setFormData({
       clientId: null,
-      whyNeedFridge: '',
+      whyNeedWhiteware: '',
       reasonableSteps: '',
       canMeetNeedOtherWay: '',
       supplierName: '',
@@ -56,7 +59,8 @@ const FridgePage: React.FC = () => {
       recoveryRate: 0,
       directCredit: '',
       paymentReference: '',
-    paymentCardNumber: '',
+      paymentCardNumber: '',
+      incomeLabels: createDefaultIncomeLabels(),
       householdSize: '',
       addressContactConfirmed: '',
       spaceMeasured: '',
@@ -98,7 +102,7 @@ const FridgePage: React.FC = () => {
       <div className="header">
         <div className="header-top">
           <div className="greeting-section">
-            <h1 className="greeting">Fridge</h1>
+            <h1 className="greeting">Whiteware</h1>
             <p className="date">{getCurrentDate()}</p>
           </div>
         </div>
@@ -110,16 +114,17 @@ const FridgePage: React.FC = () => {
         </button>
       </div>
       <div className="food-layout">
-        <FridgeQuestions 
+        <WhitewareQuestions 
           formData={formData} 
           onFormDataChange={handleFormDataChange}
         />
         <div className="note-section">
-          <NoteOutput formData={formData} service="fridge" onReset={resetForm} customHeadingFormat={customHeadingFormat} />
+          <NeedsInApplication formData={formData} needType="whiteware" />
+          <NoteOutput formData={formData} service="whiteware" onReset={resetForm} customHeadingFormat={customHeadingFormat} />
         </div>
       </div>
     </div>
   );
 };
 
-export default FridgePage;
+export default WhitewarePage;

@@ -4,11 +4,13 @@ import FoodQuestions from './FoodQuestions';
 import NoteOutput from './NoteOutput';
 import { FoodFormData } from '../App';
 import { useSettings } from '../contexts/SettingsContext';
+import { createDefaultIncomeLabels } from './IncomeSection';
+import NeedsInApplication from './multi-need/NeedsInApplication';
 
 const FoodPage: React.FC = () => {
   const navigate = useNavigate();
   const { customHeadingFormat } = useSettings();
-  const [formData, setFormData] = useState<FoodFormData>({
+  const [formData, setFormData] = useState<FoodFormData>(() => ({
     clientId: null,
     whyNeedFood: '',
     currentFoodBalance: 0,
@@ -23,6 +25,7 @@ const FoodPage: React.FC = () => {
     directCredit: '',
     paymentReference: '',
     paymentCardNumber: '',
+    incomeLabels: createDefaultIncomeLabels(),
     income: {
       benefit: 0,
       employment: 0,
@@ -34,7 +37,7 @@ const FoodPage: React.FC = () => {
     costs: [],
     decision: '',
     decisionReason: '',
-  });
+  }));
 
   const handleFormDataChange = (data: Partial<FoodFormData>) => {
     setFormData(prev => ({ ...prev, ...data }));
@@ -56,6 +59,7 @@ const FoodPage: React.FC = () => {
       directCredit: '',
       paymentReference: '',
       paymentCardNumber: '',
+      incomeLabels: createDefaultIncomeLabels(),
       income: {
         benefit: 0,
         employment: 0,
@@ -107,6 +111,7 @@ const FoodPage: React.FC = () => {
           onFormDataChange={handleFormDataChange}
         />
         <div className="note-section">
+          <NeedsInApplication formData={formData} needType="food" />
           <NoteOutput formData={formData} service="food" onReset={resetForm} customHeadingFormat={customHeadingFormat} />
         </div>
       </div>

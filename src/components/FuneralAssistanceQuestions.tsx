@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import IncomeSection, { IncomeLabels } from './IncomeSection';
+import IncomeSection, { IncomeLabels, createDefaultIncomeLabels } from './IncomeSection';
 import PaymentSection from './PaymentSection';
 import DecisionSection from './DecisionSection';
 import FormattedTextarea from './FormattedTextarea';
@@ -66,6 +66,7 @@ interface FuneralAssistanceFormData {
   directCredit: string;
   paymentReference: string;
   paymentCardNumber: string;
+  incomeLabels?: IncomeLabels;
   income: {
     benefit: number;
     employment: number;
@@ -89,13 +90,11 @@ interface FuneralAssistanceQuestionsProps {
 
 const FuneralAssistanceQuestions: React.FC<FuneralAssistanceQuestionsProps> = ({ formData, onFormDataChange }) => {
   const [visibleSections, setVisibleSections] = useState<Set<string>>(new Set(['client']));
-  const [incomeLabels, setIncomeLabels] = useState<IncomeLabels>({
-    benefit: 'Benefit',
-    employment: 'Employment',
-    childSupport: 'Child Support',
-    otherIncome: 'Other Income',
-    familyTaxCredit: 'Family Tax Credit',
-    childDisabilityAllowance: 'Child Disability Allowance'
+  const [incomeLabels, setIncomeLabels] = useState<IncomeLabels>(() => {
+    if (formData.incomeLabels) {
+      return { ...formData.incomeLabels };
+    }
+    return createDefaultIncomeLabels();
   });
 
   // Petrol calculator state
@@ -318,8 +317,18 @@ const FuneralAssistanceQuestions: React.FC<FuneralAssistanceQuestionsProps> = ({
     });
   };
 
+  useEffect(() => {
+    if (formData.incomeLabels) {
+      setIncomeLabels({ ...formData.incomeLabels });
+    } else {
+      setIncomeLabels(createDefaultIncomeLabels());
+    }
+  }, [formData.incomeLabels]);
+
   const handleIncomeLabelsChange = (labels: IncomeLabels) => {
-    setIncomeLabels(labels);
+    const updatedLabels = { ...labels };
+    setIncomeLabels(updatedLabels);
+    onFormDataChange({ incomeLabels: updatedLabels });
   };
 
   const handleCostChange = (index: number, field: 'amount' | 'cost', value: any) => {

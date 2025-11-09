@@ -21,6 +21,19 @@ export interface IncomeLabels {
   childDisabilityAllowance: string;
 }
 
+export const DEFAULT_INCOME_LABELS: IncomeLabels = {
+  benefit: 'Benefit',
+  employment: 'Employment',
+  childSupport: 'Child Support',
+  otherIncome: 'Other Income',
+  familyTaxCredit: 'Family Tax Credit',
+  childDisabilityAllowance: 'Child Disability Allowance'
+};
+
+export const createDefaultIncomeLabels = (): IncomeLabels => ({
+  ...DEFAULT_INCOME_LABELS
+});
+
 export interface CostData {
   amount: number;
   cost: string;
@@ -55,17 +68,7 @@ const IncomeSection: React.FC<IncomeSectionProps> = ({
   const [editValue, setEditValue] = useState('');
   const editInputRef = useRef<HTMLInputElement>(null);
 
-  // Default labels if none provided
-  const defaultLabels: IncomeLabels = {
-    benefit: 'Benefit',
-    employment: 'Employment',
-    childSupport: 'Child Support',
-    otherIncome: 'Other Income',
-    familyTaxCredit: 'Family Tax Credit',
-    childDisabilityAllowance: 'Child Disability Allowance'
-  };
-
-  const labels = incomeLabels || defaultLabels;
+  const labels = incomeLabels || DEFAULT_INCOME_LABELS;
 
   const totalIncome = Object.values(income).reduce((sum, value) => sum + (value || 0), 0);
   const totalCosts = costs.reduce((sum, cost) => sum + (cost.amount || 0), 0);
@@ -95,7 +98,7 @@ const IncomeSection: React.FC<IncomeSectionProps> = ({
 
   const handleRestoreLabel = (field: keyof IncomeLabels) => {
     if (onIncomeLabelsChange) {
-      const newLabels = { ...labels, [field]: defaultLabels[field] };
+      const newLabels = { ...labels, [field]: DEFAULT_INCOME_LABELS[field] };
       onIncomeLabelsChange(newLabels);
     }
   };
@@ -119,7 +122,7 @@ const IncomeSection: React.FC<IncomeSectionProps> = ({
 
   const renderIncomeField = (field: keyof IncomeData, labelField: keyof IncomeLabels) => {
     const isEditing = editingField === labelField;
-    const currentLabel = labels[labelField] || defaultLabels[labelField];
+    const currentLabel = labels[labelField] || DEFAULT_INCOME_LABELS[labelField];
     
     // Don't render if the label has been deleted
     if (!currentLabel) {
@@ -206,7 +209,7 @@ const IncomeSection: React.FC<IncomeSectionProps> = ({
             {renderIncomeField('childDisabilityAllowance', 'childDisabilityAllowance')}
             
             {/* Show restore options for deleted labels */}
-            {Object.entries(defaultLabels).map(([key, defaultLabel]) => {
+            {Object.entries(DEFAULT_INCOME_LABELS).map(([key, defaultLabel]) => {
               const labelKey = key as keyof IncomeLabels;
               if (!labels[labelKey]) {
                                  return (
@@ -311,7 +314,7 @@ const IncomeSection: React.FC<IncomeSectionProps> = ({
             {Object.entries(income).map(([key, value]) => {
               const fieldKey = key as keyof IncomeData;
               const labelKey = key as keyof IncomeLabels;
-              const label = labels[labelKey] || defaultLabels[labelKey];
+              const label = labels[labelKey] || DEFAULT_INCOME_LABELS[labelKey];
               if (label && value > 0) {
                 return (
                   <div key={fieldKey} className="income-item">

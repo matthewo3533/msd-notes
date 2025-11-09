@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import DentalQuestions from './DentalQuestions';
 import NoteOutput from './NoteOutput';
 import { useSettings } from '../contexts/SettingsContext';
+import { IncomeLabels, createDefaultIncomeLabels } from './IncomeSection';
+import NeedsInApplication from './multi-need/NeedsInApplication';
 
 interface DentalFormData {
   clientId: boolean | null;
@@ -26,6 +28,7 @@ interface DentalFormData {
     childDisabilityAllowance: number;
     otherIncome: number;
   };
+  incomeLabels?: IncomeLabels;
   costs: Array<{
     amount: number;
     cost: string;
@@ -59,6 +62,7 @@ const DentalPage: React.FC = () => {
       childDisabilityAllowance: 0,
       otherIncome: 0,
     },
+    incomeLabels: createDefaultIncomeLabels(),
     costs: [],
     decision: '',
     decisionReason: '',
@@ -82,7 +86,7 @@ const DentalPage: React.FC = () => {
       recoveryRate: 0,
       directCredit: '',
       paymentReference: '',
-    paymentCardNumber: '',
+      paymentCardNumber: '',
       income: {
         benefit: 0,
         employment: 0,
@@ -91,6 +95,7 @@ const DentalPage: React.FC = () => {
         childDisabilityAllowance: 0,
         otherIncome: 0,
       },
+      incomeLabels: createDefaultIncomeLabels(),
       costs: [],
       decision: '',
       decisionReason: '',
@@ -134,6 +139,7 @@ const DentalPage: React.FC = () => {
           onFormDataChange={handleFormDataChange}
         />
         <div className="note-section">
+          <NeedsInApplication formData={formData} needType="dental" />
           <NoteOutput formData={formData} service="dental" onReset={resetForm} customHeadingFormat={customHeadingFormat} />
         </div>
       </div>

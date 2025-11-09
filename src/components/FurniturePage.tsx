@@ -4,11 +4,13 @@ import FurnitureQuestions from './FurnitureQuestions';
 import type { FurnitureFormData } from './FurnitureQuestions';
 import NoteOutput from './NoteOutput';
 import { useSettings } from '../contexts/SettingsContext';
+import { createDefaultIncomeLabels } from './IncomeSection';
+import NeedsInApplication from './multi-need/NeedsInApplication';
 
 const FurniturePage: React.FC = () => {
   const navigate = useNavigate();
   const { customHeadingFormat } = useSettings();
-  const [formData, setFormData] = useState<FurnitureFormData>({
+  const [formData, setFormData] = useState<FurnitureFormData>(() => ({
     clientId: null,
     whyNeedFurniture: '',
     furnitureType: '',
@@ -21,6 +23,7 @@ const FurniturePage: React.FC = () => {
     directCredit: '',
     paymentReference: '',
     paymentCardNumber: '',
+    incomeLabels: createDefaultIncomeLabels(),
     income: {
       benefit: 0,
       employment: 0,
@@ -32,7 +35,7 @@ const FurniturePage: React.FC = () => {
     costs: [],
     decision: '',
     decisionReason: '',
-  });
+  }));
 
   const handleFormDataChange = (data: Partial<FurnitureFormData>) => {
     setFormData((prev: FurnitureFormData) => ({ ...prev, ...data }));
@@ -51,7 +54,8 @@ const FurniturePage: React.FC = () => {
       recoveryRate: 0,
       directCredit: '',
       paymentReference: '',
-    paymentCardNumber: '',
+      paymentCardNumber: '',
+      incomeLabels: createDefaultIncomeLabels(),
       income: {
         benefit: 0,
         employment: 0,
@@ -103,6 +107,7 @@ const FurniturePage: React.FC = () => {
           onFormDataChange={handleFormDataChange}
         />
         <div className="note-section">
+          <NeedsInApplication formData={formData} needType="furniture" />
           <NoteOutput formData={formData} service="furniture" onReset={resetForm} customHeadingFormat={customHeadingFormat} />
         </div>
       </div>

@@ -4,6 +4,8 @@ import ElectricityQuestions from './ElectricityQuestions';
 import NoteOutput from './NoteOutput';
 import EmailOutput from './EmailOutput';
 import { useSettings } from '../contexts/SettingsContext';
+import { IncomeLabels, createDefaultIncomeLabels } from './IncomeSection';
+import NeedsInApplication from './multi-need/NeedsInApplication';
 
 interface ElectricityFormData {
   clientId: boolean | null;
@@ -26,6 +28,7 @@ interface ElectricityFormData {
     childDisabilityAllowance: number;
     otherIncome: number;
   };
+  incomeLabels?: IncomeLabels;
   costs: Array<{
     amount: number;
     cost: string;
@@ -80,6 +83,7 @@ const ElectricityPage: React.FC = () => {
       childDisabilityAllowance: 0,
       otherIncome: 0,
     },
+    incomeLabels: createDefaultIncomeLabels(),
     costs: [],
     decision: '',
     decisionReason: '',
@@ -116,6 +120,7 @@ const ElectricityPage: React.FC = () => {
         childDisabilityAllowance: 0,
         otherIncome: 0,
       },
+      incomeLabels: createDefaultIncomeLabels(),
       costs: [],
       decision: '',
       decisionReason: '',
@@ -165,6 +170,7 @@ const ElectricityPage: React.FC = () => {
           onEmailFieldFocus={handleEmailFieldFocus}
         />
         <div className="note-section">
+          <NeedsInApplication formData={formData} needType="electricity" />
           <NoteOutput formData={formData} service="electricity" onReset={resetForm} customHeadingFormat={customHeadingFormat} />
           <EmailOutput 
             ref={emailOutputRef}

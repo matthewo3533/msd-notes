@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import BeddingQuestions from './BeddingQuestions';
 import NoteOutput from './NoteOutput';
 import { useSettings } from '../contexts/SettingsContext';
+import { IncomeLabels, createDefaultIncomeLabels } from './IncomeSection';
+import NeedsInApplication from './multi-need/NeedsInApplication';
 
 interface BeddingFormData {
   clientId: boolean | null;
@@ -24,6 +26,7 @@ interface BeddingFormData {
     childDisabilityAllowance: number;
     otherIncome: number;
   };
+  incomeLabels?: IncomeLabels;
   costs: Array<{
     amount: number;
     cost: string;
@@ -55,6 +58,7 @@ const BeddingPage: React.FC = () => {
       childDisabilityAllowance: 0,
       otherIncome: 0,
     },
+    incomeLabels: createDefaultIncomeLabels(),
     costs: [],
     decision: '',
     decisionReason: '',
@@ -76,7 +80,7 @@ const BeddingPage: React.FC = () => {
       recoveryRate: 0,
       directCredit: '',
       paymentReference: '',
-    paymentCardNumber: '',
+      paymentCardNumber: '',
       income: {
         benefit: 0,
         employment: 0,
@@ -85,6 +89,7 @@ const BeddingPage: React.FC = () => {
         childDisabilityAllowance: 0,
         otherIncome: 0,
       },
+      incomeLabels: createDefaultIncomeLabels(),
       costs: [],
       decision: '',
       decisionReason: '',
@@ -128,6 +133,7 @@ const BeddingPage: React.FC = () => {
           onFormDataChange={handleFormDataChange}
         />
         <div className="note-section">
+          <NeedsInApplication formData={formData} needType="bedding" />
           <NoteOutput formData={formData} service="bedding" onReset={resetForm} customHeadingFormat={customHeadingFormat} />
         </div>
       </div>

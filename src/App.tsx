@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import Navigation from './components/Navigation';
 import Home from './components/Home';
 import { keepAliveService } from './services/keepAliveService';
+import type { IncomeLabels } from './components/IncomeSection';
 import { SettingsProvider, useSettings } from './contexts/SettingsContext';
 
 // Lazy load components for better performance
@@ -20,14 +21,14 @@ const BedsPage = lazy(() => import('./components/BedsPage'));
 const BeddingPage = lazy(() => import('./components/BeddingPage'));
 const FurniturePage = lazy(() => import('./components/FurniturePage'));
 const GlassesPage = lazy(() => import('./components/GlassesPage'));
-const FridgePage = lazy(() => import('./components/FridgePage'));
-const WashingMachinePage = lazy(() => import('./components/WashingMachinePage'));
+const WhitewarePage = lazy(() => import('./components/WhitewarePage'));
 const BondRentPage = lazy(() => import('./components/BondRentPage'));
 const TASGrantPage = lazy(() => import('./components/TASGrantPage'));
 const DeclareIncomePage = lazy(() => import('./components/DeclareIncomePage'));
 const ADSDPage = lazy(() => import('./components/ADSDPage'));
 const PetrolCalculator = lazy(() => import('./components/PetrolCalculator'));
 const AbsenceFromNZPage = lazy(() => import('./components/AbsenceFromNZPage'));
+const MultiNeedPage = lazy(() => import('./components/MultiNeedPage'));
 
 export interface Service {
   id: string;
@@ -50,6 +51,7 @@ export interface FoodFormData {
   directCredit: string;
   paymentReference: string;
   paymentCardNumber: string;
+  incomeLabels?: IncomeLabels;
   income: {
     benefit: number;
     employment: number;
@@ -78,6 +80,7 @@ export interface ClothingFormData {
   directCredit: string;
   paymentReference: string;
   paymentCardNumber: string;
+  incomeLabels?: IncomeLabels;
   income: {
     benefit: number;
     employment: number;
@@ -106,6 +109,7 @@ export interface EmergencyFormData {
   directCredit: string;
   paymentReference: string;
   paymentCardNumber: string;
+  incomeLabels?: IncomeLabels;
   income: {
     benefit: number;
     employment: number;
@@ -144,6 +148,7 @@ export interface TransitionToWorkFormData {
   directCredit: string;
   paymentReference: string;
   paymentCardNumber: string;
+  incomeLabels?: IncomeLabels;
   income: {
     benefit: number;
     employment: number;
@@ -171,6 +176,7 @@ export interface ADSDFormData {
   directCredit: string;
   paymentReference: string;
   paymentCardNumber: string;
+  incomeLabels?: IncomeLabels;
   income: {
     benefit: number;
     employment: number;
@@ -200,6 +206,7 @@ export interface RentArrearsFormData {
   directCredit: string;
   paymentReference: string;
   paymentCardNumber: string;
+  incomeLabels?: IncomeLabels;
   income: {
     benefit: number;
     employment: number;
@@ -233,6 +240,7 @@ export interface CarRepairsFormData {
   directCredit: string;
   paymentReference: string;
   paymentCardNumber: string;
+  incomeLabels?: IncomeLabels;
   income: {
     benefit: number;
     employment: number;
@@ -268,6 +276,7 @@ export interface FuneralAssistanceFormData {
   directCredit: string;
   paymentReference: string;
   paymentCardNumber: string;
+  incomeLabels?: IncomeLabels;
   income: {
     benefit: number;
     employment: number;
@@ -303,6 +312,7 @@ export interface StrandedTravelFormData {
   directCredit: string;
   paymentReference: string;
   paymentCardNumber: string;
+  incomeLabels?: IncomeLabels;
   income: {
     benefit: number;
     employment: number;
@@ -342,6 +352,7 @@ export interface BondRentFormData {
   directCredit: string;
   paymentReference: string;
   paymentCardNumber: string;
+  incomeLabels?: IncomeLabels;
   income: {
     benefit: number;
     employment: number;
@@ -370,6 +381,7 @@ export interface GlassesFormData {
   directCredit: string;
   paymentReference: string;
   paymentCardNumber: string;
+  incomeLabels?: IncomeLabels;
   income: {
     benefit: number;
     employment: number;
@@ -386,9 +398,9 @@ export interface GlassesFormData {
   decisionReason: string;
 }
 
-export interface FridgeFormData {
+export interface WhitewareFormData {
   clientId: boolean | null;
-  whyNeedFridge: string;
+  whyNeedWhiteware: string;
   reasonableSteps: string;
   canMeetNeedOtherWay: string;
   supplierName: string;
@@ -398,42 +410,7 @@ export interface FridgeFormData {
   directCredit: string;
   paymentReference: string;
   paymentCardNumber: string;
-  // Whiteware Info section
-  householdSize: string;
-  addressContactConfirmed: string;
-  spaceMeasured: string;
-  specialDeliveryInstructions: string;
-  deliveryInstructionsDetails: string;
-  applianceModel: string;
-  applianceCANumber: string;
-  income: {
-    benefit: number;
-    employment: number;
-    familyTaxCredit: number;
-    childSupport: number;
-    childDisabilityAllowance: number;
-    otherIncome: number;
-  };
-  costs: Array<{
-    amount: number;
-    cost: string;
-  }>;
-  decision: string;
-  decisionReason: string;
-}
-
-export interface WashingMachineFormData {
-  clientId: boolean | null;
-  whyNeedWashingMachine: string;
-  reasonableSteps: string;
-  canMeetNeedOtherWay: string;
-  supplierName: string;
-  supplierId: string;
-  amount: number;
-  recoveryRate: number;
-  directCredit: string;
-  paymentReference: string;
-  paymentCardNumber: string;
+  incomeLabels?: IncomeLabels;
   // Whiteware Info section
   householdSize: string;
   addressContactConfirmed: string;
@@ -470,6 +447,7 @@ export interface BedsFormData {
   directCredit: string;
   paymentReference: string;
   paymentCardNumber: string;
+  incomeLabels?: IncomeLabels;
   income: {
     benefit: number;
     employment: number;
@@ -498,6 +476,7 @@ export interface BeddingFormData {
   directCredit: string;
   paymentReference: string;
   paymentCardNumber: string;
+  incomeLabels?: IncomeLabels;
   income: {
     benefit: number;
     employment: number;
@@ -517,6 +496,7 @@ export interface BeddingFormData {
 export interface FurnitureFormData {
   clientId: boolean | null;
   whyNeedFurniture: string;
+  furnitureType: string;
   reasonableSteps: string;
   canMeetNeedOtherWay: string;
   supplierName: string;
@@ -526,6 +506,7 @@ export interface FurnitureFormData {
   directCredit: string;
   paymentReference: string;
   paymentCardNumber: string;
+  incomeLabels?: IncomeLabels;
   income: {
     benefit: number;
     employment: number;
@@ -556,6 +537,7 @@ export interface DentalFormData {
   directCredit: string;
   paymentReference: string;
   paymentCardNumber: string;
+  incomeLabels?: IncomeLabels;
   income: {
     benefit: number;
     employment: number;
@@ -585,6 +567,7 @@ export interface ElectricityFormData {
   paymentReference: string;
   paymentCardNumber: string;
   powerAccountNumber: string;
+  incomeLabels?: IncomeLabels;
   income: {
     benefit: number;
     employment: number;
@@ -697,14 +680,14 @@ function AppContent() {
         <Route path="/bedding" element={<BeddingPage />} />
         <Route path="/furniture" element={<FurniturePage />} />
         <Route path="/glasses" element={<GlassesPage />} />
-        <Route path="/fridge" element={<FridgePage />} />
-        <Route path="/washing" element={<WashingMachinePage />} />
+        <Route path="/whiteware" element={<WhitewarePage />} />
         <Route path="/bond" element={<BondRentPage />} />
         <Route path="/tas-grant" element={<TASGrantPage />} />
         <Route path="/declare-income" element={<DeclareIncomePage />} />
         <Route path="/adsd" element={<ADSDPage />} />
                   <Route path="/petrol-calculator" element={<PetrolCalculator />} />
         <Route path="/absence-from-nz" element={<AbsenceFromNZPage />} />
+        <Route path="/multi-need" element={<MultiNeedPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Suspense>

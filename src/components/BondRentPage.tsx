@@ -3,10 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import BondRentQuestions from './BondRentQuestions';
 import NoteOutput from './NoteOutput';
 import { BondRentFormData } from '../App';
+import { useSettings } from '../contexts/SettingsContext';
+import { createDefaultIncomeLabels } from './IncomeSection';
+import NeedsInApplication from './multi-need/NeedsInApplication';
 
 const BondRentPage: React.FC = () => {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState<BondRentFormData>({
+  const { customHeadingFormat } = useSettings();
+  const [formData, setFormData] = useState<BondRentFormData>(() => ({
     clientId: null,
     whyNeedAccommodation: '',
     newAddress: '',
@@ -26,6 +30,7 @@ const BondRentPage: React.FC = () => {
     directCredit: '',
     paymentReference: '',
     paymentCardNumber: '',
+    incomeLabels: createDefaultIncomeLabels(),
     income: {
       benefit: 0,
       employment: 0,
@@ -37,7 +42,7 @@ const BondRentPage: React.FC = () => {
     costs: [],
     decision: '',
     decisionReason: '',
-  });
+  }));
 
   const handleFormDataChange = (data: Partial<BondRentFormData>) => {
     setFormData(prev => ({ ...prev, ...data }));
@@ -63,7 +68,8 @@ const BondRentPage: React.FC = () => {
       recoveryRate: 0,
       directCredit: '',
       paymentReference: '',
-    paymentCardNumber: '',
+      paymentCardNumber: '',
+      incomeLabels: createDefaultIncomeLabels(),
       income: {
         benefit: 0,
         employment: 0,
@@ -116,10 +122,12 @@ const BondRentPage: React.FC = () => {
           onFormDataChange={handleFormDataChange}
         />
         <div className="note-section">
+          <NeedsInApplication formData={formData} needType="bond-rent" />
           <NoteOutput
             formData={formData}
             service="bond-rent"
             onReset={resetForm}
+            customHeadingFormat={customHeadingFormat}
           />
         </div>
       </div>

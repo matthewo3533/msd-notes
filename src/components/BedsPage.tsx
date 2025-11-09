@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import BedsQuestions from './BedsQuestions';
 import NoteOutput from './NoteOutput';
 import { useSettings } from '../contexts/SettingsContext';
+import { IncomeLabels, createDefaultIncomeLabels } from './IncomeSection';
+import NeedsInApplication from './multi-need/NeedsInApplication';
 
 interface BedsFormData {
   clientId: boolean | null;
@@ -24,14 +26,7 @@ interface BedsFormData {
     childDisabilityAllowance: number;
     otherIncome: number;
   };
-  incomeLabels?: {
-    benefit: string;
-    employment: string;
-    childSupport: string;
-    otherIncome: string;
-    familyTaxCredit: string;
-    childDisabilityAllowance: string;
-  };
+  incomeLabels?: IncomeLabels;
   costs: Array<{
     amount: number;
     cost: string;
@@ -63,14 +58,7 @@ const BedsPage: React.FC = () => {
       childDisabilityAllowance: 0,
       otherIncome: 0,
     },
-    incomeLabels: {
-      benefit: 'Benefit',
-      employment: 'Employment',
-      childSupport: 'Child Support',
-      otherIncome: 'Other Income',
-      familyTaxCredit: 'Family Tax Credit',
-      childDisabilityAllowance: 'Child Disability Allowance'
-    },
+    incomeLabels: createDefaultIncomeLabels(),
     costs: [],
     decision: '',
     decisionReason: '',
@@ -92,7 +80,7 @@ const BedsPage: React.FC = () => {
       recoveryRate: 0,
       directCredit: '',
       paymentReference: '',
-    paymentCardNumber: '',
+      paymentCardNumber: '',
       income: {
         benefit: 0,
         employment: 0,
@@ -101,14 +89,7 @@ const BedsPage: React.FC = () => {
         childDisabilityAllowance: 0,
         otherIncome: 0,
       },
-      incomeLabels: {
-        benefit: 'Benefit',
-        employment: 'Employment',
-        childSupport: 'Child Support',
-        otherIncome: 'Other Income',
-        familyTaxCredit: 'Family Tax Credit',
-        childDisabilityAllowance: 'Child Disability Allowance'
-      },
+      incomeLabels: createDefaultIncomeLabels(),
       costs: [],
       decision: '',
       decisionReason: '',
@@ -152,6 +133,7 @@ const BedsPage: React.FC = () => {
           onFormDataChange={handleFormDataChange}
         />
         <div className="note-section">
+          <NeedsInApplication formData={formData} needType="beds" />
           <NoteOutput formData={formData} service="beds" onReset={resetForm} customHeadingFormat={customHeadingFormat} />
         </div>
       </div>

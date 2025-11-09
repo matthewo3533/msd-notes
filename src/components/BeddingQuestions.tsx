@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { BeddingFormData } from '../App';
-import IncomeSection, { IncomeLabels } from './IncomeSection';
+import IncomeSection, { IncomeLabels, createDefaultIncomeLabels } from './IncomeSection';
 import PaymentSection from './PaymentSection';
 import DecisionSection from './DecisionSection';
 import ExpandableSection from './ExpandableSection';
@@ -26,13 +26,11 @@ interface BeddingQuestionsProps {
 
 const BeddingQuestions: React.FC<BeddingQuestionsProps> = ({ formData, onFormDataChange }) => {
   const [visibleSections, setVisibleSections] = useState<Set<string>>(new Set(['client']));
-  const [incomeLabels, setIncomeLabels] = useState<IncomeLabels>({
-    benefit: 'Benefit',
-    employment: 'Employment',
-    childSupport: 'Child Support',
-    otherIncome: 'Other Income',
-    familyTaxCredit: 'Family Tax Credit',
-    childDisabilityAllowance: 'Child Disability Allowance'
+  const [incomeLabels, setIncomeLabels] = useState<IncomeLabels>(() => {
+    if (formData.incomeLabels) {
+      return { ...formData.incomeLabels };
+    }
+    return createDefaultIncomeLabels();
   });
 
   useEffect(() => {
@@ -77,8 +75,18 @@ const BeddingQuestions: React.FC<BeddingQuestionsProps> = ({ formData, onFormDat
     });
   };
 
+  useEffect(() => {
+    if (formData.incomeLabels) {
+      setIncomeLabels({ ...formData.incomeLabels });
+    } else {
+      setIncomeLabels(createDefaultIncomeLabels());
+    }
+  }, [formData.incomeLabels]);
+
   const handleIncomeLabelsChange = (labels: IncomeLabels) => {
-    setIncomeLabels(labels);
+    const updatedLabels = { ...labels };
+    setIncomeLabels(updatedLabels);
+    onFormDataChange({ incomeLabels: updatedLabels });
   };
 
   const handleCostChange = (index: number, field: 'amount' | 'cost', value: any) => {

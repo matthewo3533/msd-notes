@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import IncomeSection, { IncomeLabels } from './IncomeSection';
+import IncomeSection, { IncomeLabels, createDefaultIncomeLabels } from './IncomeSection';
 import DecisionSection from './DecisionSection';
 import FoodPaymentSection from './FoodPaymentSection';
 import FormattedTextarea from './FormattedTextarea';
@@ -12,13 +12,11 @@ interface FoodQuestionsProps {
 
 const FoodQuestions: React.FC<FoodQuestionsProps> = ({ formData, onFormDataChange }) => {
   const [visibleSections, setVisibleSections] = useState<Set<string>>(new Set());
-  const [incomeLabels, setIncomeLabels] = useState<IncomeLabels>({
-    benefit: 'Benefit',
-    employment: 'Employment',
-    childSupport: 'Child Support',
-    otherIncome: 'Other Income',
-    familyTaxCredit: 'Family Tax Credit',
-    childDisabilityAllowance: 'Child Disability Allowance'
+  const [incomeLabels, setIncomeLabels] = useState<IncomeLabels>(() => {
+    if (formData.incomeLabels) {
+      return { ...formData.incomeLabels };
+    }
+    return createDefaultIncomeLabels();
   });
   const sectionRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
 
@@ -79,8 +77,18 @@ const FoodQuestions: React.FC<FoodQuestionsProps> = ({ formData, onFormDataChang
     });
   };
 
+  useEffect(() => {
+    if (formData.incomeLabels) {
+      setIncomeLabels({ ...formData.incomeLabels });
+    } else {
+      setIncomeLabels(createDefaultIncomeLabels());
+    }
+  }, [formData.incomeLabels]);
+
   const handleIncomeLabelsChange = (labels: IncomeLabels) => {
-    setIncomeLabels(labels);
+    const updatedLabels = { ...labels };
+    setIncomeLabels(updatedLabels);
+    onFormDataChange({ incomeLabels: updatedLabels });
   };
 
   // Auto-fill Total Cost with foodAmountRequested
@@ -233,6 +241,7 @@ const FoodQuestions: React.FC<FoodQuestionsProps> = ({ formData, onFormDataChang
             className="form-control"
           />
         </div>
+
       </div>
 
       {/* Income Section */}

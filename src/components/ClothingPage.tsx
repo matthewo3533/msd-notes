@@ -4,11 +4,13 @@ import ClothingQuestions from './ClothingQuestions';
 import NoteOutput from './NoteOutput';
 import { ClothingFormData } from '../App';
 import { useSettings } from '../contexts/SettingsContext';
+import { createDefaultIncomeLabels } from './IncomeSection';
+import NeedsInApplication from './multi-need/NeedsInApplication';
 
 const ClothingPage: React.FC = () => {
   const navigate = useNavigate();
   const { customHeadingFormat } = useSettings();
-  const [formData, setFormData] = useState<ClothingFormData>({
+  const [formData, setFormData] = useState<ClothingFormData>(() => ({
     clientId: null,
     whyNeedClothing: '',
     reasonableSteps: '',
@@ -20,6 +22,7 @@ const ClothingPage: React.FC = () => {
     directCredit: '',
     paymentReference: '',
     paymentCardNumber: '',
+    incomeLabels: createDefaultIncomeLabels(),
     income: {
       benefit: 0,
       employment: 0,
@@ -31,7 +34,7 @@ const ClothingPage: React.FC = () => {
     costs: [],
     decision: '',
     decisionReason: '',
-  });
+  }));
 
   const handleFormDataChange = (data: Partial<ClothingFormData>) => {
     setFormData(prev => ({ ...prev, ...data }));
@@ -50,6 +53,7 @@ const ClothingPage: React.FC = () => {
       directCredit: '',
       paymentReference: '',
       paymentCardNumber: '',
+      incomeLabels: createDefaultIncomeLabels(),
       income: {
         benefit: 0,
         employment: 0,
@@ -101,6 +105,7 @@ const ClothingPage: React.FC = () => {
           onFormDataChange={handleFormDataChange}
         />
         <div className="note-section">
+          <NeedsInApplication formData={formData} needType="clothing" />
           <NoteOutput formData={formData} service="clothing" onReset={resetForm} customHeadingFormat={customHeadingFormat} />
         </div>
       </div>

@@ -4,11 +4,13 @@ import TransitionToWorkQuestions from './TransitionToWorkQuestions';
 import NoteOutput from './NoteOutput';
 import { useSettings } from '../contexts/SettingsContext';
 import { TransitionToWorkFormData } from '../App';
+import { createDefaultIncomeLabels } from './IncomeSection';
+import NeedsInApplication from './multi-need/NeedsInApplication';
 
 const TransitionToWorkPage: React.FC = () => {
   const navigate = useNavigate();
   const { customHeadingFormat } = useSettings();
-  const [formData, setFormData] = useState<TransitionToWorkFormData>({
+  const [formData, setFormData] = useState<TransitionToWorkFormData>(() => ({
     clientId: null,
     helpType: '',
     firstPayday: '',
@@ -30,6 +32,7 @@ const TransitionToWorkPage: React.FC = () => {
     directCredit: '',
     paymentReference: '',
     paymentCardNumber: '',
+    incomeLabels: createDefaultIncomeLabels(),
     income: {
       benefit: 0,
       employment: 0,
@@ -41,7 +44,7 @@ const TransitionToWorkPage: React.FC = () => {
     costs: [],
     decision: '',
     decisionReason: '',
-  });
+  }));
 
   const handleFormDataChange = (data: Partial<TransitionToWorkFormData>) => {
     setFormData(prev => ({ ...prev, ...data }));
@@ -69,7 +72,8 @@ const TransitionToWorkPage: React.FC = () => {
       recoveryRate: 0,
       directCredit: '',
       paymentReference: '',
-    paymentCardNumber: '',
+      paymentCardNumber: '',
+      incomeLabels: createDefaultIncomeLabels(),
       income: {
         benefit: 0,
         employment: 0,
@@ -121,6 +125,7 @@ const TransitionToWorkPage: React.FC = () => {
           onFormDataChange={handleFormDataChange}
         />
         <div className="note-section">
+          <NeedsInApplication formData={formData} needType="transition-to-work" />
           <NoteOutput formData={formData} service="transition-to-work" onReset={resetForm} customHeadingFormat={customHeadingFormat} />
         </div>
       </div>

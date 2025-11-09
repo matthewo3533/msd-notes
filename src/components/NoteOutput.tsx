@@ -1,15 +1,48 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { FoodFormData, ClothingFormData, RentArrearsFormData, CarRepairsFormData, FuneralAssistanceFormData, StrandedTravelFormData, TASGrantFormData, DeclareIncomeFormData, ADSDFormData, EmergencyFormData, TransitionToWorkFormData, AbsenceFromNZFormData } from '../App';
+import { DEFAULT_INCOME_LABELS, IncomeLabels } from './IncomeSection';
 import { formatHeading, CustomHeadingFormat } from '../utils/headingFormatter';
+import type { MultiNeedFormData, NeedItem } from '../types/multiNeed';
+import { getNeedTypeLabel, hasExtraSection, getExtraSectionTitle } from '../types/multiNeed';
 
 interface NoteOutputProps {
   formData: any;
-  service?: 'food' | 'clothing' | 'electricity' | 'dental' | 'beds' | 'bedding' | 'furniture' | 'glasses' | 'fridge' | 'washing' | 'tas-grant' | 'declare-income' | 'bond-rent' | 'rent-arrears' | 'car-repairs' | 'funeral-assistance' | 'stranded-travel' | 'adsd' | 'emergency' | 'transition-to-work' | 'petrol-calculator' | 'absence-from-nz';
-  onReset: () => void;
+  service?: 'food' | 'clothing' | 'electricity' | 'dental' | 'beds' | 'bedding' | 'furniture' | 'glasses' | 'whiteware' | 'tas-grant' | 'declare-income' | 'bond-rent' | 'rent-arrears' | 'car-repairs' | 'funeral-assistance' | 'stranded-travel' | 'adsd' | 'emergency' | 'transition-to-work' | 'petrol-calculator' | 'absence-from-nz' | 'multi-need';
+  onReset?: () => void;
   customHeadingFormat?: CustomHeadingFormat;
 }
 
 const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onReset, customHeadingFormat = { useTildes: true, useCapitals: false, useBold: false } }) => {
+  type IncomeKey = keyof IncomeLabels;
+  type IncomeRecord = Record<IncomeKey, number>;
+  type IncomeLabelsInput = Partial<IncomeLabels> | undefined;
+
+  const INCOME_KEYS: IncomeKey[] = [
+    'benefit',
+    'employment',
+    'familyTaxCredit',
+    'childSupport',
+    'childDisabilityAllowance',
+    'otherIncome'
+  ];
+
+  const formatIncomeLines = (income: IncomeRecord, incomeLabels?: IncomeLabelsInput): string => {
+    return INCOME_KEYS.reduce((lines, key) => {
+      const amount = income[key] || 0;
+      if (amount > 0) {
+        const label =
+          incomeLabels && incomeLabels[key] !== undefined
+            ? incomeLabels[key]
+            : DEFAULT_INCOME_LABELS[key];
+        if (label) {
+          return `${lines}$${amount.toFixed(2)} ${label}\n`;
+        }
+      }
+      return lines;
+    }, '');
+  };
+
   // Helper function to format dates from Calendar component (DD/MM/YYYY format)
   const formatCalendarDate = (dateString: string): string => {
     if (!dateString) return '';
@@ -32,7 +65,216 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
     }
   };
 
+  // Generate note content for a single need
+  const generateNeedContent = (need: NeedItem): string => {
+    let content = '';
+    const data = need.data as any;
+
+    // Common fields
+    if (data.whyNeedFood) content += `${data.whyNeedFood}\n\n`;
+    if (data.whyNeedClothing) content += `${data.whyNeedClothing}\n\n`;
+    if (data.whyNeedEmergencyPayment) content += `${data.whyNeedEmergencyPayment}\n\n`;
+    if (data.whyNeedBeds) content += `${data.whyNeedBeds}\n\n`;
+    if (data.whyNeedBedding) content += `${data.whyNeedBedding}\n\n`;
+    if (data.whyNeedFurniture) content += `${data.whyNeedFurniture}\n\n`;
+    if (data.whyNeedGlasses) content += `${data.whyNeedGlasses}\n\n`;
+    if (data.whyNeedADSD) content += `${data.whyNeedADSD}\n\n`;
+    if (data.whyNeedWhiteware) content += `${data.whyNeedWhiteware}\n\n`;
+    if (data.whyNeedPower) content += `${data.whyNeedPower}\n\n`;
+    if (need.type === 'electricity' && data.powerAccountNumber) {
+      content += `Power account number: ${data.powerAccountNumber}\n`;
+    }
+    if (data.whyNeedDental) content += `${data.whyNeedDental}\n\n`;
+    if (data.whyNeedCarRepairs) content += `${data.whyNeedCarRepairs}\n\n`;
+    if (data.whyNeedRentArrears) content += `${data.whyNeedRentArrears}\n\n`;
+    if (data.whyNeedAccommodation) content += `${data.whyNeedAccommodation}\n\n`;
+    if (data.whyNeedFuneralAssistance) content += `${data.whyNeedFuneralAssistance}\n\n`;
+    if (data.whyNeedStrandedTravelAssistance) content += `${data.whyNeedStrandedTravelAssistance}\n\n`;
+    if (data.whyNeedTransitionToWork) content += `${data.whyNeedTransitionToWork}\n\n`;
+
+    if (data.canMeetNeedOtherWay) {
+      content += `Can meet need other way: ${data.canMeetNeedOtherWay}\n\n`;
+    }
+
+    if (data.rentArrearsVerification) {
+      content += `Rent arrears verification: ${data.rentArrearsVerification}\n\n`;
+    }
+
+    // Food-specific
+    if (data.foodAmountRequested > 0) {
+      content += `Amount requested: $${data.foodAmountRequested.toFixed(2)}\n`;
+    }
+    if (data.currentFoodBalance !== undefined) {
+      content += `Current food balance: $${data.currentFoodBalance.toFixed(2)}\n`;
+    }
+    if (data.hardshipUnforeseen) {
+      content += `Hardship unforeseen: ${data.hardshipUnforeseen}\n`;
+    }
+    if (data.unforeseenCircumstance) {
+      content += `Unforeseen circumstance: ${data.unforeseenCircumstance}\n`;
+    }
+
+    // Furniture-specific
+    if (data.furnitureType) {
+      content += `Furniture type: ${data.furnitureType}\n`;
+    }
+
+    return content;
+  };
+
+  // Generate extra section content (car details, whiteware info, etc.)
+  const generateExtraSectionContent = (need: NeedItem): string => {
+    let content = '';
+    const data = need.data as any;
+
+    if (need.type === 'car-repairs') {
+      content += `${formatHeading(getExtraSectionTitle(need.type), 'custom', customHeadingFormat)}\n`;
+      if (data.vehicleMakeModel) content += `Vehicle: ${data.vehicleMakeModel}\n`;
+      if (data.licensePlate) content += `License plate: ${data.licensePlate}\n`;
+      if (data.odometer) content += `Odometer: ${data.odometer}\n`;
+      if (data.vehicleOwner) content += `Owner: ${data.vehicleOwner}\n`;
+      if (data.nztaVerification) content += `NZTA verification: ${data.nztaVerification}\n`;
+      content += '\n';
+    } else if (need.type === 'whiteware') {
+      content += `${formatHeading(getExtraSectionTitle(need.type), 'custom', customHeadingFormat)}\n`;
+      if (data.householdSize) content += `Household size: ${data.householdSize}\n`;
+      if (data.addressContactConfirmed) content += `Address/contact confirmed: ${data.addressContactConfirmed}\n`;
+      if (data.spaceMeasured) content += `Space measured: ${data.spaceMeasured}\n`;
+      if (data.specialDeliveryInstructions) content += `Special delivery instructions: ${data.specialDeliveryInstructions}\n`;
+      if (data.deliveryInstructionsDetails) content += `Details: ${data.deliveryInstructionsDetails}\n`;
+      if (data.applianceModel) content += `Model: ${data.applianceModel}\n`;
+      if (data.applianceCANumber) content += `CA Number: ${data.applianceCANumber}\n`;
+      content += '\n';
+    } else if (need.type === 'dental') {
+      content += `${formatHeading(getExtraSectionTitle(need.type), 'custom', customHeadingFormat)}\n`;
+      if (data.sngEligible) content += `SNG eligible: ${data.sngEligible}\n`;
+      if (data.sngBalance !== undefined) content += `SNG balance: $${data.sngBalance.toFixed(2)}\n`;
+      content += '\n';
+    } else if (need.type === 'bond-rent') {
+      content += `${formatHeading(getExtraSectionTitle(need.type), 'custom', customHeadingFormat)}\n`;
+      if (data.newAddress) content += `New address: ${data.newAddress}\n`;
+      if (data.asZone) content += `AS Zone: ${data.asZone}\n`;
+      if (data.weeklyRent) content += `Weekly rent: $${data.weeklyRent.toFixed(2)}\n`;
+      if (data.tenancyStartDate) content += `Tenancy start: ${data.tenancyStartDate}\n`;
+      if (data.bondAmount) content += `Bond amount: $${data.bondAmount.toFixed(2)}\n`;
+      if (data.rentInAdvanceAmount) content += `Rent in advance: $${data.rentInAdvanceAmount.toFixed(2)}\n`;
+      if (data.bondPaymentAmount) content += `Bond payment amount: $${data.bondPaymentAmount.toFixed(2)}\n`;
+      if (data.rentAdvancePaymentAmount)
+        content += `Rent in advance payment amount: $${data.rentAdvancePaymentAmount.toFixed(2)}\n`;
+      if (data.tenancyAffordable) content += `Tenancy affordable: ${data.tenancyAffordable}\n`;
+      content += '\n';
+    } else if (need.type === 'funeral-assistance' || need.type === 'stranded-travel') {
+      content += `${formatHeading(getExtraSectionTitle(need.type), 'custom', customHeadingFormat)}\n`;
+      if (data.petrolAssistance) content += `Petrol assistance: ${data.petrolAssistance}\n`;
+      if (data.startLocation) content += `From: ${data.startLocation}\n`;
+      if (data.destination) content += `To: ${data.destination}\n`;
+      if (data.returnTrip) content += `Return trip: ${data.returnTrip}\n`;
+      if (data.distance) content += `Distance: ${data.distance} km\n`;
+      if (data.travelCost) content += `Travel cost: $${data.travelCost.toFixed(2)}\n`;
+      content += '\n';
+    } else if (need.type === 'transition-to-work') {
+      content += `${formatHeading(getExtraSectionTitle(need.type), 'custom', customHeadingFormat)}\n`;
+      if (data.helpType) content += `Help type: ${data.helpType}\n`;
+      if (data.employerName) content += `Employer: ${data.employerName}\n`;
+      if (data.startDate) content += `Start date: ${data.startDate}\n`;
+      if (data.hoursPerWeek) content += `Hours per week: ${data.hoursPerWeek}\n`;
+      if (data.firstPayday) content += `First payday: ${data.firstPayday}\n`;
+      if (data.contractUploaded) content += `Contract uploaded: ${data.contractUploaded}\n`;
+      if (data.petrolAssistance) {
+        content += `Petrol assistance: ${data.petrolAssistance}\n`;
+        if (data.startLocation) content += `From: ${data.startLocation}\n`;
+        if (data.destination) content += `To: ${data.destination}\n`;
+        if (data.distance) content += `Distance: ${data.distance} km\n`;
+        if (data.travelCost) content += `Travel cost: $${data.travelCost.toFixed(2)}\n`;
+      }
+      content += '\n';
+    }
+
+    return content;
+  };
+
+  // Generate multi-need note
+  const generateMultiNeedNote = (data: MultiNeedFormData): string => {
+    let note = '';
+
+    // CCID
+    note += `CCID: ${data.clientId ? 'Yes' : 'No'}\n\n`;
+
+    // All Needs (with reasonable steps in each)
+    data.needs.forEach((need, index) => {
+      note += `${formatHeading(`Need ${index + 1} - ${getNeedTypeLabel(need.type)}`, 'custom', customHeadingFormat)}\n`;
+      note += generateNeedContent(need);
+      
+      // Add reasonable steps
+      if (data.reasonableSteps) {
+        note += `\nReasonable steps: ${data.reasonableSteps}\n`;
+      }
+      
+      note += '\n\n';
+      
+      // Add extra sections if applicable
+      if (hasExtraSection(need.type)) {
+        note += generateExtraSectionContent(need);
+        note += '\n';
+      }
+    });
+
+    // Shared Income
+    note += `${formatHeading('Income', 'custom', customHeadingFormat)}\n`;
+    note += formatIncomeLines(data.income, data.incomeLabels);
+
+    // Costs
+    const totalCosts = data.costs.reduce((sum, cost) => sum + cost.amount, 0);
+    if (totalCosts > 0) {
+      data.costs.forEach(cost => {
+        if (cost.amount > 0) {
+          note += `$${cost.amount.toFixed(2)} ${cost.cost}\n`;
+        }
+      });
+    }
+
+    // Calculate remaining
+    const totalIncome = Object.values(data.income).reduce((sum, val) => sum + val, 0);
+    const remaining = totalIncome - totalCosts;
+    note += `\nClient is left with: $${remaining.toFixed(2)}\n\n`;
+
+    // All Payments
+    data.needs.forEach((need) => {
+      note += `${formatHeading(`Payment - ${getNeedTypeLabel(need.type)}`, 'custom', customHeadingFormat)}\n`;
+      if (need.payment.supplierName) note += `Supplier Name: ${need.payment.supplierName}\n`;
+      if (need.payment.supplierId) note += `Supplier ID: ${need.payment.supplierId}\n`;
+      if (need.payment.paymentCardNumber) note += `Payment card number: ${need.payment.paymentCardNumber}\n`;
+      if (need.payment.amount > 0) note += `Amount: $${need.payment.amount.toFixed(2)}\n`;
+      if (need.payment.recoveryRate > 0) note += `Recovery rate: $${need.payment.recoveryRate.toFixed(2)}\n`;
+      if (need.payment.bankAccount) note += `Bank account: ${need.payment.bankAccount}\n`;
+      if (need.payment.directCredit) note += `Direct credit: ${need.payment.directCredit}\n`;
+      if (need.payment.paymentReference) note += `Payment reference: ${need.payment.paymentReference}\n`;
+      if (need.payment.powerAccountNumber) note += `Power account number: ${need.payment.powerAccountNumber}\n`;
+      note += '\n';
+    });
+
+    // Per-Need Decisions
+    note += `${formatHeading('Decision', 'custom', customHeadingFormat)}\n`;
+    data.needs.forEach((need) => {
+      if (need.decision.decision) {
+        const decisionText = need.decision.decision.charAt(0).toUpperCase() + need.decision.decision.slice(1);
+        note += `${getNeedTypeLabel(need.type)} - ${decisionText}\n`;
+        if (need.decision.decisionReason) {
+          note += `${need.decision.decisionReason}\n`;
+        }
+        note += '\n';
+      }
+    });
+
+    return note;
+  };
+
   const generateNote = () => {
+    // Check if this is a multi-need form
+    if (service === 'multi-need' || (formData.needs && Array.isArray(formData.needs))) {
+      return generateMultiNeedNote(formData as MultiNeedFormData);
+    }
+
     if (service === 'absence-from-nz') {
       // Absence from NZ note output
       const a: AbsenceFromNZFormData = formData;
@@ -279,10 +521,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
         note += `Reference number: ${c.paymentReference}\n`;
       }
       note += `\n${formatHeading('Income', 'custom', customHeadingFormat)}\n`;
-      if (c.income.benefit > 0) note += `$${c.income.benefit.toFixed(2)} Benefit\n`;
-      if (c.income.employment > 0) note += `$${c.income.employment.toFixed(2)} Employment\n`;
-      if (c.income.childSupport > 0) note += `$${c.income.childSupport.toFixed(2)} Child Support\n`;
-      if (c.income.otherIncome > 0) note += `$${c.income.otherIncome.toFixed(2)} Other Income\n`;
+      note += formatIncomeLines(c.income, c.incomeLabels);
       c.costs.forEach((cost: { amount: number; cost: string }) => {
         if (cost.amount > 0) note += `-$${cost.amount.toFixed(2)} ${cost.cost}\n`;
       });
@@ -330,12 +569,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
         note += `Reference number: ${e.paymentReference}\n`;
       }
       note += `\n${formatHeading('Income', 'custom', customHeadingFormat)}\n`;
-      if (e.income.benefit > 0) note += `$${e.income.benefit.toFixed(2)} Benefit\n`;
-      if (e.income.employment > 0) note += `$${e.income.employment.toFixed(2)} Employment\n`;
-      if (e.income.familyTaxCredit > 0) note += `$${e.income.familyTaxCredit.toFixed(2)} Family Tax Credit\n`;
-      if (e.income.childSupport > 0) note += `$${e.income.childSupport.toFixed(2)} Child Support\n`;
-      if (e.income.childDisabilityAllowance > 0) note += `$${e.income.childDisabilityAllowance.toFixed(2)} Child Disability Allowance\n`;
-      if (e.income.otherIncome > 0) note += `$${e.income.otherIncome.toFixed(2)} Other Income\n`;
+      note += formatIncomeLines(e.income, e.incomeLabels);
       e.costs.forEach((cost: { amount: number; cost: string }) => {
         if (cost.amount > 0) note += `-$${cost.amount.toFixed(2)} ${cost.cost}\n`;
       });
@@ -421,12 +655,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
         note += `Reference number: ${t.paymentReference}\n`;
       }
       note += `\n${formatHeading('Income', 'custom', customHeadingFormat)}\n`;
-      if (t.income.benefit > 0) note += `$${t.income.benefit.toFixed(2)} Benefit\n`;
-      if (t.income.employment > 0) note += `$${t.income.employment.toFixed(2)} Employment\n`;
-      if (t.income.familyTaxCredit > 0) note += `$${t.income.familyTaxCredit.toFixed(2)} Family Tax Credit\n`;
-      if (t.income.childSupport > 0) note += `$${t.income.childSupport.toFixed(2)} Child Support\n`;
-      if (t.income.childDisabilityAllowance > 0) note += `$${t.income.childDisabilityAllowance.toFixed(2)} Child Disability Allowance\n`;
-      if (t.income.otherIncome > 0) note += `$${t.income.otherIncome.toFixed(2)} Other Income\n`;
+      note += formatIncomeLines(t.income, t.incomeLabels);
       t.costs.forEach((cost: { amount: number; cost: string }) => {
         if (cost.amount > 0) note += `-$${cost.amount.toFixed(2)} ${cost.cost}\n`;
       });
@@ -487,6 +716,9 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       if (a.amount && a.amount > 0) {
         note += `Amount: $${a.amount.toFixed(2)}\n`;
       }
+      if (a.bankAccount && a.bankAccount.trim()) {
+        note += `Bank account: ${a.bankAccount}\n`;
+      }
       if (a.recoveryRate && a.recoveryRate > 0) {
         note += `Recovery rate: $${a.recoveryRate.toFixed(2)}\n`;
       }
@@ -497,12 +729,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
         note += `Reference number: ${a.paymentReference}\n`;
       }
       note += `\n${formatHeading('Income', 'custom', customHeadingFormat)}\n`;
-      if (a.income.benefit > 0) note += `$${a.income.benefit.toFixed(2)} Benefit\n`;
-      if (a.income.employment > 0) note += `$${a.income.employment.toFixed(2)} Employment\n`;
-      if (a.income.familyTaxCredit > 0) note += `$${a.income.familyTaxCredit.toFixed(2)} Family Tax Credit\n`;
-      if (a.income.childSupport > 0) note += `$${a.income.childSupport.toFixed(2)} Child Support\n`;
-      if (a.income.childDisabilityAllowance > 0) note += `$${a.income.childDisabilityAllowance.toFixed(2)} Child Disability Allowance\n`;
-      if (a.income.otherIncome > 0) note += `$${a.income.otherIncome.toFixed(2)} Other Income\n`;
+      note += formatIncomeLines(a.income, a.incomeLabels);
       a.costs.forEach((cost: { amount: number; cost: string }) => {
         if (cost.amount > 0) note += `-$${cost.amount.toFixed(2)} ${cost.cost}\n`;
       });
@@ -553,12 +780,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
         note += `Reference number: ${r.paymentReference}\n`;
       }
       note += `\n${formatHeading('Tenancy Affordability', 'custom', customHeadingFormat)}\n`;
-      if (r.income.benefit > 0) note += `$${r.income.benefit.toFixed(2)} Benefit\n`;
-      if (r.income.employment > 0) note += `$${r.income.employment.toFixed(2)} Employment\n`;
-      if (r.income.familyTaxCredit > 0) note += `$${r.income.familyTaxCredit.toFixed(2)} Family Tax Credit\n`;
-      if (r.income.childSupport > 0) note += `$${r.income.childSupport.toFixed(2)} Child Support\n`;
-      if (r.income.childDisabilityAllowance > 0) note += `$${r.income.childDisabilityAllowance.toFixed(2)} Child Disability Allowance\n`;
-      if (r.income.otherIncome > 0) note += `$${r.income.otherIncome.toFixed(2)} Other Income\n`;
+      note += formatIncomeLines(r.income, r.incomeLabels);
       r.costs.forEach((cost: { amount: number; cost: string }) => {
         if (cost.amount > 0) note += `-$${cost.amount.toFixed(2)} ${cost.cost}\n`;
       });
@@ -617,12 +839,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
         note += `Reference number: ${c.paymentReference}\n`;
       }
       note += `\n${formatHeading('Income', 'custom', customHeadingFormat)}\n`;
-      if (c.income.benefit > 0) note += `$${c.income.benefit.toFixed(2)} Benefit\n`;
-      if (c.income.employment > 0) note += `$${c.income.employment.toFixed(2)} Employment\n`;
-      if (c.income.familyTaxCredit > 0) note += `$${c.income.familyTaxCredit.toFixed(2)} Family Tax Credit\n`;
-      if (c.income.childSupport > 0) note += `$${c.income.childSupport.toFixed(2)} Child Support\n`;
-      if (c.income.childDisabilityAllowance > 0) note += `$${c.income.childDisabilityAllowance.toFixed(2)} Child Disability Allowance\n`;
-      if (c.income.otherIncome > 0) note += `$${c.income.otherIncome.toFixed(2)} Other Income\n`;
+      note += formatIncomeLines(c.income, c.incomeLabels);
       c.costs.forEach((cost: { amount: number; cost: string }) => {
         if (cost.amount > 0) note += `-$${cost.amount.toFixed(2)} ${cost.cost}\n`;
       });
@@ -687,12 +904,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
         note += `Reference number: ${f.paymentReference}\n`;
       }
       note += `\n${formatHeading('Income', 'custom', customHeadingFormat)}\n`;
-      if (f.income.benefit > 0) note += `$${f.income.benefit.toFixed(2)} Benefit\n`;
-      if (f.income.employment > 0) note += `$${f.income.employment.toFixed(2)} Employment\n`;
-      if (f.income.familyTaxCredit > 0) note += `$${f.income.familyTaxCredit.toFixed(2)} Family Tax Credit\n`;
-      if (f.income.childSupport > 0) note += `$${f.income.childSupport.toFixed(2)} Child Support\n`;
-      if (f.income.childDisabilityAllowance > 0) note += `$${f.income.childDisabilityAllowance.toFixed(2)} Child Disability Allowance\n`;
-      if (f.income.otherIncome > 0) note += `$${f.income.otherIncome.toFixed(2)} Other Income\n`;
+      note += formatIncomeLines(f.income, f.incomeLabels);
       f.costs.forEach((cost: { amount: number; cost: string }) => {
         if (cost.amount > 0) note += `-$${cost.amount.toFixed(2)} ${cost.cost}\n`;
       });
@@ -757,12 +969,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
         note += `Reference number: ${s.paymentReference}\n`;
       }
       note += `\n${formatHeading('Income', 'custom', customHeadingFormat)}\n`;
-      if (s.income.benefit > 0) note += `$${s.income.benefit.toFixed(2)} Benefit\n`;
-      if (s.income.employment > 0) note += `$${s.income.employment.toFixed(2)} Employment\n`;
-      if (s.income.familyTaxCredit > 0) note += `$${s.income.familyTaxCredit.toFixed(2)} Family Tax Credit\n`;
-      if (s.income.childSupport > 0) note += `$${s.income.childSupport.toFixed(2)} Child Support\n`;
-      if (s.income.childDisabilityAllowance > 0) note += `$${s.income.childDisabilityAllowance.toFixed(2)} Child Disability Allowance\n`;
-      if (s.income.otherIncome > 0) note += `$${s.income.otherIncome.toFixed(2)} Other Income\n`;
+      note += formatIncomeLines(s.income, s.incomeLabels);
       s.costs.forEach((cost: { amount: number; cost: string }) => {
         if (cost.amount > 0) note += `-$${cost.amount.toFixed(2)} ${cost.cost}\n`;
       });
@@ -825,12 +1032,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       }
       
       note += `\n${formatHeading('Tenancy Affordability', 'custom', customHeadingFormat)}\n`;
-      if (b.income.benefit > 0) note += `$${b.income.benefit.toFixed(2)} Benefit\n`;
-      if (b.income.employment > 0) note += `$${b.income.employment.toFixed(2)} Employment\n`;
-      if (b.income.familyTaxCredit > 0) note += `$${b.income.familyTaxCredit.toFixed(2)} Family Tax Credit\n`;
-      if (b.income.childSupport > 0) note += `$${b.income.childSupport.toFixed(2)} Child Support\n`;
-      if (b.income.childDisabilityAllowance > 0) note += `$${b.income.childDisabilityAllowance.toFixed(2)} Child Disability Allowance\n`;
-      if (b.income.otherIncome > 0) note += `$${b.income.otherIncome.toFixed(2)} Other Income\n`;
+      note += formatIncomeLines(b.income, b.incomeLabels);
       b.costs.forEach((cost: { amount: number; cost: string }) => {
         if (cost.amount > 0) note += `-$${cost.amount.toFixed(2)} ${cost.cost}\n`;
       });
@@ -878,12 +1080,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
         note += `Reference number: ${e.paymentReference}\n`;
       }
       note += `\n${formatHeading('Income', 'custom', customHeadingFormat)}\n`;
-      if (e.income.benefit > 0) note += `$${e.income.benefit.toFixed(2)} Benefit\n`;
-      if (e.income.employment > 0) note += `$${e.income.employment.toFixed(2)} Employment\n`;
-      if (e.income.familyTaxCredit > 0) note += `$${e.income.familyTaxCredit.toFixed(2)} Family Tax Credit\n`;
-      if (e.income.childSupport > 0) note += `$${e.income.childSupport.toFixed(2)} Child Support\n`;
-      if (e.income.childDisabilityAllowance > 0) note += `$${e.income.childDisabilityAllowance.toFixed(2)} Child Disability Allowance\n`;
-      if (e.income.otherIncome > 0) note += `$${e.income.otherIncome.toFixed(2)} Other Income\n`;
+      note += formatIncomeLines(e.income, e.incomeLabels);
       e.costs.forEach((cost: { amount: number; cost: string }) => {
         if (cost.amount > 0) note += `-$${cost.amount.toFixed(2)} ${cost.cost}\n`;
       });
@@ -935,12 +1132,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
         note += `Reference number: ${d.paymentReference}\n`;
       }
       note += `\n${formatHeading('Income', 'custom', customHeadingFormat)}\n`;
-      if (d.income.benefit > 0) note += `$${d.income.benefit.toFixed(2)} Benefit\n`;
-      if (d.income.employment > 0) note += `$${d.income.employment.toFixed(2)} Employment\n`;
-      if (d.income.familyTaxCredit > 0) note += `$${d.income.familyTaxCredit.toFixed(2)} Family Tax Credit\n`;
-      if (d.income.childSupport > 0) note += `$${d.income.childSupport.toFixed(2)} Child Support\n`;
-      if (d.income.childDisabilityAllowance > 0) note += `$${d.income.childDisabilityAllowance.toFixed(2)} Child Disability Allowance\n`;
-      if (d.income.otherIncome > 0) note += `$${d.income.otherIncome.toFixed(2)} Other Income\n`;
+      note += formatIncomeLines(d.income, d.incomeLabels);
       d.costs.forEach((cost: { amount: number; cost: string }) => {
         if (cost.amount > 0) note += `-$${cost.amount.toFixed(2)} ${cost.cost}\n`;
       });
@@ -986,12 +1178,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
         note += `Reference number: ${b.paymentReference}\n`;
       }
       note += `\n${formatHeading('Income', 'custom', customHeadingFormat)}\n`;
-      if (b.income.benefit > 0) note += `$${b.income.benefit.toFixed(2)} Benefit\n`;
-      if (b.income.employment > 0) note += `$${b.income.employment.toFixed(2)} Employment\n`;
-      if (b.income.familyTaxCredit > 0) note += `$${b.income.familyTaxCredit.toFixed(2)} Family Tax Credit\n`;
-      if (b.income.childSupport > 0) note += `$${b.income.childSupport.toFixed(2)} Child Support\n`;
-      if (b.income.childDisabilityAllowance > 0) note += `$${b.income.childDisabilityAllowance.toFixed(2)} Child Disability Allowance\n`;
-      if (b.income.otherIncome > 0) note += `$${b.income.otherIncome.toFixed(2)} Other Income\n`;
+      note += formatIncomeLines(b.income, b.incomeLabels);
       (b.costs as Array<{amount:number;cost:string}>).forEach((cost: {amount:number;cost:string}) => {
         if (cost.amount > 0) note += `-$${cost.amount.toFixed(2)} ${cost.cost}\n`;
       });
@@ -1038,12 +1225,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
         note += `Reference number: ${f.paymentReference}\n`;
       }
       note += `\n${formatHeading('Income', 'custom', customHeadingFormat)}\n`;
-      if (f.income.benefit > 0) note += `$${f.income.benefit.toFixed(2)} Benefit\n`;
-      if (f.income.employment > 0) note += `$${f.income.employment.toFixed(2)} Employment\n`;
-      if (f.income.familyTaxCredit > 0) note += `$${f.income.familyTaxCredit.toFixed(2)} Family Tax Credit\n`;
-      if (f.income.childSupport > 0) note += `$${f.income.childSupport.toFixed(2)} Child Support\n`;
-      if (f.income.childDisabilityAllowance > 0) note += `$${f.income.childDisabilityAllowance.toFixed(2)} Child Disability Allowance\n`;
-      if (f.income.otherIncome > 0) note += `$${f.income.otherIncome.toFixed(2)} Other Income\n`;
+      note += formatIncomeLines(f.income, f.incomeLabels);
       (f.costs as Array<{amount:number;cost:string}>).forEach((cost: {amount:number;cost:string}) => {
         if (cost.amount > 0) note += `-$${cost.amount.toFixed(2)} ${cost.cost}\n`;
       });
@@ -1093,12 +1275,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
         note += `Reference number: ${b.paymentReference}\n`;
       }
       note += `\n${formatHeading('Income', 'custom', customHeadingFormat)}\n`;
-      if (b.income.benefit > 0) note += `$${b.income.benefit.toFixed(2)} Benefit\n`;
-      if (b.income.employment > 0) note += `$${b.income.employment.toFixed(2)} Employment\n`;
-      if (b.income.familyTaxCredit > 0) note += `$${b.income.familyTaxCredit.toFixed(2)} Family Tax Credit\n`;
-      if (b.income.childSupport > 0) note += `$${b.income.childSupport.toFixed(2)} Child Support\n`;
-      if (b.income.childDisabilityAllowance > 0) note += `$${b.income.childDisabilityAllowance.toFixed(2)} Child Disability Allowance\n`;
-      if (b.income.otherIncome > 0) note += `$${b.income.otherIncome.toFixed(2)} Other Income\n`;
+      note += formatIncomeLines(b.income, b.incomeLabels);
       (b.costs as Array<{amount:number;cost:string}>).forEach((cost: {amount:number;cost:string}) => {
         if (cost.amount > 0) note += `-$${cost.amount.toFixed(2)} ${cost.cost}\n`;
       });
@@ -1144,10 +1321,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
         note += `Reference number: ${g.paymentReference}\n`;
       }
       note += `\n${formatHeading('Income', 'custom', customHeadingFormat)}\n`;
-      if (g.income.benefit > 0) note += `$${g.income.benefit.toFixed(2)} Benefit\n`;
-      if (g.income.employment > 0) note += `$${g.income.employment.toFixed(2)} Employment\n`;
-      if (g.income.childSupport > 0) note += `$${g.income.childSupport.toFixed(2)} Child Support\n`;
-      if (g.income.otherIncome > 0) note += `$${g.income.otherIncome.toFixed(2)} Other Income\n`;
+      note += formatIncomeLines(g.income, g.incomeLabels);
       g.costs.forEach((cost: { amount: number; cost: string }) => {
         if (cost.amount > 0) note += `-$${cost.amount.toFixed(2)} ${cost.cost}\n`;
       });
@@ -1165,79 +1339,13 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       else if (g.decision === 'declined') note += 'APPLICATION DECLINED\n';
       if (g.decisionReason) note += `${g.decisionReason}\n`;
       return note;
-    } else if (service === 'fridge') {
-      // Fridge note output
-      const f = formData;
-      let note = '';
-      note += `CCID: ${f.clientId === false ? 'No' : 'Yes'}\n\n`;
-      note += `${formatHeading('Need', 'custom', customHeadingFormat)}\n`;
-      if (f.whyNeedFridge) note += `${f.whyNeedFridge}\n`;
-
-      if (f.reasonableSteps) note += `What reasonable steps is the client taken to improve their situation?\n${f.reasonableSteps}\n`;
-      
-      // Whiteware Info section
-      const householdSizeLabels: { [key: string]: string } = {
-        '1-2': '1-2 people',
-        '3-4': '3-4 people',
-        '5+': '5+ people'
-      };
-      note += '\nHousehold size: ' + (householdSizeLabels[f.householdSize] || f.householdSize || '-') + '\n';
-      note += 'Model: ' + (f.applianceModel || '-') + '\n';
-      note += 'CA: ' + (f.applianceCANumber || '-') + '\n';
-      note += '\nAddress/contact details confirmed: ' + (f.addressContactConfirmed || '-') + '\n';
-      note += 'Space measured: ' + (f.spaceMeasured || '-') + '\n';
-      if (f.deliveryInstructionsDetails) {
-        note += 'Special delivery instructions:\n' + f.deliveryInstructionsDetails + '\n';
-      }
-      
-      note += `\n${formatHeading('Payment', 'custom', customHeadingFormat)}\n`;
-      if (f.supplierName && f.supplierName.trim()) {
-        note += `Supplier Name: ${f.supplierName}\n`;
-      }
-      if (f.supplierId && f.supplierId.trim()) {
-        note += `Supplier ID: ${f.supplierId}\n`;
-      }
-      if (f.paymentCardNumber && f.paymentCardNumber.trim()) {
-        note += `Payment card number: ${f.paymentCardNumber}\n`;
-      }
-      if (f.amount && f.amount > 0) {
-        note += `Amount: $${f.amount.toFixed(2)}\n`;
-      }
-      if (f.recoveryRate && f.recoveryRate > 0) {
-        note += `Recovery rate: $${f.recoveryRate.toFixed(2)}\n`;
-      }
-      if (f.directCredit === 'yes' && f.paymentReference) {
-        note += `Reference number: ${f.paymentReference}\n`;
-      }
-      note += `\n${formatHeading('Income', 'custom', customHeadingFormat)}\n`;
-      if (f.income.benefit > 0) note += `$${f.income.benefit.toFixed(2)} Benefit\n`;
-      if (f.income.employment > 0) note += `$${f.income.employment.toFixed(2)} Employment\n`;
-      if (f.income.childSupport > 0) note += `$${f.income.childSupport.toFixed(2)} Child Support\n`;
-      if (f.income.otherIncome > 0) note += `$${f.income.otherIncome.toFixed(2)} Other Income\n`;
-      f.costs.forEach((cost: { amount: number; cost: string }) => {
-        if (cost.amount > 0) note += `-$${cost.amount.toFixed(2)} ${cost.cost}\n`;
-      });
-      if (f.costs.length > 0) {
-        const totalIncome = (Object.values(f.income) as number[]).reduce((sum: number, value: number) => sum + (value || 0), 0);
-        const totalCosts = f.costs.reduce((sum: number, cost: { amount: number; cost: string }) => sum + (cost.amount || 0), 0);
-        const remainingIncome = totalIncome - totalCosts;
-        note += '--------------\n';
-        note += `Client is left with $${remainingIncome.toFixed(2)}\n`;
-      }
-      note += `\n${formatHeading('Reasonable Steps', 'custom', customHeadingFormat)}\n`;
-      if (f.reasonableSteps) note += `${f.reasonableSteps}\n`;
-      note += `\n${formatHeading('Outcome', 'custom', customHeadingFormat)}\n`;
-      if (f.decision === 'approved') note += 'APPLICATION APPROVED\n';
-      else if (f.decision === 'declined') note += 'APPLICATION DECLINED\n';
-      if (f.decisionReason) note += `${f.decisionReason}\n`;
-      return note;
-    } else if (service === 'washing') {
-      // Washing Machine note output
+    } else if (service === 'whiteware') {
+      // Whiteware note output
       const w = formData;
       let note = '';
       note += `CCID: ${w.clientId === false ? 'No' : 'Yes'}\n\n`;
       note += `${formatHeading('Need', 'custom', customHeadingFormat)}\n`;
-      if (w.whyNeedWashingMachine) note += `${w.whyNeedWashingMachine}\n`;
+      if (w.whyNeedWhiteware) note += `${w.whyNeedWhiteware}\n`;
 
       if (w.reasonableSteps) note += `What reasonable steps is the client taken to improve their situation?\n${w.reasonableSteps}\n`;
       
@@ -1276,10 +1384,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
         note += `Reference number: ${w.paymentReference}\n`;
       }
       note += `\n${formatHeading('Income', 'custom', customHeadingFormat)}\n`;
-      if (w.income.benefit > 0) note += `$${w.income.benefit.toFixed(2)} Benefit\n`;
-      if (w.income.employment > 0) note += `$${w.income.employment.toFixed(2)} Employment\n`;
-      if (w.income.childSupport > 0) note += `$${w.income.childSupport.toFixed(2)} Child Support\n`;
-      if (w.income.otherIncome > 0) note += `$${w.income.otherIncome.toFixed(2)} Other Income\n`;
+      note += formatIncomeLines(w.income, w.incomeLabels);
       w.costs.forEach((cost: { amount: number; cost: string }) => {
         if (cost.amount > 0) note += `-$${cost.amount.toFixed(2)} ${cost.cost}\n`;
       });
@@ -1322,10 +1427,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       if (f.amount > 0) note += `Total Cost: $${f.amount.toFixed(2)}\n`;
       
       note += `\n${formatHeading('Income', 'custom', customHeadingFormat)}\n`;
-      if (f.income.benefit > 0) note += `$${f.income.benefit.toFixed(2)} Benefit\n`;
-      if (f.income.employment > 0) note += `$${f.income.employment.toFixed(2)} Employment\n`;
-      if (f.income.childSupport > 0) note += `$${f.income.childSupport.toFixed(2)} Child Support\n`;
-      if (f.income.otherIncome > 0) note += `$${f.income.otherIncome.toFixed(2)} Other Income\n`;
+      note += formatIncomeLines(f.income, f.incomeLabels);
       f.costs.forEach((cost: { amount: number; cost: string }) => {
         if (cost.amount > 0) note += `-$${cost.amount.toFixed(2)} ${cost.cost}\n`;
       });
@@ -1517,10 +1619,23 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
           </svg>
           Copy to Clipboard
         </button>
-        <button 
-          className="copy-btn copy-btn-with-icon" 
-          onClick={onReset}
-          style={{ marginTop: '0.5rem', background: '#6c757d', width: '100%' }}
+        <Link
+          to="/"
+          className="copy-btn copy-btn-with-icon"
+          onClick={() => onReset?.()}
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginTop: '0.5rem',
+            background: '#6c757d',
+            width: '100%',
+            textDecoration: 'none',
+            fontFamily: 'inherit',
+            fontSize: 'inherit',
+            fontWeight: 'inherit',
+            color: 'inherit'
+          }}
         >
           <svg className="btn-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path>
@@ -1529,7 +1644,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
             <path d="M3 21v-5h5"></path>
           </svg>
           Start New Application
-        </button>
+        </Link>
       </div>
       
       {/* Quick Copy Section */}

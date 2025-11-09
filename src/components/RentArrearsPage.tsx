@@ -4,11 +4,13 @@ import RentArrearsQuestions from './RentArrearsQuestions';
 import NoteOutput from './NoteOutput';
 import { useSettings } from '../contexts/SettingsContext';
 import { RentArrearsFormData } from '../App';
+import { createDefaultIncomeLabels } from './IncomeSection';
+import NeedsInApplication from './multi-need/NeedsInApplication';
 
 const RentArrearsPage: React.FC = () => {
   const navigate = useNavigate();
   const { customHeadingFormat } = useSettings();
-  const [formData, setFormData] = useState<RentArrearsFormData>({
+  const [formData, setFormData] = useState<RentArrearsFormData>(() => ({
     clientId: null,
     whyNeedRentArrears: '',
     reasonableSteps: '',
@@ -21,6 +23,7 @@ const RentArrearsPage: React.FC = () => {
     directCredit: '',
     paymentReference: '',
     paymentCardNumber: '',
+    incomeLabels: createDefaultIncomeLabels(),
     income: {
       benefit: 0,
       employment: 0,
@@ -32,7 +35,7 @@ const RentArrearsPage: React.FC = () => {
     costs: [],
     decision: '',
     decisionReason: '',
-  });
+  }));
 
   const handleFormDataChange = (data: Partial<RentArrearsFormData>) => {
     setFormData(prev => ({ ...prev, ...data }));
@@ -51,7 +54,8 @@ const RentArrearsPage: React.FC = () => {
       recoveryRate: 0,
       directCredit: '',
       paymentReference: '',
-    paymentCardNumber: '',
+      paymentCardNumber: '',
+      incomeLabels: createDefaultIncomeLabels(),
       income: {
         benefit: 0,
         employment: 0,
@@ -103,6 +107,7 @@ const RentArrearsPage: React.FC = () => {
           onFormDataChange={handleFormDataChange}
         />
         <div className="note-section">
+          <NeedsInApplication formData={formData} needType="rent-arrears" />
           <NoteOutput formData={formData} service="rent-arrears" onReset={resetForm} customHeadingFormat={customHeadingFormat} />
         </div>
       </div>

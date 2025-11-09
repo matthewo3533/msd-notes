@@ -1,24 +1,22 @@
 import React, { useEffect, useState } from 'react';
-import IncomeSection, { IncomeLabels } from './IncomeSection';
+import IncomeSection, { IncomeLabels, createDefaultIncomeLabels } from './IncomeSection';
 import PaymentSection from './PaymentSection';
 import DecisionSection from './DecisionSection';
-import { FridgeFormData } from '../App';
+import { WhitewareFormData } from '../App';
 import FormattedTextarea from './FormattedTextarea';
 
-interface FridgeQuestionsProps {
-  formData: FridgeFormData;
-  onFormDataChange: (data: Partial<FridgeFormData>) => void;
+interface WhitewareQuestionsProps {
+  formData: WhitewareFormData;
+  onFormDataChange: (data: Partial<WhitewareFormData>) => void;
 }
 
-const FridgeQuestions: React.FC<FridgeQuestionsProps> = ({ formData, onFormDataChange }) => {
+const WhitewareQuestions: React.FC<WhitewareQuestionsProps> = ({ formData, onFormDataChange }) => {
   const [visibleSections, setVisibleSections] = useState<Set<string>>(new Set(['general']));
-  const [incomeLabels, setIncomeLabels] = useState<IncomeLabels>({
-    benefit: 'Benefit',
-    employment: 'Employment',
-    childSupport: 'Child Support',
-    otherIncome: 'Other Income',
-    familyTaxCredit: 'Family Tax Credit',
-    childDisabilityAllowance: 'Child Disability Allowance'
+  const [incomeLabels, setIncomeLabels] = useState<IncomeLabels>(() => {
+    if (formData.incomeLabels) {
+      return { ...formData.incomeLabels };
+    }
+    return createDefaultIncomeLabels();
   });
 
   useEffect(() => {
@@ -57,11 +55,11 @@ const FridgeQuestions: React.FC<FridgeQuestionsProps> = ({ formData, onFormDataC
     }
   }, [formData.applianceModel, onFormDataChange]);
 
-  const handleInputChange = (field: keyof FridgeFormData, value: any) => {
+  const handleInputChange = (field: keyof WhitewareFormData, value: any) => {
     onFormDataChange({ [field]: value });
   };
 
-  const handleIncomeChange = (field: keyof FridgeFormData['income'], value: number) => {
+  const handleIncomeChange = (field: keyof WhitewareFormData['income'], value: number) => {
     onFormDataChange({
       income: {
         ...formData.income,
@@ -70,8 +68,18 @@ const FridgeQuestions: React.FC<FridgeQuestionsProps> = ({ formData, onFormDataC
     });
   };
 
+  useEffect(() => {
+    if (formData.incomeLabels) {
+      setIncomeLabels({ ...formData.incomeLabels });
+    } else {
+      setIncomeLabels(createDefaultIncomeLabels());
+    }
+  }, [formData.incomeLabels]);
+
   const handleIncomeLabelsChange = (labels: IncomeLabels) => {
-    setIncomeLabels(labels);
+    const updatedLabels = { ...labels };
+    setIncomeLabels(updatedLabels);
+    onFormDataChange({ incomeLabels: updatedLabels });
   };
 
   const handleCostChange = (index: number, field: 'amount' | 'cost', value: any) => {
@@ -122,10 +130,10 @@ const FridgeQuestions: React.FC<FridgeQuestionsProps> = ({ formData, onFormDataC
         </div>
         <div className="form-group">
           <FormattedTextarea
-            label="1. Why is the client needing a fridge?"
-            value={formData.whyNeedFridge}
-            onChange={(value) => handleInputChange('whyNeedFridge', value)}
-            placeholder="Please describe the client's situation..."
+            label="1. Why is the client needing whiteware?"
+            value={formData.whyNeedWhiteware}
+            onChange={(value) => handleInputChange('whyNeedWhiteware', value)}
+            placeholder="Please describe the client's situation (e.g. replacement fridge, washing machine failure, etc.)"
             className="form-control"
           />
         </div>
@@ -346,4 +354,4 @@ const FridgeQuestions: React.FC<FridgeQuestionsProps> = ({ formData, onFormDataC
   );
 };
 
-export default FridgeQuestions;
+export default WhitewareQuestions;

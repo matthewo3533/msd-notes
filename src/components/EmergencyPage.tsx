@@ -4,11 +4,13 @@ import EmergencyQuestions from './EmergencyQuestions';
 import NoteOutput from './NoteOutput';
 import { EmergencyFormData } from '../App';
 import { useSettings } from '../contexts/SettingsContext';
+import { createDefaultIncomeLabels } from './IncomeSection';
+import NeedsInApplication from './multi-need/NeedsInApplication';
 
 const EmergencyPage: React.FC = () => {
   const navigate = useNavigate();
   const { customHeadingFormat } = useSettings();
-  const [formData, setFormData] = useState<EmergencyFormData>({
+  const [formData, setFormData] = useState<EmergencyFormData>(() => ({
     clientId: null,
     whyNeedEmergencyPayment: '',
     reasonableSteps: '',
@@ -20,6 +22,7 @@ const EmergencyPage: React.FC = () => {
     directCredit: '',
     paymentReference: '',
     paymentCardNumber: '',
+    incomeLabels: createDefaultIncomeLabels(),
     income: {
       benefit: 0,
       employment: 0,
@@ -31,7 +34,7 @@ const EmergencyPage: React.FC = () => {
     costs: [],
     decision: '',
     decisionReason: '',
-  });
+  }));
 
   const handleFormDataChange = (data: Partial<EmergencyFormData>) => {
     setFormData(prev => ({ ...prev, ...data }));
@@ -49,7 +52,8 @@ const EmergencyPage: React.FC = () => {
       recoveryRate: 0,
       directCredit: '',
       paymentReference: '',
-    paymentCardNumber: '',
+      paymentCardNumber: '',
+      incomeLabels: createDefaultIncomeLabels(),
       income: {
         benefit: 0,
         employment: 0,
@@ -101,6 +105,7 @@ const EmergencyPage: React.FC = () => {
           onFormDataChange={handleFormDataChange}
         />
         <div className="note-section">
+          <NeedsInApplication formData={formData} needType="emergency" />
           <NoteOutput formData={formData} service="emergency" onReset={resetForm} customHeadingFormat={customHeadingFormat} />
         </div>
       </div>

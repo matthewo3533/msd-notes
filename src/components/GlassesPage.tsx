@@ -4,11 +4,13 @@ import GlassesQuestions from './GlassesQuestions';
 import NoteOutput from './NoteOutput';
 import { useSettings } from '../contexts/SettingsContext';
 import { GlassesFormData } from '../App';
+import { createDefaultIncomeLabels } from './IncomeSection';
+import NeedsInApplication from './multi-need/NeedsInApplication';
 
 const GlassesPage: React.FC = () => {
   const navigate = useNavigate();
   const { customHeadingFormat } = useSettings();
-  const [formData, setFormData] = useState<GlassesFormData>({
+  const [formData, setFormData] = useState<GlassesFormData>(() => ({
     clientId: null,
     whyNeedGlasses: '',
     reasonableSteps: '',
@@ -20,6 +22,7 @@ const GlassesPage: React.FC = () => {
     directCredit: '',
     paymentReference: '',
     paymentCardNumber: '',
+    incomeLabels: createDefaultIncomeLabels(),
     income: {
       benefit: 0,
       employment: 0,
@@ -31,7 +34,7 @@ const GlassesPage: React.FC = () => {
     costs: [],
     decision: '',
     decisionReason: '',
-  });
+  }));
 
   const handleFormDataChange = (data: Partial<GlassesFormData>) => {
     setFormData(prev => ({ ...prev, ...data }));
@@ -49,7 +52,8 @@ const GlassesPage: React.FC = () => {
       recoveryRate: 0,
       directCredit: '',
       paymentReference: '',
-    paymentCardNumber: '',
+      paymentCardNumber: '',
+      incomeLabels: createDefaultIncomeLabels(),
       income: {
         benefit: 0,
         employment: 0,
@@ -101,6 +105,7 @@ const GlassesPage: React.FC = () => {
           onFormDataChange={handleFormDataChange}
         />
         <div className="note-section">
+          <NeedsInApplication formData={formData} needType="glasses" />
           <NoteOutput formData={formData} service="glasses" onReset={resetForm} customHeadingFormat={customHeadingFormat} />
         </div>
       </div>

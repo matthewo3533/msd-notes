@@ -4,11 +4,13 @@ import StrandedTravelQuestions from './StrandedTravelQuestions';
 import NoteOutput from './NoteOutput';
 import { useSettings } from '../contexts/SettingsContext';
 import { StrandedTravelFormData } from '../App';
+import { createDefaultIncomeLabels } from './IncomeSection';
+import NeedsInApplication from './multi-need/NeedsInApplication';
 
 const StrandedTravelPage: React.FC = () => {
   const navigate = useNavigate();
   const { customHeadingFormat } = useSettings();
-  const [formData, setFormData] = useState<StrandedTravelFormData>({
+  const [formData, setFormData] = useState<StrandedTravelFormData>(() => ({
     clientId: null,
     whyNeedStrandedTravelAssistance: '',
     reasonableSteps: '',
@@ -26,6 +28,7 @@ const StrandedTravelPage: React.FC = () => {
     directCredit: '',
     paymentReference: '',
     paymentCardNumber: '',
+    incomeLabels: createDefaultIncomeLabels(),
     income: {
       benefit: 0,
       employment: 0,
@@ -37,7 +40,7 @@ const StrandedTravelPage: React.FC = () => {
     costs: [],
     decision: '',
     decisionReason: '',
-  });
+  }));
 
   const handleFormDataChange = (data: Partial<StrandedTravelFormData>) => {
     setFormData(prev => ({ ...prev, ...data }));
@@ -61,7 +64,8 @@ const StrandedTravelPage: React.FC = () => {
       recoveryRate: 0,
       directCredit: '',
       paymentReference: '',
-    paymentCardNumber: '',
+      paymentCardNumber: '',
+      incomeLabels: createDefaultIncomeLabels(),
       income: {
         benefit: 0,
         employment: 0,
@@ -113,6 +117,7 @@ const StrandedTravelPage: React.FC = () => {
           onFormDataChange={handleFormDataChange}
         />
         <div className="note-section">
+          <NeedsInApplication formData={formData} needType="stranded-travel" />
           <NoteOutput formData={formData} service="stranded-travel" onReset={resetForm} customHeadingFormat={customHeadingFormat} />
         </div>
       </div>

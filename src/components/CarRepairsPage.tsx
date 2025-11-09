@@ -4,11 +4,13 @@ import CarRepairsQuestions from './CarRepairsQuestions';
 import NoteOutput from './NoteOutput';
 import { useSettings } from '../contexts/SettingsContext';
 import { CarRepairsFormData } from '../App';
+import { createDefaultIncomeLabels } from './IncomeSection';
+import NeedsInApplication from './multi-need/NeedsInApplication';
 
 const CarRepairsPage: React.FC = () => {
   const navigate = useNavigate();
   const { customHeadingFormat } = useSettings();
-  const [formData, setFormData] = useState<CarRepairsFormData>({
+  const [formData, setFormData] = useState<CarRepairsFormData>(() => ({
     clientId: null,
     whyNeedCarRepairs: '',
     reasonableSteps: '',
@@ -25,6 +27,7 @@ const CarRepairsPage: React.FC = () => {
     directCredit: '',
     paymentReference: '',
     paymentCardNumber: '',
+    incomeLabels: createDefaultIncomeLabels(),
     income: {
       benefit: 0,
       employment: 0,
@@ -36,7 +39,7 @@ const CarRepairsPage: React.FC = () => {
     costs: [],
     decision: '',
     decisionReason: '',
-  });
+  }));
 
   const handleFormDataChange = (data: Partial<CarRepairsFormData>) => {
     setFormData(prev => ({ ...prev, ...data }));
@@ -59,7 +62,8 @@ const CarRepairsPage: React.FC = () => {
       recoveryRate: 0,
       directCredit: '',
       paymentReference: '',
-    paymentCardNumber: '',
+      paymentCardNumber: '',
+      incomeLabels: createDefaultIncomeLabels(),
       income: {
         benefit: 0,
         employment: 0,
@@ -111,6 +115,7 @@ const CarRepairsPage: React.FC = () => {
           onFormDataChange={handleFormDataChange}
         />
         <div className="note-section">
+          <NeedsInApplication formData={formData} needType="car-repairs" />
           <NoteOutput formData={formData} service="car-repairs" onReset={resetForm} customHeadingFormat={customHeadingFormat} />
         </div>
       </div>
