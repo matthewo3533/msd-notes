@@ -1624,17 +1624,10 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
           className="copy-btn copy-btn-with-icon"
           onClick={() => onReset?.()}
           style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            justifyContent: 'center',
             marginTop: '0.5rem',
             background: '#6c757d',
             width: '100%',
-            textDecoration: 'none',
-            fontFamily: 'inherit',
-            fontSize: 'inherit',
-            fontWeight: 'inherit',
-            color: 'inherit'
+            textDecoration: 'none'
           }}
         >
           <svg className="btn-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
