@@ -25,6 +25,7 @@ const services: Service[] = [
   { id: 'funeral', title: 'Assistance to Attend Funeral', emoji: '⚰️' },
   { id: 'stranded-travel', title: 'Stranded Travel', emoji: '⛽' },
   { id: 'emergency', title: 'Other Emergency Payment', emoji: '🚨' },
+  { id: 'generic-template', title: 'Generic Template', emoji: '📝' },
 ];
 
 const generalNotes: Service[] = [

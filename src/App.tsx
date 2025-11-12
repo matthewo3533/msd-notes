@@ -29,6 +29,7 @@ const ADSDPage = lazy(() => import('./components/ADSDPage'));
 const PetrolCalculator = lazy(() => import('./components/PetrolCalculator'));
 const AbsenceFromNZPage = lazy(() => import('./components/AbsenceFromNZPage'));
 const MultiNeedPage = lazy(() => import('./components/MultiNeedPage'));
+const GenericTemplatePage = lazy(() => import('./components/GenericTemplatePage'));
 
 export interface Service {
   id: string;
@@ -688,6 +689,7 @@ function AppContent() {
                   <Route path="/petrol-calculator" element={<PetrolCalculator />} />
         <Route path="/absence-from-nz" element={<AbsenceFromNZPage />} />
         <Route path="/multi-need" element={<MultiNeedPage />} />
+        <Route path="/generic-template" element={<GenericTemplatePage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Suspense>

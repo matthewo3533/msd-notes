@@ -8,7 +8,7 @@ import { getNeedTypeLabel, hasExtraSection, getExtraSectionTitle } from '../type
 
 interface NoteOutputProps {
   formData: any;
-  service?: 'food' | 'clothing' | 'electricity' | 'dental' | 'beds' | 'bedding' | 'furniture' | 'glasses' | 'whiteware' | 'tas-grant' | 'declare-income' | 'bond-rent' | 'rent-arrears' | 'car-repairs' | 'funeral-assistance' | 'stranded-travel' | 'adsd' | 'emergency' | 'transition-to-work' | 'petrol-calculator' | 'absence-from-nz' | 'multi-need';
+  service?: 'food' | 'clothing' | 'electricity' | 'dental' | 'beds' | 'bedding' | 'furniture' | 'glasses' | 'whiteware' | 'tas-grant' | 'declare-income' | 'bond-rent' | 'rent-arrears' | 'car-repairs' | 'funeral-assistance' | 'stranded-travel' | 'adsd' | 'emergency' | 'transition-to-work' | 'petrol-calculator' | 'absence-from-nz' | 'multi-need' | 'generic-template';
   onReset?: () => void;
   customHeadingFormat?: CustomHeadingFormat;
 }
@@ -541,6 +541,54 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       return note;
     } else if (service === 'emergency') {
       // Emergency Payment note output (same template as clothing)
+      const e: EmergencyFormData = formData;
+      let note = '';
+      note += `CCID: ${e.clientId === false ? 'No' : 'Yes'}\n\n`;
+      note += `${formatHeading('Need', 'custom', customHeadingFormat)}\n`;
+      if (e.whyNeedEmergencyPayment) {
+        note += `${e.whyNeedEmergencyPayment}\n`;
+      }
+
+      note += `\n${formatHeading('Payment', 'custom', customHeadingFormat)}\n`;
+      if (e.supplierName && e.supplierName.trim()) {
+        note += `Supplier Name: ${e.supplierName}\n`;
+      }
+      if (e.supplierId && e.supplierId.trim()) {
+        note += `Supplier ID: ${e.supplierId}\n`;
+      }
+      if (e.paymentCardNumber && e.paymentCardNumber.trim()) {
+        note += `Payment card number: ${e.paymentCardNumber}\n`;
+      }
+      if (e.amount && e.amount > 0) {
+        note += `Amount: $${e.amount.toFixed(2)}\n`;
+      }
+      if (e.recoveryRate && e.recoveryRate > 0) {
+        note += `Recovery rate: $${e.recoveryRate.toFixed(2)}\n`;
+      }
+      if (e.directCredit === 'yes' && e.paymentReference) {
+        note += `Reference number: ${e.paymentReference}\n`;
+      }
+      note += `\n${formatHeading('Income', 'custom', customHeadingFormat)}\n`;
+      note += formatIncomeLines(e.income, e.incomeLabels);
+      e.costs.forEach((cost: { amount: number; cost: string }) => {
+        if (cost.amount > 0) note += `-$${cost.amount.toFixed(2)} ${cost.cost}\n`;
+      });
+      if (e.costs.length > 0) {
+        const totalIncome = (Object.values(e.income) as number[]).reduce((sum: number, value: number) => sum + (value || 0), 0);
+        const totalCosts = e.costs.reduce((sum: number, cost: { amount: number; cost: string }) => sum + (cost.amount || 0), 0);
+        const remainingIncome = totalIncome - totalCosts;
+        note += '--------------\n';
+        note += `Client is left with $${remainingIncome.toFixed(2)}\n`;
+      }
+      note += `\n${formatHeading('Reasonable Steps', 'custom', customHeadingFormat)}\n`;
+      if (e.reasonableSteps) note += `${e.reasonableSteps}\n`;
+      note += `\n${formatHeading('Outcome', 'custom', customHeadingFormat)}\n`;
+      if (e.decision === 'approved') note += 'APPLICATION APPROVED\n';
+      else if (e.decision === 'declined') note += 'APPLICATION DECLINED\n';
+      if (e.decisionReason) note += `${e.decisionReason}\n`;
+      return note;
+    } else if (service === 'generic-template') {
+      // Generic Template note output (same template as emergency)
       const e: EmergencyFormData = formData;
       let note = '';
       note += `CCID: ${e.clientId === false ? 'No' : 'Yes'}\n\n`;
