@@ -200,15 +200,10 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
     // CCID
     note += `CCID: ${data.clientId ? 'Yes' : 'No'}\n\n`;
 
-    // All Needs (with reasonable steps in each)
+    // All Needs
     data.needs.forEach((need, index) => {
       note += `${formatHeading(`Need ${index + 1} - ${getNeedTypeLabel(need.type)}`, 'custom', customHeadingFormat)}\n`;
       note += generateNeedContent(need);
-      
-      // Add reasonable steps
-      if (data.reasonableSteps) {
-        note += `\nReasonable steps: ${data.reasonableSteps}\n`;
-      }
       
       note += '\n\n';
       
@@ -218,6 +213,12 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
         note += '\n';
       }
     });
+
+    // Reasonable Steps (once, after all needs)
+    if (data.reasonableSteps && data.reasonableSteps.trim()) {
+      note += `${formatHeading('Reasonable Steps', 'custom', customHeadingFormat)}\n`;
+      note += `${data.reasonableSteps}\n\n`;
+    }
 
     // Shared Income
     note += `${formatHeading('Income', 'custom', customHeadingFormat)}\n`;
@@ -1473,6 +1474,12 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       note += `\n${formatHeading('Payment', 'custom', customHeadingFormat)}\n`;
       note += `Supplier Name: Food Supplier Group\n`;
       if (f.amount > 0) note += `Total Cost: $${f.amount.toFixed(2)}\n`;
+      if (f.directCredit === 'yes' && f.paymentReference) {
+        note += `Reference number: ${f.paymentReference}\n`;
+      }
+      if (f.directCredit !== 'yes' && f.paymentCardNumber && f.paymentCardNumber.trim()) {
+        note += `Payment card number: ${f.paymentCardNumber}\n`;
+      }
       
       note += `\n${formatHeading('Income', 'custom', customHeadingFormat)}\n`;
       note += formatIncomeLines(f.income, f.incomeLabels);

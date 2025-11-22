@@ -5,7 +5,6 @@ import NoteOutput from './NoteOutput';
 import { EmergencyFormData } from '../App';
 import { useSettings } from '../contexts/SettingsContext';
 import { createDefaultIncomeLabels } from './IncomeSection';
-import NeedsInApplication from './multi-need/NeedsInApplication';
 
 const GenericTemplatePage: React.FC = () => {
   const navigate = useNavigate();
@@ -105,7 +104,7 @@ const GenericTemplatePage: React.FC = () => {
           onFormDataChange={handleFormDataChange}
         />
         <div className="note-section">
-          <NeedsInApplication formData={formData} needType="emergency" />
+         
           <NoteOutput formData={formData} service="generic-template" onReset={resetForm} customHeadingFormat={customHeadingFormat} />
         </div>
       </div>

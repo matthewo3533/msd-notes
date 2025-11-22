@@ -26,7 +26,7 @@ const MultiNeedContainer: React.FC<MultiNeedContainerProps> = ({ formData, onFor
   const [recoveryOverrides, setRecoveryOverrides] = useState<Record<string, boolean>>({});
   const [expandedSections, setExpandedSections] = useState<Set<string>>(() => {
     // Initialize with all sections expanded
-    const initialExpanded = new Set<string>(['client-id', 'income', 'decisions']);
+    const initialExpanded = new Set<string>(['client-id', 'income', 'decisions', 'reasonable-steps']);
     // Add all need sections (general, extra, payment) - we'll add these dynamically
     return initialExpanded;
   });
@@ -856,16 +856,6 @@ const MultiNeedContainer: React.FC<MultiNeedContainerProps> = ({ formData, onFor
                     data={need.data}
                     onChange={(updates) => handleUpdateNeed(need.id, { data: { ...need.data, ...updates } })}
                   />
-                  
-                  <div className="form-group" style={{ marginTop: '2rem' }}>
-                    <FormattedTextarea
-                      label="What reasonable steps has the client taken to improve their situation?"
-                      value={formData.reasonableSteps}
-                      onChange={(value) => onFormDataChange({ reasonableSteps: value })}
-                      placeholder="Describe steps taken..."
-                      className="form-control"
-                    />
-                  </div>
                 </>
               )}
             </div>
@@ -1067,6 +1057,38 @@ const MultiNeedContainer: React.FC<MultiNeedContainerProps> = ({ formData, onFor
           </div>
         );
       })}
+
+      {/* Reasonable Steps */}
+      <div 
+        ref={(el) => { sectionRefs.current['reasonable-steps'] = el; }}
+        data-section="reasonable-steps"
+        className={`form-section-card ${permanentlyVisible.has('reasonable-steps') ? 'section-visible' : ''}`}
+      >
+        <div className="section-header">
+          <h3>Reasonable Steps</h3>
+          <button 
+            className={`expand-collapse-btn ${!expandedSections.has('reasonable-steps') ? 'collapsed' : ''}`}
+            type="button"
+            onClick={() => toggleSection('reasonable-steps')}
+            aria-label={expandedSections.has('reasonable-steps') ? 'Collapse section' : 'Expand section'}
+          >
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M4 6L8 10L12 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </button>
+        </div>
+        {expandedSections.has('reasonable-steps') && (
+          <div className="form-group" style={{ marginTop: '1rem' }}>
+            <FormattedTextarea
+              label="What reasonable steps has the client taken to improve their situation?"
+              value={formData.reasonableSteps}
+              onChange={(value) => onFormDataChange({ reasonableSteps: value })}
+              placeholder="Describe steps taken..."
+              className="form-control"
+            />
+          </div>
+        )}
+      </div>
 
       {/* All Decisions */}
       <div 
