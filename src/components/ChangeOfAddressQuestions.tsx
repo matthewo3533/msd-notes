@@ -43,25 +43,25 @@ const ChangeOfAddressQuestions: React.FC<ChangeOfAddressQuestionsProps> = ({ for
     };
   }, []);
 
-  const getDefaultCosts = (type: string) => {
+  const getDefaultCosts = (type: string): ChangeOfAddressFormData['accommodationCosts'] => {
     if (type === 'Board') {
       return [
-        { label: 'Rent', amount: 0, frequency: 'weekly' },
-        { label: 'Power', amount: 0, frequency: 'weekly' },
-        { label: 'Wifi', amount: 0, frequency: 'weekly' },
-        { label: 'Food', amount: 0, frequency: 'weekly' },
+        { label: 'Rent', amount: 0, frequency: 'weekly' as const },
+        { label: 'Power', amount: 0, frequency: 'weekly' as const },
+        { label: 'Wifi', amount: 0, frequency: 'weekly' as const },
+        { label: 'Food', amount: 0, frequency: 'weekly' as const },
       ];
     }
     if (type === 'Mortgage') {
       return [
-        { label: 'Mortgage', amount: 0, frequency: 'weekly' },
-        { label: 'Rates', amount: 0, frequency: 'weekly' },
-        { label: 'Insurance', amount: 0, frequency: 'weekly' },
+        { label: 'Mortgage', amount: 0, frequency: 'weekly' as const },
+        { label: 'Rates', amount: 0, frequency: 'weekly' as const },
+        { label: 'Insurance', amount: 0, frequency: 'weekly' as const },
       ];
     }
     // Rent or other
     return [
-      { label: 'Rent', amount: 0, frequency: 'weekly' },
+      { label: 'Rent', amount: 0, frequency: 'weekly' as const },
     ];
   };
 
@@ -139,7 +139,7 @@ const ChangeOfAddressQuestions: React.FC<ChangeOfAddressQuestionsProps> = ({ for
         <div className="form-group">
           <AddressInput
             value={formData.newAddress}
-            onChange={(address, locationData) => {
+            onChange={(address) => {
               handleInputChange('newAddress', address);
             }}
             placeholder="Enter new address"
