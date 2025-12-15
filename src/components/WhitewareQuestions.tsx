@@ -48,13 +48,6 @@ const WhitewareQuestions: React.FC<WhitewareQuestionsProps> = ({ formData, onFor
     };
   }, []);
 
-  // Auto-fill payment reference when appliance model changes
-  useEffect(() => {
-    if (formData.applianceModel) {
-      onFormDataChange({ paymentReference: formData.applianceModel });
-    }
-  }, [formData.applianceModel, onFormDataChange]);
-
   const handleInputChange = (field: keyof WhitewareFormData, value: any) => {
     onFormDataChange({ [field]: value });
   };
@@ -207,106 +200,6 @@ const WhitewareQuestions: React.FC<WhitewareQuestionsProps> = ({ formData, onFor
               />
             </label>
           </div>
-        </div>
-        <div className="form-group">
-          <label>Address/contact details confirmed?</label>
-          <div className="radio-group">
-            <label className={`radio-btn ${formData.addressContactConfirmed === 'yes' ? 'selected' : ''}`}>Yes
-              <input
-                type="checkbox"
-                name="addressContactConfirmedYes"
-                checked={formData.addressContactConfirmed === 'yes'}
-                onChange={() => handleInputChange('addressContactConfirmed', formData.addressContactConfirmed === 'yes' ? '' : 'yes')}
-                className="visually-hidden"
-              />
-            </label>
-            <label className={`radio-btn ${formData.addressContactConfirmed === 'no' ? 'selected' : ''}`}>No
-              <input
-                type="checkbox"
-                name="addressContactConfirmedNo"
-                checked={formData.addressContactConfirmed === 'no'}
-                onChange={() => handleInputChange('addressContactConfirmed', formData.addressContactConfirmed === 'no' ? '' : 'no')}
-                className="visually-hidden"
-              />
-            </label>
-          </div>
-        </div>
-        <div className="form-group">
-          <label>Space measured and item will fit?</label>
-          <div className="radio-group">
-            <label className={`radio-btn ${formData.spaceMeasured === 'yes' ? 'selected' : ''}`}>Yes
-              <input
-                type="checkbox"
-                name="spaceMeasuredYes"
-                checked={formData.spaceMeasured === 'yes'}
-                onChange={() => handleInputChange('spaceMeasured', formData.spaceMeasured === 'yes' ? '' : 'yes')}
-                className="visually-hidden"
-              />
-            </label>
-            <label className={`radio-btn ${formData.spaceMeasured === 'no' ? 'selected' : ''}`}>No
-              <input
-                type="checkbox"
-                name="spaceMeasuredNo"
-                checked={formData.spaceMeasured === 'no'}
-                onChange={() => handleInputChange('spaceMeasured', formData.spaceMeasured === 'no' ? '' : 'no')}
-                className="visually-hidden"
-              />
-            </label>
-          </div>
-        </div>
-        <div className="form-group">
-          <label>Appliance Model:</label>
-          <input
-            type="text"
-            className="form-control"
-            value={formData.applianceModel}
-            onChange={e => handleInputChange('applianceModel', e.target.value)}
-            placeholder="Enter appliance model..."
-          />
-        </div>
-        <div className="form-group">
-          <label>Appliance CA number</label>
-          <input
-            type="text"
-            className="form-control"
-            value={formData.applianceCANumber}
-            onChange={e => handleInputChange('applianceCANumber', e.target.value)}
-            placeholder="Enter appliance CA number..."
-          />
-        </div>
-        <div className="form-group">
-          <label>Does client have any special delivery instructions?</label>
-          <div className="radio-group">
-            <label className={`radio-btn ${formData.specialDeliveryInstructions === 'yes' ? 'selected' : ''}`}>Yes
-              <input
-                type="checkbox"
-                name="specialDeliveryInstructionsYes"
-                checked={formData.specialDeliveryInstructions === 'yes'}
-                onChange={() => handleInputChange('specialDeliveryInstructions', formData.specialDeliveryInstructions === 'yes' ? '' : 'yes')}
-                className="visually-hidden"
-              />
-            </label>
-            <label className={`radio-btn ${formData.specialDeliveryInstructions === 'no' ? 'selected' : ''}`}>No
-              <input
-                type="checkbox"
-                name="specialDeliveryInstructionsNo"
-                checked={formData.specialDeliveryInstructions === 'no'}
-                onChange={() => handleInputChange('specialDeliveryInstructions', formData.specialDeliveryInstructions === 'no' ? '' : 'no')}
-                className="visually-hidden"
-              />
-            </label>
-          </div>
-          {formData.specialDeliveryInstructions === 'yes' && (
-            <div className="form-group">
-              <FormattedTextarea
-                label="Please outline the delivery instructions."
-                value={formData.deliveryInstructionsDetails || ''}
-                onChange={(value) => handleInputChange('deliveryInstructionsDetails', value)}
-                placeholder="Enter delivery instructions..."
-                className="form-control"
-              />
-            </div>
-          )}
         </div>
       </div>
 

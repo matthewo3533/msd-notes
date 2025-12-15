@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { FoodFormData, ClothingFormData, RentArrearsFormData, CarRepairsFormData, FuneralAssistanceFormData, StrandedTravelFormData, TASGrantFormData, DeclareIncomeFormData, ADSDFormData, EmergencyFormData, TransitionToWorkFormData, AbsenceFromNZFormData } from '../App';
+import { FoodFormData, ClothingFormData, RentArrearsFormData, CarRepairsFormData, FuneralAssistanceFormData, StrandedTravelFormData, TASGrantFormData, DeclareIncomeFormData, ADSDFormData, EmergencyFormData, TransitionToWorkFormData, AbsenceFromNZFormData, ChangeOfAddressFormData } from '../App';
 import { DEFAULT_INCOME_LABELS, IncomeLabels } from './IncomeSection';
 import { formatHeading, CustomHeadingFormat } from '../utils/headingFormatter';
 import type { MultiNeedFormData, NeedItem } from '../types/multiNeed';
@@ -8,7 +8,7 @@ import { getNeedTypeLabel, hasExtraSection, getExtraSectionTitle } from '../type
 
 interface NoteOutputProps {
   formData: any;
-  service?: 'food' | 'clothing' | 'electricity' | 'dental' | 'beds' | 'bedding' | 'furniture' | 'glasses' | 'whiteware' | 'tas-grant' | 'declare-income' | 'bond-rent' | 'rent-arrears' | 'car-repairs' | 'funeral-assistance' | 'stranded-travel' | 'adsd' | 'emergency' | 'transition-to-work' | 'petrol-calculator' | 'absence-from-nz' | 'multi-need' | 'generic-template';
+  service?: 'food' | 'clothing' | 'electricity' | 'dental' | 'beds' | 'bedding' | 'furniture' | 'glasses' | 'whiteware' | 'tas-grant' | 'declare-income' | 'bond-rent' | 'rent-arrears' | 'car-repairs' | 'funeral-assistance' | 'stranded-travel' | 'adsd' | 'emergency' | 'transition-to-work' | 'petrol-calculator' | 'absence-from-nz' | 'multi-need' | 'generic-template' | 'change-of-address';
   onReset?: () => void;
   customHeadingFormat?: CustomHeadingFormat;
 }
@@ -41,6 +41,62 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       }
       return lines;
     }, '');
+  };
+
+  // Helper functions to check if sections have data
+  const hasPaymentData = (data: any): boolean => {
+    return !!(
+      (data.supplierName && data.supplierName.trim()) ||
+      (data.supplierId && data.supplierId.trim()) ||
+      (data.paymentCardNumber && data.paymentCardNumber.trim()) ||
+      (data.amount && data.amount > 0) ||
+      (data.recoveryRate && data.recoveryRate > 0) ||
+      (data.directCredit === 'yes' && data.paymentReference) ||
+      (data.bankAccount && data.bankAccount.trim()) ||
+      (data.bondAmount && data.bondAmount > 0) ||
+      (data.rentInAdvanceAmount && data.rentInAdvanceAmount > 0) ||
+      (data.powerAccountNumber && data.powerAccountNumber.trim())
+    );
+  };
+
+  const hasIncomeData = (income: IncomeRecord): boolean => {
+    return Object.values(income).some(value => (value || 0) > 0);
+  };
+
+  const hasReasonableStepsData = (reasonableSteps?: string): boolean => {
+    return !!(reasonableSteps && reasonableSteps.trim());
+  };
+
+  const hasOutcomeData = (decision?: string, decisionReason?: string): boolean => {
+    return !!(decision || decisionReason);
+  };
+
+  const freqToWeeklyMultiplier = (freq?: 'daily' | 'weekly' | 'fortnightly' | 'monthly'): number => {
+    switch (freq) {
+      case 'daily':
+        return 7;
+      case 'fortnightly':
+        return 1 / 2;
+      case 'monthly':
+        return 1 / 4.345; // average weeks per month
+      case 'weekly':
+      default:
+        return 1;
+    }
+  };
+
+  const formatFreq = (freq?: 'daily' | 'weekly' | 'fortnightly' | 'monthly'): string => {
+    switch (freq) {
+      case 'daily':
+        return 'per day';
+      case 'fortnightly':
+        return 'per fortnight';
+      case 'monthly':
+        return 'per month';
+      case 'weekly':
+      default:
+        return 'per week';
+    }
   };
 
   // Helper function to format dates from Calendar component (DD/MM/YYYY format)
@@ -138,12 +194,6 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
     } else if (need.type === 'whiteware') {
       content += `${formatHeading(getExtraSectionTitle(need.type), 'custom', customHeadingFormat)}\n`;
       if (data.householdSize) content += `Household size: ${data.householdSize}\n`;
-      if (data.addressContactConfirmed) content += `Address/contact confirmed: ${data.addressContactConfirmed}\n`;
-      if (data.spaceMeasured) content += `Space measured: ${data.spaceMeasured}\n`;
-      if (data.specialDeliveryInstructions) content += `Special delivery instructions: ${data.specialDeliveryInstructions}\n`;
-      if (data.deliveryInstructionsDetails) content += `Details: ${data.deliveryInstructionsDetails}\n`;
-      if (data.applianceModel) content += `Model: ${data.applianceModel}\n`;
-      if (data.applianceCANumber) content += `CA Number: ${data.applianceCANumber}\n`;
       content += '\n';
     } else if (need.type === 'dental') {
       content += `${formatHeading(getExtraSectionTitle(need.type), 'custom', customHeadingFormat)}\n`;
@@ -221,51 +271,57 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
     }
 
     // Shared Income
-    note += `${formatHeading('Income', 'custom', customHeadingFormat)}\n`;
-    note += formatIncomeLines(data.income, data.incomeLabels);
+    if (hasIncomeData(data.income)) {
+      note += `${formatHeading('Income', 'custom', customHeadingFormat)}\n`;
+      note += formatIncomeLines(data.income, data.incomeLabels);
 
-    // Costs
-    const totalCosts = data.costs.reduce((sum, cost) => sum + cost.amount, 0);
-    if (totalCosts > 0) {
-      data.costs.forEach(cost => {
-        if (cost.amount > 0) {
-          note += `$${cost.amount.toFixed(2)} ${cost.cost}\n`;
-        }
-      });
+      // Costs
+      const totalCosts = data.costs.reduce((sum, cost) => sum + cost.amount, 0);
+      if (totalCosts > 0) {
+        data.costs.forEach(cost => {
+          if (cost.amount > 0) {
+            note += `$${cost.amount.toFixed(2)} ${cost.cost}\n`;
+          }
+        });
+      }
+
+      // Calculate remaining
+      const totalIncome = Object.values(data.income).reduce((sum, val) => sum + val, 0);
+      const remaining = totalIncome - totalCosts;
+      note += `\nClient is left with: $${remaining.toFixed(2)}\n\n`;
     }
-
-    // Calculate remaining
-    const totalIncome = Object.values(data.income).reduce((sum, val) => sum + val, 0);
-    const remaining = totalIncome - totalCosts;
-    note += `\nClient is left with: $${remaining.toFixed(2)}\n\n`;
 
     // All Payments
     data.needs.forEach((need) => {
-      note += `${formatHeading(`Payment - ${getNeedTypeLabel(need.type)}`, 'custom', customHeadingFormat)}\n`;
-      if (need.payment.supplierName) note += `Supplier Name: ${need.payment.supplierName}\n`;
-      if (need.payment.supplierId) note += `Supplier ID: ${need.payment.supplierId}\n`;
-      if (need.payment.paymentCardNumber) note += `Payment card number: ${need.payment.paymentCardNumber}\n`;
-      if (need.payment.amount > 0) note += `Amount: $${need.payment.amount.toFixed(2)}\n`;
-      if (need.payment.recoveryRate > 0) note += `Recovery rate: $${need.payment.recoveryRate.toFixed(2)}\n`;
-      if (need.payment.bankAccount) note += `Bank account: ${need.payment.bankAccount}\n`;
-      if (need.payment.directCredit) note += `Direct credit: ${need.payment.directCredit}\n`;
-      if (need.payment.paymentReference) note += `Payment reference: ${need.payment.paymentReference}\n`;
-      if (need.payment.powerAccountNumber) note += `Power account number: ${need.payment.powerAccountNumber}\n`;
-      note += '\n';
-    });
-
-    // Per-Need Decisions
-    note += `${formatHeading('Decision', 'custom', customHeadingFormat)}\n`;
-    data.needs.forEach((need) => {
-      if (need.decision.decision) {
-        const decisionText = need.decision.decision.charAt(0).toUpperCase() + need.decision.decision.slice(1);
-        note += `${getNeedTypeLabel(need.type)} - ${decisionText}\n`;
-        if (need.decision.decisionReason) {
-          note += `${need.decision.decisionReason}\n`;
-        }
+      if (hasPaymentData(need.payment)) {
+        note += `${formatHeading(`Payment - ${getNeedTypeLabel(need.type)}`, 'custom', customHeadingFormat)}\n`;
+        if (need.payment.supplierName) note += `Supplier Name: ${need.payment.supplierName}\n`;
+        if (need.payment.supplierId) note += `Supplier ID: ${need.payment.supplierId}\n`;
+        if (need.payment.paymentCardNumber) note += `Payment card number: ${need.payment.paymentCardNumber}\n`;
+        if (need.payment.amount > 0) note += `Amount: $${need.payment.amount.toFixed(2)}\n`;
+        if (need.payment.recoveryRate > 0) note += `Recovery rate: $${need.payment.recoveryRate.toFixed(2)}\n`;
+        if (need.payment.bankAccount) note += `Bank account: ${need.payment.bankAccount}\n`;
+        if (need.payment.directCredit) note += `Direct credit: ${need.payment.directCredit}\n`;
+        if (need.payment.paymentReference) note += `Payment reference: ${need.payment.paymentReference}\n`;
+        if (need.payment.powerAccountNumber) note += `Power account number: ${need.payment.powerAccountNumber}\n`;
         note += '\n';
       }
     });
+
+    // Per-Need Decisions
+    const hasAnyDecision = data.needs.some((need) => need.decision.decision || need.decision.decisionReason);
+    if (hasAnyDecision) {
+      note += `${formatHeading('Decision', 'custom', customHeadingFormat)}\n`;
+      data.needs.forEach((need) => {
+        if (need.decision.decision) {
+          const decisionText = need.decision.decision.charAt(0).toUpperCase() + need.decision.decision.slice(1);
+          note += `${getNeedTypeLabel(need.type)} - ${decisionText}\n`;
+          if (need.decision.decisionReason) {
+            note += `${need.decision.decisionReason}\n`;
+          }
+        }
+      });
+    }
 
     return note;
   };
@@ -327,6 +383,96 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
         }
       } else if (a.arrearsIssued === false) {
         note += `Arrears issued: No\n`;
+      }
+      
+      return note;
+    } else if (service === 'change-of-address') {
+      // Change of Address note output
+      const c: ChangeOfAddressFormData = formData;
+      let note = '';
+      
+      // General comments
+      if (c.generalComments && c.generalComments.trim()) {
+        note += `${formatHeading('General Comments', 'custom', customHeadingFormat)}\n`;
+        note += `${c.generalComments.trim()}\n\n`;
+      }
+      
+      // Address and Dates
+      if ((c.newAddress && c.newAddress.trim()) || c.dateOfMove || c.dateNotified) {
+        note += `${formatHeading('Address and Dates', 'custom', customHeadingFormat)}\n`;
+        if (c.newAddress && c.newAddress.trim()) {
+          note += `New address: ${c.newAddress}\n`;
+        }
+        if (c.dateOfMove) {
+          note += `Date of move: ${formatCalendarDate(c.dateOfMove)}\n`;
+        }
+        if (c.dateNotified) {
+          note += `Date notified: ${formatCalendarDate(c.dateNotified)}\n`;
+        }
+        note += '\n';
+      }
+      
+      // Accommodation Details
+      const hasCosts = c.accommodationCosts && c.accommodationCosts.length > 0;
+
+      if (
+        c.asZone ||
+        c.accommodationType ||
+        hasCosts ||
+        c.tenancyAgreementProvided ||
+        (c.newASRate && c.newASRate > 0) ||
+        c.clientEligibleForTAS
+      ) {
+        note += `${formatHeading('Accommodation Details', 'custom', customHeadingFormat)}\n`;
+        if (c.asZone) {
+          note += `AS zone: ${c.asZone}\n`;
+        }
+        if (c.accommodationType) {
+          note += `Accommodation type: ${c.accommodationType}\n`;
+        }
+
+        if (hasCosts) {
+          let weeklyTotal = 0;
+          let filledCount = 0;
+          c.accommodationCosts.forEach((cost) => {
+            if (cost.amount && cost.amount > 0) {
+              filledCount += 1;
+              weeklyTotal += cost.amount * freqToWeeklyMultiplier(cost.frequency);
+              note += `${cost.label || 'Cost'}: $${cost.amount.toFixed(2)} ${formatFreq(cost.frequency)}\n`;
+            }
+          });
+          if (weeklyTotal > 0 && filledCount > 1) {
+            note += '--------------\n';
+            note += `Total: $${weeklyTotal.toFixed(2)} per week\n`;
+          }
+        }
+        if (c.tenancyAgreementProvided) {
+          note += `Tenancy agreement provided: ${c.tenancyAgreementProvided === 'yes' ? 'Yes' : 'No'}\n`;
+        }
+        if (c.newASRate && c.newASRate > 0) {
+          note += `New AS rate: $${c.newASRate.toFixed(2)}\n`;
+        }
+        if (c.clientEligibleForTAS) {
+          note += `Client is eligible for TAS: ${c.clientEligibleForTAS === 'yes' ? 'Yes' : 'No'}\n`;
+        }
+        note += '\n';
+      }
+      
+      // Arrears and Debt
+      if (c.arrearsCreated || c.debtCreated) {
+        note += `${formatHeading('Arrears and Debt', 'custom', customHeadingFormat)}\n`;
+        if (c.arrearsCreated) {
+          note += `Arrears created: ${c.arrearsCreated === 'yes' ? 'Yes' : 'No'}\n`;
+          if (c.arrearsCreated === 'yes' && c.arrearsAmount && c.arrearsAmount > 0) {
+            note += `Arrears amount: $${c.arrearsAmount.toFixed(2)}\n`;
+          }
+        }
+        if (c.debtCreated) {
+          note += `Debt created: ${c.debtCreated === 'yes' ? 'Yes' : 'No'}\n`;
+          if (c.debtCreated === 'yes' && c.debtAmount && c.debtAmount > 0) {
+            note += `Debt amount: $${c.debtAmount.toFixed(2)}\n`;
+          }
+        }
       }
       
       return note;
@@ -502,43 +648,51 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
         note += `${c.whyNeedClothing}\n`;
       }
 
-      note += `\n${formatHeading('Payment', 'custom', customHeadingFormat)}\n`;
-      if (c.supplierName && c.supplierName.trim()) {
-        note += `Supplier Name: ${c.supplierName}\n`;
+      if (hasPaymentData(c)) {
+        note += `\n${formatHeading('Payment', 'custom', customHeadingFormat)}\n`;
+        if (c.supplierName && c.supplierName.trim()) {
+          note += `Supplier Name: ${c.supplierName}\n`;
+        }
+        if (c.supplierId && c.supplierId.trim()) {
+          note += `Supplier ID: ${c.supplierId}\n`;
+        }
+        if (c.paymentCardNumber && c.paymentCardNumber.trim()) {
+          note += `Payment card number: ${c.paymentCardNumber}\n`;
+        }
+        if (c.amount && c.amount > 0) {
+          note += `Amount: $${c.amount.toFixed(2)}\n`;
+        }
+        if (c.recoveryRate && c.recoveryRate > 0) {
+          note += `Recovery rate: $${c.recoveryRate.toFixed(2)}\n`;
+        }
+        if (c.directCredit === 'yes' && c.paymentReference) {
+          note += `Reference number: ${c.paymentReference}\n`;
+        }
       }
-      if (c.supplierId && c.supplierId.trim()) {
-        note += `Supplier ID: ${c.supplierId}\n`;
+      if (hasIncomeData(c.income)) {
+        note += `\n${formatHeading('Income', 'custom', customHeadingFormat)}\n`;
+        note += formatIncomeLines(c.income, c.incomeLabels);
+        c.costs.forEach((cost: { amount: number; cost: string }) => {
+          if (cost.amount > 0) note += `-$${cost.amount.toFixed(2)} ${cost.cost}\n`;
+        });
+        if (c.costs.length > 0) {
+          const totalIncome = (Object.values(c.income) as number[]).reduce((sum: number, value: number) => sum + (value || 0), 0);
+          const totalCosts = c.costs.reduce((sum: number, cost: { amount: number; cost: string }) => sum + (cost.amount || 0), 0);
+          const remainingIncome = totalIncome - totalCosts;
+          note += '--------------\n';
+          note += `Client is left with $${remainingIncome.toFixed(2)}\n`;
+        }
       }
-      if (c.paymentCardNumber && c.paymentCardNumber.trim()) {
-        note += `Payment card number: ${c.paymentCardNumber}\n`;
+      if (hasReasonableStepsData(c.reasonableSteps)) {
+        note += `\n${formatHeading('Reasonable Steps', 'custom', customHeadingFormat)}\n`;
+        note += `${c.reasonableSteps}\n`;
       }
-      if (c.amount && c.amount > 0) {
-        note += `Amount: $${c.amount.toFixed(2)}\n`;
+      if (hasOutcomeData(c.decision, c.decisionReason)) {
+        note += `\n${formatHeading('Outcome', 'custom', customHeadingFormat)}\n`;
+        if (c.decision === 'approved') note += 'APPLICATION APPROVED\n';
+        else if (c.decision === 'declined') note += 'APPLICATION DECLINED\n';
+        if (c.decisionReason) note += `${c.decisionReason}\n`;
       }
-      if (c.recoveryRate && c.recoveryRate > 0) {
-        note += `Recovery rate: $${c.recoveryRate.toFixed(2)}\n`;
-      }
-      if (c.directCredit === 'yes' && c.paymentReference) {
-        note += `Reference number: ${c.paymentReference}\n`;
-      }
-      note += `\n${formatHeading('Income', 'custom', customHeadingFormat)}\n`;
-      note += formatIncomeLines(c.income, c.incomeLabels);
-      c.costs.forEach((cost: { amount: number; cost: string }) => {
-        if (cost.amount > 0) note += `-$${cost.amount.toFixed(2)} ${cost.cost}\n`;
-      });
-      if (c.costs.length > 0) {
-        const totalIncome = (Object.values(c.income) as number[]).reduce((sum: number, value: number) => sum + (value || 0), 0);
-        const totalCosts = c.costs.reduce((sum: number, cost: { amount: number; cost: string }) => sum + (cost.amount || 0), 0);
-        const remainingIncome = totalIncome - totalCosts;
-        note += '--------------\n';
-        note += `Client is left with $${remainingIncome.toFixed(2)}\n`;
-      }
-      note += `\n${formatHeading('Reasonable Steps', 'custom', customHeadingFormat)}\n`;
-      if (c.reasonableSteps) note += `${c.reasonableSteps}\n`;
-      note += `\n${formatHeading('Outcome', 'custom', customHeadingFormat)}\n`;
-      if (c.decision === 'approved') note += 'APPLICATION APPROVED\n';
-      else if (c.decision === 'declined') note += 'APPLICATION DECLINED\n';
-      if (c.decisionReason) note += `${c.decisionReason}\n`;
       return note;
     } else if (service === 'emergency') {
       // Emergency Payment note output (same template as clothing)
@@ -550,43 +704,51 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
         note += `${e.whyNeedEmergencyPayment}\n`;
       }
 
-      note += `\n${formatHeading('Payment', 'custom', customHeadingFormat)}\n`;
-      if (e.supplierName && e.supplierName.trim()) {
-        note += `Supplier Name: ${e.supplierName}\n`;
+      if (hasPaymentData(e)) {
+        note += `\n${formatHeading('Payment', 'custom', customHeadingFormat)}\n`;
+        if (e.supplierName && e.supplierName.trim()) {
+          note += `Supplier Name: ${e.supplierName}\n`;
+        }
+        if (e.supplierId && e.supplierId.trim()) {
+          note += `Supplier ID: ${e.supplierId}\n`;
+        }
+        if (e.paymentCardNumber && e.paymentCardNumber.trim()) {
+          note += `Payment card number: ${e.paymentCardNumber}\n`;
+        }
+        if (e.amount && e.amount > 0) {
+          note += `Amount: $${e.amount.toFixed(2)}\n`;
+        }
+        if (e.recoveryRate && e.recoveryRate > 0) {
+          note += `Recovery rate: $${e.recoveryRate.toFixed(2)}\n`;
+        }
+        if (e.directCredit === 'yes' && e.paymentReference) {
+          note += `Reference number: ${e.paymentReference}\n`;
+        }
       }
-      if (e.supplierId && e.supplierId.trim()) {
-        note += `Supplier ID: ${e.supplierId}\n`;
+      if (hasIncomeData(e.income)) {
+        note += `\n${formatHeading('Income', 'custom', customHeadingFormat)}\n`;
+        note += formatIncomeLines(e.income, e.incomeLabels);
+        e.costs.forEach((cost: { amount: number; cost: string }) => {
+          if (cost.amount > 0) note += `-$${cost.amount.toFixed(2)} ${cost.cost}\n`;
+        });
+        if (e.costs.length > 0) {
+          const totalIncome = (Object.values(e.income) as number[]).reduce((sum: number, value: number) => sum + (value || 0), 0);
+          const totalCosts = e.costs.reduce((sum: number, cost: { amount: number; cost: string }) => sum + (cost.amount || 0), 0);
+          const remainingIncome = totalIncome - totalCosts;
+          note += '--------------\n';
+          note += `Client is left with $${remainingIncome.toFixed(2)}\n`;
+        }
       }
-      if (e.paymentCardNumber && e.paymentCardNumber.trim()) {
-        note += `Payment card number: ${e.paymentCardNumber}\n`;
+      if (hasReasonableStepsData(e.reasonableSteps)) {
+        note += `\n${formatHeading('Reasonable Steps', 'custom', customHeadingFormat)}\n`;
+        note += `${e.reasonableSteps}\n`;
       }
-      if (e.amount && e.amount > 0) {
-        note += `Amount: $${e.amount.toFixed(2)}\n`;
+      if (hasOutcomeData(e.decision, e.decisionReason)) {
+        note += `\n${formatHeading('Outcome', 'custom', customHeadingFormat)}\n`;
+        if (e.decision === 'approved') note += 'APPLICATION APPROVED\n';
+        else if (e.decision === 'declined') note += 'APPLICATION DECLINED\n';
+        if (e.decisionReason) note += `${e.decisionReason}\n`;
       }
-      if (e.recoveryRate && e.recoveryRate > 0) {
-        note += `Recovery rate: $${e.recoveryRate.toFixed(2)}\n`;
-      }
-      if (e.directCredit === 'yes' && e.paymentReference) {
-        note += `Reference number: ${e.paymentReference}\n`;
-      }
-      note += `\n${formatHeading('Income', 'custom', customHeadingFormat)}\n`;
-      note += formatIncomeLines(e.income, e.incomeLabels);
-      e.costs.forEach((cost: { amount: number; cost: string }) => {
-        if (cost.amount > 0) note += `-$${cost.amount.toFixed(2)} ${cost.cost}\n`;
-      });
-      if (e.costs.length > 0) {
-        const totalIncome = (Object.values(e.income) as number[]).reduce((sum: number, value: number) => sum + (value || 0), 0);
-        const totalCosts = e.costs.reduce((sum: number, cost: { amount: number; cost: string }) => sum + (cost.amount || 0), 0);
-        const remainingIncome = totalIncome - totalCosts;
-        note += '--------------\n';
-        note += `Client is left with $${remainingIncome.toFixed(2)}\n`;
-      }
-      note += `\n${formatHeading('Reasonable Steps', 'custom', customHeadingFormat)}\n`;
-      if (e.reasonableSteps) note += `${e.reasonableSteps}\n`;
-      note += `\n${formatHeading('Outcome', 'custom', customHeadingFormat)}\n`;
-      if (e.decision === 'approved') note += 'APPLICATION APPROVED\n';
-      else if (e.decision === 'declined') note += 'APPLICATION DECLINED\n';
-      if (e.decisionReason) note += `${e.decisionReason}\n`;
       return note;
     } else if (service === 'generic-template') {
       // Generic Template note output (same template as emergency)
@@ -598,43 +760,51 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
         note += `${e.whyNeedEmergencyPayment}\n`;
       }
 
-      note += `\n${formatHeading('Payment', 'custom', customHeadingFormat)}\n`;
-      if (e.supplierName && e.supplierName.trim()) {
-        note += `Supplier Name: ${e.supplierName}\n`;
+      if (hasPaymentData(e)) {
+        note += `\n${formatHeading('Payment', 'custom', customHeadingFormat)}\n`;
+        if (e.supplierName && e.supplierName.trim()) {
+          note += `Supplier Name: ${e.supplierName}\n`;
+        }
+        if (e.supplierId && e.supplierId.trim()) {
+          note += `Supplier ID: ${e.supplierId}\n`;
+        }
+        if (e.paymentCardNumber && e.paymentCardNumber.trim()) {
+          note += `Payment card number: ${e.paymentCardNumber}\n`;
+        }
+        if (e.amount && e.amount > 0) {
+          note += `Amount: $${e.amount.toFixed(2)}\n`;
+        }
+        if (e.recoveryRate && e.recoveryRate > 0) {
+          note += `Recovery rate: $${e.recoveryRate.toFixed(2)}\n`;
+        }
+        if (e.directCredit === 'yes' && e.paymentReference) {
+          note += `Reference number: ${e.paymentReference}\n`;
+        }
       }
-      if (e.supplierId && e.supplierId.trim()) {
-        note += `Supplier ID: ${e.supplierId}\n`;
+      if (hasIncomeData(e.income)) {
+        note += `\n${formatHeading('Income', 'custom', customHeadingFormat)}\n`;
+        note += formatIncomeLines(e.income, e.incomeLabels);
+        e.costs.forEach((cost: { amount: number; cost: string }) => {
+          if (cost.amount > 0) note += `-$${cost.amount.toFixed(2)} ${cost.cost}\n`;
+        });
+        if (e.costs.length > 0) {
+          const totalIncome = (Object.values(e.income) as number[]).reduce((sum: number, value: number) => sum + (value || 0), 0);
+          const totalCosts = e.costs.reduce((sum: number, cost: { amount: number; cost: string }) => sum + (cost.amount || 0), 0);
+          const remainingIncome = totalIncome - totalCosts;
+          note += '--------------\n';
+          note += `Client is left with $${remainingIncome.toFixed(2)}\n`;
+        }
       }
-      if (e.paymentCardNumber && e.paymentCardNumber.trim()) {
-        note += `Payment card number: ${e.paymentCardNumber}\n`;
+      if (hasReasonableStepsData(e.reasonableSteps)) {
+        note += `\n${formatHeading('Reasonable Steps', 'custom', customHeadingFormat)}\n`;
+        note += `${e.reasonableSteps}\n`;
       }
-      if (e.amount && e.amount > 0) {
-        note += `Amount: $${e.amount.toFixed(2)}\n`;
+      if (hasOutcomeData(e.decision, e.decisionReason)) {
+        note += `\n${formatHeading('Outcome', 'custom', customHeadingFormat)}\n`;
+        if (e.decision === 'approved') note += 'APPLICATION APPROVED\n';
+        else if (e.decision === 'declined') note += 'APPLICATION DECLINED\n';
+        if (e.decisionReason) note += `${e.decisionReason}\n`;
       }
-      if (e.recoveryRate && e.recoveryRate > 0) {
-        note += `Recovery rate: $${e.recoveryRate.toFixed(2)}\n`;
-      }
-      if (e.directCredit === 'yes' && e.paymentReference) {
-        note += `Reference number: ${e.paymentReference}\n`;
-      }
-      note += `\n${formatHeading('Income', 'custom', customHeadingFormat)}\n`;
-      note += formatIncomeLines(e.income, e.incomeLabels);
-      e.costs.forEach((cost: { amount: number; cost: string }) => {
-        if (cost.amount > 0) note += `-$${cost.amount.toFixed(2)} ${cost.cost}\n`;
-      });
-      if (e.costs.length > 0) {
-        const totalIncome = (Object.values(e.income) as number[]).reduce((sum: number, value: number) => sum + (value || 0), 0);
-        const totalCosts = e.costs.reduce((sum: number, cost: { amount: number; cost: string }) => sum + (cost.amount || 0), 0);
-        const remainingIncome = totalIncome - totalCosts;
-        note += '--------------\n';
-        note += `Client is left with $${remainingIncome.toFixed(2)}\n`;
-      }
-      note += `\n${formatHeading('Reasonable Steps', 'custom', customHeadingFormat)}\n`;
-      if (e.reasonableSteps) note += `${e.reasonableSteps}\n`;
-      note += `\n${formatHeading('Outcome', 'custom', customHeadingFormat)}\n`;
-      if (e.decision === 'approved') note += 'APPLICATION APPROVED\n';
-      else if (e.decision === 'declined') note += 'APPLICATION DECLINED\n';
-      if (e.decisionReason) note += `${e.decisionReason}\n`;
       return note;
     } else if (service === 'transition-to-work') {
       // Transition to Work Grant note output
@@ -684,42 +854,48 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
         }
       }
 
-      note += `\n${formatHeading('Payment', 'custom', customHeadingFormat)}\n`;
-      if (t.supplierName && t.supplierName.trim()) {
-        note += `Supplier Name: ${t.supplierName}\n`;
+      if (hasPaymentData(t)) {
+        note += `\n${formatHeading('Payment', 'custom', customHeadingFormat)}\n`;
+        if (t.supplierName && t.supplierName.trim()) {
+          note += `Supplier Name: ${t.supplierName}\n`;
+        }
+        if (t.supplierId && t.supplierId.trim()) {
+          note += `Supplier ID: ${t.supplierId}\n`;
+        }
+        if (t.paymentCardNumber && t.paymentCardNumber.trim()) {
+          note += `Payment card number: ${t.paymentCardNumber}\n`;
+        }
+        if (t.amount && t.amount > 0) {
+          note += `Amount: $${t.amount.toFixed(2)}\n`;
+        }
+        if (t.recoveryRate && t.recoveryRate > 0) {
+          note += `Recovery rate: $${t.recoveryRate.toFixed(2)}\n`;
+        }
+        if (t.directCredit === 'yes' && t.paymentReference) {
+          note += `Reference number: ${t.paymentReference}\n`;
+        }
       }
-      if (t.supplierId && t.supplierId.trim()) {
-        note += `Supplier ID: ${t.supplierId}\n`;
-      }
-      if (t.paymentCardNumber && t.paymentCardNumber.trim()) {
-        note += `Payment card number: ${t.paymentCardNumber}\n`;
-      }
-      if (t.amount && t.amount > 0) {
-        note += `Amount: $${t.amount.toFixed(2)}\n`;
-      }
-      if (t.recoveryRate && t.recoveryRate > 0) {
-        note += `Recovery rate: $${t.recoveryRate.toFixed(2)}\n`;
-      }
-      if (t.directCredit === 'yes' && t.paymentReference) {
-        note += `Reference number: ${t.paymentReference}\n`;
-      }
-      note += `\n${formatHeading('Income', 'custom', customHeadingFormat)}\n`;
-      note += formatIncomeLines(t.income, t.incomeLabels);
-      t.costs.forEach((cost: { amount: number; cost: string }) => {
-        if (cost.amount > 0) note += `-$${cost.amount.toFixed(2)} ${cost.cost}\n`;
-      });
-      if (t.costs.length > 0) {
-        const totalIncome = (Object.values(t.income) as number[]).reduce((sum: number, value: number) => sum + (value || 0), 0);
-        const totalCosts = t.costs.reduce((sum: number, cost: { amount: number; cost: string }) => sum + (cost.amount || 0), 0);
-        const remainingIncome = totalIncome - totalCosts;
-        note += '--------------\n';
-        note += `Client is left with $${remainingIncome.toFixed(2)}\n`;
+      if (hasIncomeData(t.income)) {
+        note += `\n${formatHeading('Income', 'custom', customHeadingFormat)}\n`;
+        note += formatIncomeLines(t.income, t.incomeLabels);
+        t.costs.forEach((cost: { amount: number; cost: string }) => {
+          if (cost.amount > 0) note += `-$${cost.amount.toFixed(2)} ${cost.cost}\n`;
+        });
+        if (t.costs.length > 0) {
+          const totalIncome = (Object.values(t.income) as number[]).reduce((sum: number, value: number) => sum + (value || 0), 0);
+          const totalCosts = t.costs.reduce((sum: number, cost: { amount: number; cost: string }) => sum + (cost.amount || 0), 0);
+          const remainingIncome = totalIncome - totalCosts;
+          note += '--------------\n';
+          note += `Client is left with $${remainingIncome.toFixed(2)}\n`;
+        }
       }
       
-      note += `\n${formatHeading('Outcome', 'custom', customHeadingFormat)}\n`;
-      if (t.decision === 'approved') note += 'APPLICATION APPROVED\n';
-      else if (t.decision === 'declined') note += 'APPLICATION DECLINED\n';
-      if (t.decisionReason) note += `${t.decisionReason}\n`;
+      if (hasOutcomeData(t.decision, t.decisionReason)) {
+        note += `\n${formatHeading('Outcome', 'custom', customHeadingFormat)}\n`;
+        if (t.decision === 'approved') note += 'APPLICATION APPROVED\n';
+        else if (t.decision === 'declined') note += 'APPLICATION DECLINED\n';
+        if (t.decisionReason) note += `${t.decisionReason}\n`;
+      }
       return note;
     } else if (service === 'petrol-calculator') {
       // Petrol Calculator note output
@@ -761,40 +937,48 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
         note += `${a.whyNeedADSD}\n`;
       }
 
-      note += `\n${formatHeading('Payment', 'custom', customHeadingFormat)}\n`;
-      if (a.amount && a.amount > 0) {
-        note += `Amount: $${a.amount.toFixed(2)}\n`;
+      if (hasPaymentData(a)) {
+        note += `\n${formatHeading('Payment', 'custom', customHeadingFormat)}\n`;
+        if (a.amount && a.amount > 0) {
+          note += `Amount: $${a.amount.toFixed(2)}\n`;
+        }
+        if (a.bankAccount && a.bankAccount.trim()) {
+          note += `Bank account: ${a.bankAccount}\n`;
+        }
+        if (a.recoveryRate && a.recoveryRate > 0) {
+          note += `Recovery rate: $${a.recoveryRate.toFixed(2)}\n`;
+        }
+        if (a.paymentCardNumber && a.paymentCardNumber.trim()) {
+          note += `Payment card number: ${a.paymentCardNumber}\n`;
+        }
+        if (a.directCredit === 'yes' && a.paymentReference) {
+          note += `Reference number: ${a.paymentReference}\n`;
+        }
       }
-      if (a.bankAccount && a.bankAccount.trim()) {
-        note += `Bank account: ${a.bankAccount}\n`;
+      if (hasIncomeData(a.income)) {
+        note += `\n${formatHeading('Income', 'custom', customHeadingFormat)}\n`;
+        note += formatIncomeLines(a.income, a.incomeLabels);
+        a.costs.forEach((cost: { amount: number; cost: string }) => {
+          if (cost.amount > 0) note += `-$${cost.amount.toFixed(2)} ${cost.cost}\n`;
+        });
+        if (a.costs.length > 0) {
+          const totalIncome = (Object.values(a.income) as number[]).reduce((sum: number, value: number) => sum + (value || 0), 0);
+          const totalCosts = a.costs.reduce((sum: number, cost: { amount: number; cost: string }) => sum + (cost.amount || 0), 0);
+          const remainingIncome = totalIncome - totalCosts;
+          note += '--------------\n';
+          note += `Client is left with $${remainingIncome.toFixed(2)}\n`;
+        }
       }
-      if (a.recoveryRate && a.recoveryRate > 0) {
-        note += `Recovery rate: $${a.recoveryRate.toFixed(2)}\n`;
+      if (hasReasonableStepsData(a.reasonableSteps)) {
+        note += `\n${formatHeading('Reasonable Steps', 'custom', customHeadingFormat)}\n`;
+        note += `${a.reasonableSteps}\n`;
       }
-      if (a.paymentCardNumber && a.paymentCardNumber.trim()) {
-        note += `Payment card number: ${a.paymentCardNumber}\n`;
+      if (hasOutcomeData(a.decision, a.decisionReason)) {
+        note += `\n${formatHeading('Outcome', 'custom', customHeadingFormat)}\n`;
+        if (a.decision === 'approved') note += 'APPLICATION APPROVED\n';
+        else if (a.decision === 'declined') note += 'APPLICATION DECLINED\n';
+        if (a.decisionReason) note += `${a.decisionReason}\n`;
       }
-      if (a.directCredit === 'yes' && a.paymentReference) {
-        note += `Reference number: ${a.paymentReference}\n`;
-      }
-      note += `\n${formatHeading('Income', 'custom', customHeadingFormat)}\n`;
-      note += formatIncomeLines(a.income, a.incomeLabels);
-      a.costs.forEach((cost: { amount: number; cost: string }) => {
-        if (cost.amount > 0) note += `-$${cost.amount.toFixed(2)} ${cost.cost}\n`;
-      });
-      if (a.costs.length > 0) {
-        const totalIncome = (Object.values(a.income) as number[]).reduce((sum: number, value: number) => sum + (value || 0), 0);
-        const totalCosts = a.costs.reduce((sum: number, cost: { amount: number; cost: string }) => sum + (cost.amount || 0), 0);
-        const remainingIncome = totalIncome - totalCosts;
-        note += '--------------\n';
-        note += `Client is left with $${remainingIncome.toFixed(2)}\n`;
-      }
-      note += `\n${formatHeading('Reasonable Steps', 'custom', customHeadingFormat)}\n`;
-      if (a.reasonableSteps) note += `${a.reasonableSteps}\n`;
-      note += `\n${formatHeading('Outcome', 'custom', customHeadingFormat)}\n`;
-      if (a.decision === 'approved') note += 'APPLICATION APPROVED\n';
-      else if (a.decision === 'declined') note += 'APPLICATION DECLINED\n';
-      if (a.decisionReason) note += `${a.decisionReason}\n`;
       return note;
     } else if (service === 'rent-arrears') {
       // Rent Arrears note output
@@ -809,44 +993,52 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
         note += 'Rent arrears verification provided\n';
       }
 
-      note += `\n${formatHeading('Payment', 'custom', customHeadingFormat)}\n`;
-      if (r.supplierName && r.supplierName.trim()) {
-        note += `Supplier Name: ${r.supplierName}\n`;
+      if (hasPaymentData(r)) {
+        note += `\n${formatHeading('Payment', 'custom', customHeadingFormat)}\n`;
+        if (r.supplierName && r.supplierName.trim()) {
+          note += `Supplier Name: ${r.supplierName}\n`;
+        }
+        if (r.supplierId && r.supplierId.trim()) {
+          note += `Supplier ID: ${r.supplierId}\n`;
+        }
+        if (r.paymentCardNumber && r.paymentCardNumber.trim()) {
+          note += `Payment card number: ${r.paymentCardNumber}\n`;
+        }
+        if (r.amount && r.amount > 0) {
+          note += `Amount: $${r.amount.toFixed(2)}\n`;
+        }
+        if (r.recoveryRate && r.recoveryRate > 0) {
+          note += `Recovery rate: $${r.recoveryRate.toFixed(2)}\n`;
+        }
+        if (r.directCredit === 'yes' && r.paymentReference) {
+          note += `Reference number: ${r.paymentReference}\n`;
+        }
       }
-      if (r.supplierId && r.supplierId.trim()) {
-        note += `Supplier ID: ${r.supplierId}\n`;
-      }
-      if (r.paymentCardNumber && r.paymentCardNumber.trim()) {
-        note += `Payment card number: ${r.paymentCardNumber}\n`;
-      }
-      if (r.amount && r.amount > 0) {
-        note += `Amount: $${r.amount.toFixed(2)}\n`;
-      }
-      if (r.recoveryRate && r.recoveryRate > 0) {
-        note += `Recovery rate: $${r.recoveryRate.toFixed(2)}\n`;
-      }
-      if (r.directCredit === 'yes' && r.paymentReference) {
-        note += `Reference number: ${r.paymentReference}\n`;
-      }
-      note += `\n${formatHeading('Tenancy Affordability', 'custom', customHeadingFormat)}\n`;
-      note += formatIncomeLines(r.income, r.incomeLabels);
-      r.costs.forEach((cost: { amount: number; cost: string }) => {
-        if (cost.amount > 0) note += `-$${cost.amount.toFixed(2)} ${cost.cost}\n`;
-      });
-      if (r.costs.length > 0) {
-        const totalIncome = (Object.values(r.income) as number[]).reduce((sum: number, value: number) => sum + (value || 0), 0);
-        const totalCosts = r.costs.reduce((sum: number, cost: { amount: number; cost: string }) => sum + (cost.amount || 0), 0);
-        const remainingIncome = totalIncome - totalCosts;
-        note += '--------------\n';
-        note += `Client is left with $${remainingIncome.toFixed(2)}\n`;
+      if (hasIncomeData(r.income)) {
+        note += `\n${formatHeading('Tenancy Affordability', 'custom', customHeadingFormat)}\n`;
+        note += formatIncomeLines(r.income, r.incomeLabels);
+        r.costs.forEach((cost: { amount: number; cost: string }) => {
+          if (cost.amount > 0) note += `-$${cost.amount.toFixed(2)} ${cost.cost}\n`;
+        });
+        if (r.costs.length > 0) {
+          const totalIncome = (Object.values(r.income) as number[]).reduce((sum: number, value: number) => sum + (value || 0), 0);
+          const totalCosts = r.costs.reduce((sum: number, cost: { amount: number; cost: string }) => sum + (cost.amount || 0), 0);
+          const remainingIncome = totalIncome - totalCosts;
+          note += '--------------\n';
+          note += `Client is left with $${remainingIncome.toFixed(2)}\n`;
+        }
       }
       
-      note += `\n${formatHeading('Reasonable Steps', 'custom', customHeadingFormat)}\n`;
-      if (r.reasonableSteps) note += `${r.reasonableSteps}\n`;
-      note += `\n${formatHeading('Outcome', 'custom', customHeadingFormat)}\n`;
-      if (r.decision === 'approved') note += 'APPLICATION APPROVED\n';
-      else if (r.decision === 'declined') note += 'APPLICATION DECLINED\n';
-      if (r.decisionReason) note += `${r.decisionReason}\n`;
+      if (hasReasonableStepsData(r.reasonableSteps)) {
+        note += `\n${formatHeading('Reasonable Steps', 'custom', customHeadingFormat)}\n`;
+        note += `${r.reasonableSteps}\n`;
+      }
+      if (hasOutcomeData(r.decision, r.decisionReason)) {
+        note += `\n${formatHeading('Outcome', 'custom', customHeadingFormat)}\n`;
+        if (r.decision === 'approved') note += 'APPLICATION APPROVED\n';
+        else if (r.decision === 'declined') note += 'APPLICATION DECLINED\n';
+        if (r.decisionReason) note += `${r.decisionReason}\n`;
+      }
       return note;
     } else if (service === 'car-repairs') {
       // Car Repairs note output
@@ -868,44 +1060,52 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
         note += `${c.nztaVerification}\n`;
       }
 
-      note += `\n${formatHeading('Payment', 'custom', customHeadingFormat)}\n`;
-      if (c.supplierName && c.supplierName.trim()) {
-        note += `Supplier Name: ${c.supplierName}\n`;
+      if (hasPaymentData(c)) {
+        note += `\n${formatHeading('Payment', 'custom', customHeadingFormat)}\n`;
+        if (c.supplierName && c.supplierName.trim()) {
+          note += `Supplier Name: ${c.supplierName}\n`;
+        }
+        if (c.supplierId && c.supplierId.trim()) {
+          note += `Supplier ID: ${c.supplierId}\n`;
+        }
+        if (c.paymentCardNumber && c.paymentCardNumber.trim()) {
+          note += `Payment card number: ${c.paymentCardNumber}\n`;
+        }
+        if (c.amount && c.amount > 0) {
+          note += `Amount: $${c.amount.toFixed(2)}\n`;
+        }
+        if (c.recoveryRate && c.recoveryRate > 0) {
+          note += `Recovery rate: $${c.recoveryRate.toFixed(2)}\n`;
+        }
+        if (c.directCredit === 'yes' && c.paymentReference) {
+          note += `Reference number: ${c.paymentReference}\n`;
+        }
       }
-      if (c.supplierId && c.supplierId.trim()) {
-        note += `Supplier ID: ${c.supplierId}\n`;
-      }
-      if (c.paymentCardNumber && c.paymentCardNumber.trim()) {
-        note += `Payment card number: ${c.paymentCardNumber}\n`;
-      }
-      if (c.amount && c.amount > 0) {
-        note += `Amount: $${c.amount.toFixed(2)}\n`;
-      }
-      if (c.recoveryRate && c.recoveryRate > 0) {
-        note += `Recovery rate: $${c.recoveryRate.toFixed(2)}\n`;
-      }
-      if (c.directCredit === 'yes' && c.paymentReference) {
-        note += `Reference number: ${c.paymentReference}\n`;
-      }
-      note += `\n${formatHeading('Income', 'custom', customHeadingFormat)}\n`;
-      note += formatIncomeLines(c.income, c.incomeLabels);
-      c.costs.forEach((cost: { amount: number; cost: string }) => {
-        if (cost.amount > 0) note += `-$${cost.amount.toFixed(2)} ${cost.cost}\n`;
-      });
-      if (c.costs.length > 0) {
-        const totalIncome = (Object.values(c.income) as number[]).reduce((sum: number, value: number) => sum + (value || 0), 0);
-        const totalCosts = c.costs.reduce((sum: number, cost: { amount: number; cost: string }) => sum + (cost.amount || 0), 0);
-        const remainingIncome = totalIncome - totalCosts;
-        note += '--------------\n';
-        note += `Client is left with $${remainingIncome.toFixed(2)}\n`;
+      if (hasIncomeData(c.income)) {
+        note += `\n${formatHeading('Income', 'custom', customHeadingFormat)}\n`;
+        note += formatIncomeLines(c.income, c.incomeLabels);
+        c.costs.forEach((cost: { amount: number; cost: string }) => {
+          if (cost.amount > 0) note += `-$${cost.amount.toFixed(2)} ${cost.cost}\n`;
+        });
+        if (c.costs.length > 0) {
+          const totalIncome = (Object.values(c.income) as number[]).reduce((sum: number, value: number) => sum + (value || 0), 0);
+          const totalCosts = c.costs.reduce((sum: number, cost: { amount: number; cost: string }) => sum + (cost.amount || 0), 0);
+          const remainingIncome = totalIncome - totalCosts;
+          note += '--------------\n';
+          note += `Client is left with $${remainingIncome.toFixed(2)}\n`;
+        }
       }
       
-      note += `\n${formatHeading('Reasonable Steps', 'custom', customHeadingFormat)}\n`;
-      if (c.reasonableSteps) note += `${c.reasonableSteps}\n`;
-      note += `\n${formatHeading('Outcome', 'custom', customHeadingFormat)}\n`;
-      if (c.decision === 'approved') note += 'APPLICATION APPROVED\n';
-      else if (c.decision === 'declined') note += 'APPLICATION DECLINED\n';
-      if (c.decisionReason) note += `${c.decisionReason}\n`;
+      if (hasReasonableStepsData(c.reasonableSteps)) {
+        note += `\n${formatHeading('Reasonable Steps', 'custom', customHeadingFormat)}\n`;
+        note += `${c.reasonableSteps}\n`;
+      }
+      if (hasOutcomeData(c.decision, c.decisionReason)) {
+        note += `\n${formatHeading('Outcome', 'custom', customHeadingFormat)}\n`;
+        if (c.decision === 'approved') note += 'APPLICATION APPROVED\n';
+        else if (c.decision === 'declined') note += 'APPLICATION DECLINED\n';
+        if (c.decisionReason) note += `${c.decisionReason}\n`;
+      }
       return note;
     } else if (service === 'funeral-assistance') {
       // Funeral Assistance note output
@@ -933,44 +1133,52 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
         }
       }
 
-      note += `\n${formatHeading('Payment', 'custom', customHeadingFormat)}\n`;
-      if (f.supplierName && f.supplierName.trim()) {
-        note += `Supplier Name: ${f.supplierName}\n`;
+      if (hasPaymentData(f)) {
+        note += `\n${formatHeading('Payment', 'custom', customHeadingFormat)}\n`;
+        if (f.supplierName && f.supplierName.trim()) {
+          note += `Supplier Name: ${f.supplierName}\n`;
+        }
+        if (f.supplierId && f.supplierId.trim()) {
+          note += `Supplier ID: ${f.supplierId}\n`;
+        }
+        if (f.paymentCardNumber && f.paymentCardNumber.trim()) {
+          note += `Payment card number: ${f.paymentCardNumber}\n`;
+        }
+        if (f.amount && f.amount > 0) {
+          note += `Amount: $${f.amount.toFixed(2)}\n`;
+        }
+        if (f.recoveryRate && f.recoveryRate > 0) {
+          note += `Recovery rate: $${f.recoveryRate.toFixed(2)}\n`;
+        }
+        if (f.directCredit === 'yes' && f.paymentReference) {
+          note += `Reference number: ${f.paymentReference}\n`;
+        }
       }
-      if (f.supplierId && f.supplierId.trim()) {
-        note += `Supplier ID: ${f.supplierId}\n`;
-      }
-      if (f.paymentCardNumber && f.paymentCardNumber.trim()) {
-        note += `Payment card number: ${f.paymentCardNumber}\n`;
-      }
-      if (f.amount && f.amount > 0) {
-        note += `Amount: $${f.amount.toFixed(2)}\n`;
-      }
-      if (f.recoveryRate && f.recoveryRate > 0) {
-        note += `Recovery rate: $${f.recoveryRate.toFixed(2)}\n`;
-      }
-      if (f.directCredit === 'yes' && f.paymentReference) {
-        note += `Reference number: ${f.paymentReference}\n`;
-      }
-      note += `\n${formatHeading('Income', 'custom', customHeadingFormat)}\n`;
-      note += formatIncomeLines(f.income, f.incomeLabels);
-      f.costs.forEach((cost: { amount: number; cost: string }) => {
-        if (cost.amount > 0) note += `-$${cost.amount.toFixed(2)} ${cost.cost}\n`;
-      });
-      if (f.costs.length > 0) {
-        const totalIncome = (Object.values(f.income) as number[]).reduce((sum: number, value: number) => sum + (value || 0), 0);
-        const totalCosts = f.costs.reduce((sum: number, cost: { amount: number; cost: string }) => sum + (cost.amount || 0), 0);
-        const remainingIncome = totalIncome - totalCosts;
-        note += '--------------\n';
-        note += `Client is left with $${remainingIncome.toFixed(2)}\n`;
+      if (hasIncomeData(f.income)) {
+        note += `\n${formatHeading('Income', 'custom', customHeadingFormat)}\n`;
+        note += formatIncomeLines(f.income, f.incomeLabels);
+        f.costs.forEach((cost: { amount: number; cost: string }) => {
+          if (cost.amount > 0) note += `-$${cost.amount.toFixed(2)} ${cost.cost}\n`;
+        });
+        if (f.costs.length > 0) {
+          const totalIncome = (Object.values(f.income) as number[]).reduce((sum: number, value: number) => sum + (value || 0), 0);
+          const totalCosts = f.costs.reduce((sum: number, cost: { amount: number; cost: string }) => sum + (cost.amount || 0), 0);
+          const remainingIncome = totalIncome - totalCosts;
+          note += '--------------\n';
+          note += `Client is left with $${remainingIncome.toFixed(2)}\n`;
+        }
       }
       
-      note += `\n${formatHeading('Reasonable Steps', 'custom', customHeadingFormat)}\n`;
-      if (f.reasonableSteps) note += `${f.reasonableSteps}\n`;
-      note += `\n${formatHeading('Outcome', 'custom', customHeadingFormat)}\n`;
-      if (f.decision === 'approved') note += 'APPLICATION APPROVED\n';
-      else if (f.decision === 'declined') note += 'APPLICATION DECLINED\n';
-      if (f.decisionReason) note += `${f.decisionReason}\n`;
+      if (hasReasonableStepsData(f.reasonableSteps)) {
+        note += `\n${formatHeading('Reasonable Steps', 'custom', customHeadingFormat)}\n`;
+        note += `${f.reasonableSteps}\n`;
+      }
+      if (hasOutcomeData(f.decision, f.decisionReason)) {
+        note += `\n${formatHeading('Outcome', 'custom', customHeadingFormat)}\n`;
+        if (f.decision === 'approved') note += 'APPLICATION APPROVED\n';
+        else if (f.decision === 'declined') note += 'APPLICATION DECLINED\n';
+        if (f.decisionReason) note += `${f.decisionReason}\n`;
+      }
       return note;
     } else if (service === 'stranded-travel') {
       // Stranded Travel note output (same template as funeral assistance)
@@ -998,44 +1206,52 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
         }
       }
 
-      note += `\n${formatHeading('Payment', 'custom', customHeadingFormat)}\n`;
-      if (s.supplierName && s.supplierName.trim()) {
-        note += `Supplier Name: ${s.supplierName}\n`;
+      if (hasPaymentData(s)) {
+        note += `\n${formatHeading('Payment', 'custom', customHeadingFormat)}\n`;
+        if (s.supplierName && s.supplierName.trim()) {
+          note += `Supplier Name: ${s.supplierName}\n`;
+        }
+        if (s.supplierId && s.supplierId.trim()) {
+          note += `Supplier ID: ${s.supplierId}\n`;
+        }
+        if (s.paymentCardNumber && s.paymentCardNumber.trim()) {
+          note += `Payment card number: ${s.paymentCardNumber}\n`;
+        }
+        if (s.amount && s.amount > 0) {
+          note += `Amount: $${s.amount.toFixed(2)}\n`;
+        }
+        if (s.recoveryRate && s.recoveryRate > 0) {
+          note += `Recovery rate: $${s.recoveryRate.toFixed(2)}\n`;
+        }
+        if (s.directCredit === 'yes' && s.paymentReference) {
+          note += `Reference number: ${s.paymentReference}\n`;
+        }
       }
-      if (s.supplierId && s.supplierId.trim()) {
-        note += `Supplier ID: ${s.supplierId}\n`;
-      }
-      if (s.paymentCardNumber && s.paymentCardNumber.trim()) {
-        note += `Payment card number: ${s.paymentCardNumber}\n`;
-      }
-      if (s.amount && s.amount > 0) {
-        note += `Amount: $${s.amount.toFixed(2)}\n`;
-      }
-      if (s.recoveryRate && s.recoveryRate > 0) {
-        note += `Recovery rate: $${s.recoveryRate.toFixed(2)}\n`;
-      }
-      if (s.directCredit === 'yes' && s.paymentReference) {
-        note += `Reference number: ${s.paymentReference}\n`;
-      }
-      note += `\n${formatHeading('Income', 'custom', customHeadingFormat)}\n`;
-      note += formatIncomeLines(s.income, s.incomeLabels);
-      s.costs.forEach((cost: { amount: number; cost: string }) => {
-        if (cost.amount > 0) note += `-$${cost.amount.toFixed(2)} ${cost.cost}\n`;
-      });
-      if (s.costs.length > 0) {
-        const totalIncome = (Object.values(s.income) as number[]).reduce((sum: number, value: number) => sum + (value || 0), 0);
-        const totalCosts = s.costs.reduce((sum: number, cost: { amount: number; cost: string }) => sum + (cost.amount || 0), 0);
-        const remainingIncome = totalIncome - totalCosts;
-        note += '--------------\n';
-        note += `Client is left with $${remainingIncome.toFixed(2)}\n`;
+      if (hasIncomeData(s.income)) {
+        note += `\n${formatHeading('Income', 'custom', customHeadingFormat)}\n`;
+        note += formatIncomeLines(s.income, s.incomeLabels);
+        s.costs.forEach((cost: { amount: number; cost: string }) => {
+          if (cost.amount > 0) note += `-$${cost.amount.toFixed(2)} ${cost.cost}\n`;
+        });
+        if (s.costs.length > 0) {
+          const totalIncome = (Object.values(s.income) as number[]).reduce((sum: number, value: number) => sum + (value || 0), 0);
+          const totalCosts = s.costs.reduce((sum: number, cost: { amount: number; cost: string }) => sum + (cost.amount || 0), 0);
+          const remainingIncome = totalIncome - totalCosts;
+          note += '--------------\n';
+          note += `Client is left with $${remainingIncome.toFixed(2)}\n`;
+        }
       }
       
-      note += `\n${formatHeading('Reasonable Steps', 'custom', customHeadingFormat)}\n`;
-      if (s.reasonableSteps) note += `${s.reasonableSteps}\n`;
-      note += `\n${formatHeading('Outcome', 'custom', customHeadingFormat)}\n`;
-      if (s.decision === 'approved') note += 'APPLICATION APPROVED\n';
-      else if (s.decision === 'declined') note += 'APPLICATION DECLINED\n';
-      if (s.decisionReason) note += `${s.decisionReason}\n`;
+      if (hasReasonableStepsData(s.reasonableSteps)) {
+        note += `\n${formatHeading('Reasonable Steps', 'custom', customHeadingFormat)}\n`;
+        note += `${s.reasonableSteps}\n`;
+      }
+      if (hasOutcomeData(s.decision, s.decisionReason)) {
+        note += `\n${formatHeading('Outcome', 'custom', customHeadingFormat)}\n`;
+        if (s.decision === 'approved') note += 'APPLICATION APPROVED\n';
+        else if (s.decision === 'declined') note += 'APPLICATION DECLINED\n';
+        if (s.decisionReason) note += `${s.decisionReason}\n`;
+      }
       return note;
     } else if (service === 'bond-rent') {
       // Bond/Rent in Advance note output
@@ -1053,52 +1269,60 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
         note += `Tenancy start date: ${formatCalendarDate(b.tenancyStartDate)}\n`;
       }
       
-      note += `\n${formatHeading('Payment', 'custom', customHeadingFormat)}\n`;
-      if (b.supplierName && b.supplierName.trim()) {
-        note += `Supplier Name: ${b.supplierName}\n`;
-      }
-      if (b.supplierId && b.supplierId.trim()) {
-        note += `Supplier ID: ${b.supplierId}\n`;
-      }
-      if (b.paymentCardNumber && b.paymentCardNumber.trim()) {
-        note += `Payment card number: ${b.paymentCardNumber}\n`;
-      }
-      if (b.bondAmount && b.bondAmount > 0) {
-        note += `Bond Amount: $${b.bondAmount.toFixed(2)}\n`;
-      }
-      if (b.rentInAdvanceAmount && b.rentInAdvanceAmount > 0) {
-        note += `Rent in Advance Amount: $${b.rentInAdvanceAmount.toFixed(2)}\n`;
-      }
-      const totalAmount = (b.bondAmount || 0) + (b.rentInAdvanceAmount || 0);
-      if (totalAmount > 0) {
-        note += `Total Amount: $${totalAmount.toFixed(2)}\n`;
-      }
-      if (b.recoveryRate && b.recoveryRate > 0) {
-        note += `Recovery rate: $${b.recoveryRate.toFixed(2)}\n`;
-      }
-      if (b.directCredit === 'yes' && b.paymentReference) {
-        note += `Reference number: ${b.paymentReference}\n`;
-      }
-      
-      note += `\n${formatHeading('Tenancy Affordability', 'custom', customHeadingFormat)}\n`;
-      note += formatIncomeLines(b.income, b.incomeLabels);
-      b.costs.forEach((cost: { amount: number; cost: string }) => {
-        if (cost.amount > 0) note += `-$${cost.amount.toFixed(2)} ${cost.cost}\n`;
-      });
-      if (b.costs.length > 0) {
-        const totalIncome = (Object.values(b.income) as number[]).reduce((sum: number, value: number) => sum + (value || 0), 0);
-        const totalCosts = b.costs.reduce((sum: number, cost: { amount: number; cost: string }) => sum + (cost.amount || 0), 0);
-        const remainingIncome = totalIncome - totalCosts;
-        note += '--------------\n';
-        note += `Client is left with $${remainingIncome.toFixed(2)}\n`;
+      if (hasPaymentData(b)) {
+        note += `\n${formatHeading('Payment', 'custom', customHeadingFormat)}\n`;
+        if (b.supplierName && b.supplierName.trim()) {
+          note += `Supplier Name: ${b.supplierName}\n`;
+        }
+        if (b.supplierId && b.supplierId.trim()) {
+          note += `Supplier ID: ${b.supplierId}\n`;
+        }
+        if (b.paymentCardNumber && b.paymentCardNumber.trim()) {
+          note += `Payment card number: ${b.paymentCardNumber}\n`;
+        }
+        if (b.bondAmount && b.bondAmount > 0) {
+          note += `Bond Amount: $${b.bondAmount.toFixed(2)}\n`;
+        }
+        if (b.rentInAdvanceAmount && b.rentInAdvanceAmount > 0) {
+          note += `Rent in Advance Amount: $${b.rentInAdvanceAmount.toFixed(2)}\n`;
+        }
+        const totalAmount = (b.bondAmount || 0) + (b.rentInAdvanceAmount || 0);
+        if (totalAmount > 0) {
+          note += `Total Amount: $${totalAmount.toFixed(2)}\n`;
+        }
+        if (b.recoveryRate && b.recoveryRate > 0) {
+          note += `Recovery rate: $${b.recoveryRate.toFixed(2)}\n`;
+        }
+        if (b.directCredit === 'yes' && b.paymentReference) {
+          note += `Reference number: ${b.paymentReference}\n`;
+        }
       }
       
-      note += `\n${formatHeading('Reasonable Steps', 'custom', customHeadingFormat)}\n`;
-      if (b.reasonableSteps) note += `${b.reasonableSteps}\n`;
-      note += `\n${formatHeading('Outcome', 'custom', customHeadingFormat)}\n`;
-      if (b.decision === 'approved') note += 'APPLICATION APPROVED\n';
-      else if (b.decision === 'declined') note += 'APPLICATION DECLINED\n';
-      if (b.decisionReason) note += `${b.decisionReason}\n`;
+      if (hasIncomeData(b.income)) {
+        note += `\n${formatHeading('Tenancy Affordability', 'custom', customHeadingFormat)}\n`;
+        note += formatIncomeLines(b.income, b.incomeLabels);
+        b.costs.forEach((cost: { amount: number; cost: string }) => {
+          if (cost.amount > 0) note += `-$${cost.amount.toFixed(2)} ${cost.cost}\n`;
+        });
+        if (b.costs.length > 0) {
+          const totalIncome = (Object.values(b.income) as number[]).reduce((sum: number, value: number) => sum + (value || 0), 0);
+          const totalCosts = b.costs.reduce((sum: number, cost: { amount: number; cost: string }) => sum + (cost.amount || 0), 0);
+          const remainingIncome = totalIncome - totalCosts;
+          note += '--------------\n';
+          note += `Client is left with $${remainingIncome.toFixed(2)}\n`;
+        }
+      }
+      
+      if (hasReasonableStepsData(b.reasonableSteps)) {
+        note += `\n${formatHeading('Reasonable Steps', 'custom', customHeadingFormat)}\n`;
+        note += `${b.reasonableSteps}\n`;
+      }
+      if (hasOutcomeData(b.decision, b.decisionReason)) {
+        note += `\n${formatHeading('Outcome', 'custom', customHeadingFormat)}\n`;
+        if (b.decision === 'approved') note += 'APPLICATION APPROVED\n';
+        else if (b.decision === 'declined') note += 'APPLICATION DECLINED\n';
+        if (b.decisionReason) note += `${b.decisionReason}\n`;
+      }
       return note;
     } else if (service === 'electricity') {
       // Electricity note output (similar to clothing)
@@ -1109,43 +1333,51 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       if (e.whyNeedPower) note += `${e.whyNeedPower}\n`;
 
       note += `Power Account Number: ${e.powerAccountNumber || '-'}\n`;
-      note += `\n${formatHeading('Payment', 'custom', customHeadingFormat)}\n`;
-      if (e.supplierName && e.supplierName.trim()) {
-        note += `Supplier Name: ${e.supplierName}\n`;
+      if (hasPaymentData(e)) {
+        note += `\n${formatHeading('Payment', 'custom', customHeadingFormat)}\n`;
+        if (e.supplierName && e.supplierName.trim()) {
+          note += `Supplier Name: ${e.supplierName}\n`;
+        }
+        if (e.supplierId && e.supplierId.trim()) {
+          note += `Supplier ID: ${e.supplierId}\n`;
+        }
+        if (e.paymentCardNumber && e.paymentCardNumber.trim()) {
+          note += `Payment card number: ${e.paymentCardNumber}\n`;
+        }
+        if (e.amount && e.amount > 0) {
+          note += `Amount: $${e.amount.toFixed(2)}\n`;
+        }
+        if (e.recoveryRate && e.recoveryRate > 0) {
+          note += `Recovery rate: $${e.recoveryRate.toFixed(2)}\n`;
+        }
+        if (e.directCredit === 'yes' && e.paymentReference) {
+          note += `Reference number: ${e.paymentReference}\n`;
+        }
       }
-      if (e.supplierId && e.supplierId.trim()) {
-        note += `Supplier ID: ${e.supplierId}\n`;
+      if (hasIncomeData(e.income)) {
+        note += `\n${formatHeading('Income', 'custom', customHeadingFormat)}\n`;
+        note += formatIncomeLines(e.income, e.incomeLabels);
+        e.costs.forEach((cost: { amount: number; cost: string }) => {
+          if (cost.amount > 0) note += `-$${cost.amount.toFixed(2)} ${cost.cost}\n`;
+        });
+        if (e.costs.length > 0) {
+          const totalIncome = (Object.values(e.income) as number[]).reduce((sum: number, value: number) => sum + (value || 0), 0);
+          const totalCosts = e.costs.reduce((sum: number, cost: { amount: number; cost: string }) => sum + (cost.amount || 0), 0);
+          const remainingIncome = totalIncome - totalCosts;
+          note += '--------------\n';
+          note += `Client is left with $${remainingIncome.toFixed(2)}\n`;
+        }
       }
-      if (e.paymentCardNumber && e.paymentCardNumber.trim()) {
-        note += `Payment card number: ${e.paymentCardNumber}\n`;
+      if (hasReasonableStepsData(e.reasonableSteps)) {
+        note += `\n${formatHeading('Reasonable Steps', 'custom', customHeadingFormat)}\n`;
+        note += `${e.reasonableSteps}\n`;
       }
-      if (e.amount && e.amount > 0) {
-        note += `Amount: $${e.amount.toFixed(2)}\n`;
+      if (hasOutcomeData(e.decision, e.decisionReason)) {
+        note += `\n${formatHeading('Outcome', 'custom', customHeadingFormat)}\n`;
+        if (e.decision === 'approved') note += 'APPLICATION APPROVED\n';
+        else if (e.decision === 'declined') note += 'APPLICATION DECLINED\n';
+        if (e.decisionReason) note += `${e.decisionReason}\n`;
       }
-      if (e.recoveryRate && e.recoveryRate > 0) {
-        note += `Recovery rate: $${e.recoveryRate.toFixed(2)}\n`;
-      }
-      if (e.directCredit === 'yes' && e.paymentReference) {
-        note += `Reference number: ${e.paymentReference}\n`;
-      }
-      note += `\n${formatHeading('Income', 'custom', customHeadingFormat)}\n`;
-      note += formatIncomeLines(e.income, e.incomeLabels);
-      e.costs.forEach((cost: { amount: number; cost: string }) => {
-        if (cost.amount > 0) note += `-$${cost.amount.toFixed(2)} ${cost.cost}\n`;
-      });
-      if (e.costs.length > 0) {
-        const totalIncome = (Object.values(e.income) as number[]).reduce((sum: number, value: number) => sum + (value || 0), 0);
-        const totalCosts = e.costs.reduce((sum: number, cost: { amount: number; cost: string }) => sum + (cost.amount || 0), 0);
-        const remainingIncome = totalIncome - totalCosts;
-        note += '--------------\n';
-        note += `Client is left with $${remainingIncome.toFixed(2)}\n`;
-      }
-      note += `\n${formatHeading('Reasonable Steps', 'custom', customHeadingFormat)}\n`;
-      if (e.reasonableSteps) note += `${e.reasonableSteps}\n`;
-      note += `\n${formatHeading('Outcome', 'custom', customHeadingFormat)}\n`;
-      if (e.decision === 'approved') note += 'APPLICATION APPROVED\n';
-      else if (e.decision === 'declined') note += 'APPLICATION DECLINED\n';
-      if (e.decisionReason) note += `${e.decisionReason}\n`;
       return note;
     } else if (service === 'dental') {
       // Dental note output
@@ -1155,49 +1387,57 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       note += `${formatHeading('Need', 'custom', customHeadingFormat)}\n`;
       if (d.whyNeedDental) note += `${d.whyNeedDental}\n`;
 
-      note += `\n${formatHeading('Payment', 'custom', customHeadingFormat)}\n`;
-      if (d.supplierName && d.supplierName.trim()) {
-        note += `Supplier Name: ${d.supplierName}\n`;
+      if (hasPaymentData(d)) {
+        note += `\n${formatHeading('Payment', 'custom', customHeadingFormat)}\n`;
+        if (d.supplierName && d.supplierName.trim()) {
+          note += `Supplier Name: ${d.supplierName}\n`;
+        }
+        if (d.supplierId && d.supplierId.trim()) {
+          note += `Supplier ID: ${d.supplierId}\n`;
+        }
+        if (d.paymentCardNumber && d.paymentCardNumber.trim()) {
+          note += `Payment card number: ${d.paymentCardNumber}\n`;
+        }
+        if (d.amount && d.amount > 0) {
+          note += `Total Cost: $${d.amount.toFixed(2)}\n`;
+        }
+        if (d.sngEligible === 'yes') {
+          const sng = Math.min(d.amount, d.sngBalance || 0);
+          const advance = Math.max(0, d.amount - sng);
+          note += `SNG: $${sng.toFixed(2)}\n`;
+          if (advance > 0) note += `Advance: $${advance.toFixed(2)}\n`;
+        }
+        if (d.recoveryRate && d.recoveryRate > 0) {
+          note += `Recovery rate: $${d.recoveryRate.toFixed(2)}\n`;
+        }
+        if (d.directCredit === 'yes' && d.paymentReference) {
+          note += `Reference number: ${d.paymentReference}\n`;
+        }
       }
-      if (d.supplierId && d.supplierId.trim()) {
-        note += `Supplier ID: ${d.supplierId}\n`;
+      if (hasIncomeData(d.income)) {
+        note += `\n${formatHeading('Income', 'custom', customHeadingFormat)}\n`;
+        note += formatIncomeLines(d.income, d.incomeLabels);
+        d.costs.forEach((cost: { amount: number; cost: string }) => {
+          if (cost.amount > 0) note += `-$${cost.amount.toFixed(2)} ${cost.cost}\n`;
+        });
+        if (d.costs.length > 0) {
+          const totalIncome = (Object.values(d.income) as number[]).reduce((sum: number, value: number) => sum + (value || 0), 0);
+          const totalCosts = d.costs.reduce((sum: number, cost: { amount: number; cost: string }) => sum + (cost.amount || 0), 0);
+          const remainingIncome = totalIncome - totalCosts;
+          note += '--------------\n';
+          note += `Client is left with $${remainingIncome.toFixed(2)}\n`;
+        }
       }
-      if (d.paymentCardNumber && d.paymentCardNumber.trim()) {
-        note += `Payment card number: ${d.paymentCardNumber}\n`;
+      if (hasReasonableStepsData(d.reasonableSteps)) {
+        note += `\n${formatHeading('Reasonable Steps', 'custom', customHeadingFormat)}\n`;
+        note += `${d.reasonableSteps}\n`;
       }
-      if (d.amount && d.amount > 0) {
-        note += `Total Cost: $${d.amount.toFixed(2)}\n`;
+      if (hasOutcomeData(d.decision, d.decisionReason)) {
+        note += `\n${formatHeading('Outcome', 'custom', customHeadingFormat)}\n`;
+        if (d.decision === 'approved') note += 'APPLICATION APPROVED\n';
+        else if (d.decision === 'declined') note += 'APPLICATION DECLINED\n';
+        if (d.decisionReason) note += `${d.decisionReason}\n`;
       }
-      if (d.sngEligible === 'yes') {
-        const sng = Math.min(d.amount, d.sngBalance || 0);
-        const advance = Math.max(0, d.amount - sng);
-        note += `SNG: $${sng.toFixed(2)}\n`;
-        if (advance > 0) note += `Advance: $${advance.toFixed(2)}\n`;
-      }
-      if (d.recoveryRate && d.recoveryRate > 0) {
-        note += `Recovery rate: $${d.recoveryRate.toFixed(2)}\n`;
-      }
-      if (d.directCredit === 'yes' && d.paymentReference) {
-        note += `Reference number: ${d.paymentReference}\n`;
-      }
-      note += `\n${formatHeading('Income', 'custom', customHeadingFormat)}\n`;
-      note += formatIncomeLines(d.income, d.incomeLabels);
-      d.costs.forEach((cost: { amount: number; cost: string }) => {
-        if (cost.amount > 0) note += `-$${cost.amount.toFixed(2)} ${cost.cost}\n`;
-      });
-      if (d.costs.length > 0) {
-        const totalIncome = (Object.values(d.income) as number[]).reduce((sum: number, value: number) => sum + (value || 0), 0);
-        const totalCosts = d.costs.reduce((sum: number, cost: { amount: number; cost: string }) => sum + (cost.amount || 0), 0);
-        const remainingIncome = totalIncome - totalCosts;
-        note += '--------------\n';
-        note += `Client is left with $${remainingIncome.toFixed(2)}\n`;
-      }
-      note += `\n${formatHeading('Reasonable Steps', 'custom', customHeadingFormat)}\n`;
-      if (d.reasonableSteps) note += `${d.reasonableSteps}\n`;
-      note += `\n${formatHeading('Outcome', 'custom', customHeadingFormat)}\n`;
-      if (d.decision === 'approved') note += 'APPLICATION APPROVED\n';
-      else if (d.decision === 'declined') note += 'APPLICATION DECLINED\n';
-      if (d.decisionReason) note += `${d.decisionReason}\n`;
       return note;
     } else if (service === 'beds') {
       // Beds note output (like clothing, but beds wording)
@@ -1207,43 +1447,51 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       note += `${formatHeading('Need', 'custom', customHeadingFormat)}\n`;
       if (b.whyNeedBeds) note += `${b.whyNeedBeds}\n`;
 
-      note += `\n${formatHeading('Payment', 'custom', customHeadingFormat)}\n`;
-      if (b.supplierName && b.supplierName.trim()) {
-        note += `Supplier Name: ${b.supplierName}\n`;
+      if (hasPaymentData(b)) {
+        note += `\n${formatHeading('Payment', 'custom', customHeadingFormat)}\n`;
+        if (b.supplierName && b.supplierName.trim()) {
+          note += `Supplier Name: ${b.supplierName}\n`;
+        }
+        if (b.supplierId && b.supplierId.trim()) {
+          note += `Supplier ID: ${b.supplierId}\n`;
+        }
+        if (b.paymentCardNumber && b.paymentCardNumber.trim()) {
+          note += `Payment card number: ${b.paymentCardNumber}\n`;
+        }
+        if (b.amount && b.amount > 0) {
+          note += `Amount: $${b.amount.toFixed(2)}\n`;
+        }
+        if (b.recoveryRate && b.recoveryRate > 0) {
+          note += `Recovery rate: $${b.recoveryRate.toFixed(2)}\n`;
+        }
+        if (b.directCredit === 'yes' && b.paymentReference) {
+          note += `Reference number: ${b.paymentReference}\n`;
+        }
       }
-      if (b.supplierId && b.supplierId.trim()) {
-        note += `Supplier ID: ${b.supplierId}\n`;
+      if (hasIncomeData(b.income)) {
+        note += `\n${formatHeading('Income', 'custom', customHeadingFormat)}\n`;
+        note += formatIncomeLines(b.income, b.incomeLabels);
+        (b.costs as Array<{amount:number;cost:string}>).forEach((cost: {amount:number;cost:string}) => {
+          if (cost.amount > 0) note += `-$${cost.amount.toFixed(2)} ${cost.cost}\n`;
+        });
+        if (b.costs && b.costs.length > 0) {
+          const totalIncome = (Object.values(b.income) as number[]).reduce((sum: number, value: number) => sum + (value || 0), 0);
+          const totalCosts = (b.costs as Array<{amount:number}>).reduce((sum: number, cost: {amount:number}) => sum + (cost.amount || 0), 0);
+          const remainingIncome = totalIncome - totalCosts;
+          note += '--------------\n';
+          note += `Client is left with $${remainingIncome.toFixed(2)}\n`;
+        }
       }
-      if (b.paymentCardNumber && b.paymentCardNumber.trim()) {
-        note += `Payment card number: ${b.paymentCardNumber}\n`;
+      if (hasReasonableStepsData(b.reasonableSteps)) {
+        note += `\n${formatHeading('Reasonable Steps', 'custom', customHeadingFormat)}\n`;
+        note += `${b.reasonableSteps}\n`;
       }
-      if (b.amount && b.amount > 0) {
-        note += `Amount: $${b.amount.toFixed(2)}\n`;
+      if (hasOutcomeData(b.decision, b.decisionReason)) {
+        note += `\n${formatHeading('Outcome', 'custom', customHeadingFormat)}\n`;
+        if (b.decision === 'approved') note += 'APPLICATION APPROVED\n';
+        else if (b.decision === 'declined') note += 'APPLICATION DECLINED\n';
+        if (b.decisionReason) note += `${b.decisionReason}\n`;
       }
-      if (b.recoveryRate && b.recoveryRate > 0) {
-        note += `Recovery rate: $${b.recoveryRate.toFixed(2)}\n`;
-      }
-      if (b.directCredit === 'yes' && b.paymentReference) {
-        note += `Reference number: ${b.paymentReference}\n`;
-      }
-      note += `\n${formatHeading('Income', 'custom', customHeadingFormat)}\n`;
-      note += formatIncomeLines(b.income, b.incomeLabels);
-      (b.costs as Array<{amount:number;cost:string}>).forEach((cost: {amount:number;cost:string}) => {
-        if (cost.amount > 0) note += `-$${cost.amount.toFixed(2)} ${cost.cost}\n`;
-      });
-      if (b.costs && b.costs.length > 0) {
-        const totalIncome = (Object.values(b.income) as number[]).reduce((sum: number, value: number) => sum + (value || 0), 0);
-        const totalCosts = (b.costs as Array<{amount:number}>).reduce((sum: number, cost: {amount:number}) => sum + (cost.amount || 0), 0);
-        const remainingIncome = totalIncome - totalCosts;
-        note += '--------------\n';
-        note += `Client is left with $${remainingIncome.toFixed(2)}\n`;
-      }
-      note += `\n${formatHeading('Reasonable Steps', 'custom', customHeadingFormat)}\n`;
-      if (b.reasonableSteps) note += `${b.reasonableSteps}\n`;
-      note += `\n${formatHeading('Outcome', 'custom', customHeadingFormat)}\n`;
-      if (b.decision === 'approved') note += 'APPLICATION APPROVED\n';
-      else if (b.decision === 'declined') note += 'APPLICATION DECLINED\n';
-      if (b.decisionReason) note += `${b.decisionReason}\n`;
       return note;
     } else if (service === 'furniture') {
       // Furniture note output (like beds, but furniture wording)
@@ -1254,43 +1502,51 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       if (f.whyNeedFurniture) note += `${f.whyNeedFurniture}\n`;
       if (f.furnitureType) note += `Client is requesting help with a ${f.furnitureType}\n`;
 
-      note += `\n${formatHeading('Payment', 'custom', customHeadingFormat)}\n`;
-      if (f.supplierName && f.supplierName.trim()) {
-        note += `Supplier Name: ${f.supplierName}\n`;
+      if (hasPaymentData(f)) {
+        note += `\n${formatHeading('Payment', 'custom', customHeadingFormat)}\n`;
+        if (f.supplierName && f.supplierName.trim()) {
+          note += `Supplier Name: ${f.supplierName}\n`;
+        }
+        if (f.supplierId && f.supplierId.trim()) {
+          note += `Supplier ID: ${f.supplierId}\n`;
+        }
+        if (f.paymentCardNumber && f.paymentCardNumber.trim()) {
+          note += `Payment card number: ${f.paymentCardNumber}\n`;
+        }
+        if (f.amount && f.amount > 0) {
+          note += `Amount: $${f.amount.toFixed(2)}\n`;
+        }
+        if (f.recoveryRate && f.recoveryRate > 0) {
+          note += `Recovery rate: $${f.recoveryRate.toFixed(2)}\n`;
+        }
+        if (f.directCredit === 'yes' && f.paymentReference) {
+          note += `Reference number: ${f.paymentReference}\n`;
+        }
       }
-      if (f.supplierId && f.supplierId.trim()) {
-        note += `Supplier ID: ${f.supplierId}\n`;
+      if (hasIncomeData(f.income)) {
+        note += `\n${formatHeading('Income', 'custom', customHeadingFormat)}\n`;
+        note += formatIncomeLines(f.income, f.incomeLabels);
+        (f.costs as Array<{amount:number;cost:string}>).forEach((cost: {amount:number;cost:string}) => {
+          if (cost.amount > 0) note += `-$${cost.amount.toFixed(2)} ${cost.cost}\n`;
+        });
+        if (f.costs && f.costs.length > 0) {
+          const totalIncome = (Object.values(f.income) as number[]).reduce((sum: number, value: number) => sum + (value || 0), 0);
+          const totalCosts = (f.costs as Array<{amount:number}>).reduce((sum: number, cost: {amount:number}) => sum + (cost.amount || 0), 0);
+          const remainingIncome = totalIncome - totalCosts;
+          note += '--------------\n';
+          note += `Client is left with $${remainingIncome.toFixed(2)}\n`;
+        }
       }
-      if (f.paymentCardNumber && f.paymentCardNumber.trim()) {
-        note += `Payment card number: ${f.paymentCardNumber}\n`;
+      if (hasReasonableStepsData(f.reasonableSteps)) {
+        note += `\n${formatHeading('Reasonable Steps', 'custom', customHeadingFormat)}\n`;
+        note += `${f.reasonableSteps}\n`;
       }
-      if (f.amount && f.amount > 0) {
-        note += `Amount: $${f.amount.toFixed(2)}\n`;
+      if (hasOutcomeData(f.decision, f.decisionReason)) {
+        note += `\n${formatHeading('Outcome', 'custom', customHeadingFormat)}\n`;
+        if (f.decision === 'approved') note += 'APPLICATION APPROVED\n';
+        else if (f.decision === 'declined') note += 'APPLICATION DECLINED\n';
+        if (f.decisionReason) note += `${f.decisionReason}\n`;
       }
-      if (f.recoveryRate && f.recoveryRate > 0) {
-        note += `Recovery rate: $${f.recoveryRate.toFixed(2)}\n`;
-      }
-      if (f.directCredit === 'yes' && f.paymentReference) {
-        note += `Reference number: ${f.paymentReference}\n`;
-      }
-      note += `\n${formatHeading('Income', 'custom', customHeadingFormat)}\n`;
-      note += formatIncomeLines(f.income, f.incomeLabels);
-      (f.costs as Array<{amount:number;cost:string}>).forEach((cost: {amount:number;cost:string}) => {
-        if (cost.amount > 0) note += `-$${cost.amount.toFixed(2)} ${cost.cost}\n`;
-      });
-      if (f.costs && f.costs.length > 0) {
-        const totalIncome = (Object.values(f.income) as number[]).reduce((sum: number, value: number) => sum + (value || 0), 0);
-        const totalCosts = (f.costs as Array<{amount:number}>).reduce((sum: number, cost: {amount:number}) => sum + (cost.amount || 0), 0);
-        const remainingIncome = totalIncome - totalCosts;
-        note += '--------------\n';
-        note += `Client is left with $${remainingIncome.toFixed(2)}\n`;
-      }
-      note += `\n${formatHeading('Reasonable Steps', 'custom', customHeadingFormat)}\n`;
-      if (f.reasonableSteps) note += `${f.reasonableSteps}\n`;
-      note += `\n${formatHeading('Outcome', 'custom', customHeadingFormat)}\n`;
-      if (f.decision === 'approved') note += 'APPLICATION APPROVED\n';
-      else if (f.decision === 'declined') note += 'APPLICATION DECLINED\n';
-      if (f.decisionReason) note += `${f.decisionReason}\n`;
       return note;
     } else if (service === 'bedding') {
       // Bedding note output (like beds, with SNG logic)
@@ -1304,43 +1560,51 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
         note += '\nClient qualifies for bedding SNG\n';
         if (b.beddingSngReason) note += `Reason: ${b.beddingSngReason}\n`;
       }
-      note += `\n${formatHeading('Payment', 'custom', customHeadingFormat)}\n`;
-      if (b.supplierName && b.supplierName.trim()) {
-        note += `Supplier Name: ${b.supplierName}\n`;
+      if (hasPaymentData(b)) {
+        note += `\n${formatHeading('Payment', 'custom', customHeadingFormat)}\n`;
+        if (b.supplierName && b.supplierName.trim()) {
+          note += `Supplier Name: ${b.supplierName}\n`;
+        }
+        if (b.supplierId && b.supplierId.trim()) {
+          note += `Supplier ID: ${b.supplierId}\n`;
+        }
+        if (b.paymentCardNumber && b.paymentCardNumber.trim()) {
+          note += `Payment card number: ${b.paymentCardNumber}\n`;
+        }
+        if (b.amount && b.amount > 0) {
+          note += `Amount: $${b.amount.toFixed(2)}\n`;
+        }
+        if (b.recoveryRate && b.recoveryRate > 0) {
+          note += `Recovery rate: $${b.recoveryRate.toFixed(2)}\n`;
+        }
+        if (b.directCredit === 'yes' && b.paymentReference) {
+          note += `Reference number: ${b.paymentReference}\n`;
+        }
       }
-      if (b.supplierId && b.supplierId.trim()) {
-        note += `Supplier ID: ${b.supplierId}\n`;
+      if (hasIncomeData(b.income)) {
+        note += `\n${formatHeading('Income', 'custom', customHeadingFormat)}\n`;
+        note += formatIncomeLines(b.income, b.incomeLabels);
+        (b.costs as Array<{amount:number;cost:string}>).forEach((cost: {amount:number;cost:string}) => {
+          if (cost.amount > 0) note += `-$${cost.amount.toFixed(2)} ${cost.cost}\n`;
+        });
+        if (b.costs && b.costs.length > 0) {
+          const totalIncome = (Object.values(b.income as {[k:string]:number}) as number[]).reduce((sum: number, value: number) => sum + (value || 0), 0);
+          const totalCosts = (b.costs as Array<{amount:number}>).reduce((sum: number, cost: {amount:number}) => sum + (cost.amount || 0), 0);
+          const remainingIncome = totalIncome - totalCosts;
+          note += '--------------\n';
+          note += `Client is left with $${remainingIncome.toFixed(2)}\n`;
+        }
       }
-      if (b.paymentCardNumber && b.paymentCardNumber.trim()) {
-        note += `Payment card number: ${b.paymentCardNumber}\n`;
+      if (hasReasonableStepsData(b.reasonableSteps)) {
+        note += `\n${formatHeading('Reasonable Steps', 'custom', customHeadingFormat)}\n`;
+        note += `${b.reasonableSteps}\n`;
       }
-      if (b.amount && b.amount > 0) {
-        note += `Amount: $${b.amount.toFixed(2)}\n`;
+      if (hasOutcomeData(b.decision, b.decisionReason)) {
+        note += `\n${formatHeading('Outcome', 'custom', customHeadingFormat)}\n`;
+        if (b.decision === 'approved') note += 'APPLICATION APPROVED\n';
+        else if (b.decision === 'declined') note += 'APPLICATION DECLINED\n';
+        if (b.decisionReason) note += `${b.decisionReason}\n`;
       }
-      if (b.recoveryRate && b.recoveryRate > 0) {
-        note += `Recovery rate: $${b.recoveryRate.toFixed(2)}\n`;
-      }
-      if (b.directCredit === 'yes' && b.paymentReference) {
-        note += `Reference number: ${b.paymentReference}\n`;
-      }
-      note += `\n${formatHeading('Income', 'custom', customHeadingFormat)}\n`;
-      note += formatIncomeLines(b.income, b.incomeLabels);
-      (b.costs as Array<{amount:number;cost:string}>).forEach((cost: {amount:number;cost:string}) => {
-        if (cost.amount > 0) note += `-$${cost.amount.toFixed(2)} ${cost.cost}\n`;
-      });
-      if (b.costs && b.costs.length > 0) {
-        const totalIncome = (Object.values(b.income as {[k:string]:number}) as number[]).reduce((sum: number, value: number) => sum + (value || 0), 0);
-        const totalCosts = (b.costs as Array<{amount:number}>).reduce((sum: number, cost: {amount:number}) => sum + (cost.amount || 0), 0);
-        const remainingIncome = totalIncome - totalCosts;
-        note += '--------------\n';
-        note += `Client is left with $${remainingIncome.toFixed(2)}\n`;
-      }
-      note += `\n${formatHeading('Reasonable Steps', 'custom', customHeadingFormat)}\n`;
-      if (b.reasonableSteps) note += `${b.reasonableSteps}\n`;
-      note += `\n${formatHeading('Outcome', 'custom', customHeadingFormat)}\n`;
-      if (b.decision === 'approved') note += 'APPLICATION APPROVED\n';
-      else if (b.decision === 'declined') note += 'APPLICATION DECLINED\n';
-      if (b.decisionReason) note += `${b.decisionReason}\n`;
       return note;
     } else if (service === 'glasses') {
       // Glasses note output (similar to clothing)
@@ -1350,43 +1614,51 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       note += `${formatHeading('Need', 'custom', customHeadingFormat)}\n`;
       if (g.whyNeedGlasses) note += `${g.whyNeedGlasses}\n`;
 
-      note += `\n${formatHeading('Payment', 'custom', customHeadingFormat)}\n`;
-      if (g.supplierName && g.supplierName.trim()) {
-        note += `Supplier Name: ${g.supplierName}\n`;
+      if (hasPaymentData(g)) {
+        note += `\n${formatHeading('Payment', 'custom', customHeadingFormat)}\n`;
+        if (g.supplierName && g.supplierName.trim()) {
+          note += `Supplier Name: ${g.supplierName}\n`;
+        }
+        if (g.supplierId && g.supplierId.trim()) {
+          note += `Supplier ID: ${g.supplierId}\n`;
+        }
+        if (g.paymentCardNumber && g.paymentCardNumber.trim()) {
+          note += `Payment card number: ${g.paymentCardNumber}\n`;
+        }
+        if (g.amount && g.amount > 0) {
+          note += `Amount: $${g.amount.toFixed(2)}\n`;
+        }
+        if (g.recoveryRate && g.recoveryRate > 0) {
+          note += `Recovery rate: $${g.recoveryRate.toFixed(2)}\n`;
+        }
+        if (g.directCredit === 'yes' && g.paymentReference) {
+          note += `Reference number: ${g.paymentReference}\n`;
+        }
       }
-      if (g.supplierId && g.supplierId.trim()) {
-        note += `Supplier ID: ${g.supplierId}\n`;
+      if (hasIncomeData(g.income)) {
+        note += `\n${formatHeading('Income', 'custom', customHeadingFormat)}\n`;
+        note += formatIncomeLines(g.income, g.incomeLabels);
+        g.costs.forEach((cost: { amount: number; cost: string }) => {
+          if (cost.amount > 0) note += `-$${cost.amount.toFixed(2)} ${cost.cost}\n`;
+        });
+        if (g.costs.length > 0) {
+          const totalIncome = (Object.values(g.income) as number[]).reduce((sum: number, value: number) => sum + (value || 0), 0);
+          const totalCosts = g.costs.reduce((sum: number, cost: { amount: number; cost: string }) => sum + (cost.amount || 0), 0);
+          const remainingIncome = totalIncome - totalCosts;
+          note += '--------------\n';
+          note += `Client is left with $${remainingIncome.toFixed(2)}\n`;
+        }
       }
-      if (g.paymentCardNumber && g.paymentCardNumber.trim()) {
-        note += `Payment card number: ${g.paymentCardNumber}\n`;
+      if (hasReasonableStepsData(g.reasonableSteps)) {
+        note += `\n${formatHeading('Reasonable Steps', 'custom', customHeadingFormat)}\n`;
+        note += `${g.reasonableSteps}\n`;
       }
-      if (g.amount && g.amount > 0) {
-        note += `Amount: $${g.amount.toFixed(2)}\n`;
+      if (hasOutcomeData(g.decision, g.decisionReason)) {
+        note += `\n${formatHeading('Outcome', 'custom', customHeadingFormat)}\n`;
+        if (g.decision === 'approved') note += 'APPLICATION APPROVED\n';
+        else if (g.decision === 'declined') note += 'APPLICATION DECLINED\n';
+        if (g.decisionReason) note += `${g.decisionReason}\n`;
       }
-      if (g.recoveryRate && g.recoveryRate > 0) {
-        note += `Recovery rate: $${g.recoveryRate.toFixed(2)}\n`;
-      }
-      if (g.directCredit === 'yes' && g.paymentReference) {
-        note += `Reference number: ${g.paymentReference}\n`;
-      }
-      note += `\n${formatHeading('Income', 'custom', customHeadingFormat)}\n`;
-      note += formatIncomeLines(g.income, g.incomeLabels);
-      g.costs.forEach((cost: { amount: number; cost: string }) => {
-        if (cost.amount > 0) note += `-$${cost.amount.toFixed(2)} ${cost.cost}\n`;
-      });
-      if (g.costs.length > 0) {
-        const totalIncome = (Object.values(g.income) as number[]).reduce((sum: number, value: number) => sum + (value || 0), 0);
-        const totalCosts = g.costs.reduce((sum: number, cost: { amount: number; cost: string }) => sum + (cost.amount || 0), 0);
-        const remainingIncome = totalIncome - totalCosts;
-        note += '--------------\n';
-        note += `Client is left with $${remainingIncome.toFixed(2)}\n`;
-      }
-      note += `\n${formatHeading('Reasonable Steps', 'custom', customHeadingFormat)}\n`;
-      if (g.reasonableSteps) note += `${g.reasonableSteps}\n`;
-      note += `\n${formatHeading('Outcome', 'custom', customHeadingFormat)}\n`;
-      if (g.decision === 'approved') note += 'APPLICATION APPROVED\n';
-      else if (g.decision === 'declined') note += 'APPLICATION DECLINED\n';
-      if (g.decisionReason) note += `${g.decisionReason}\n`;
       return note;
     } else if (service === 'whiteware') {
       // Whiteware note output
@@ -1405,51 +1677,52 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
         '5+': '5+ people'
       };
       note += '\nHousehold size: ' + (householdSizeLabels[w.householdSize] || w.householdSize || '-') + '\n';
-      note += 'Model: ' + (w.applianceModel || '-') + '\n';
-      note += 'CA: ' + (w.applianceCANumber || '-') + '\n';
-      note += '\nAddress/contact details confirmed: ' + (w.addressContactConfirmed || '-') + '\n';
-      note += 'Space measured: ' + (w.spaceMeasured || '-') + '\n';
-      if (w.deliveryInstructionsDetails) {
-        note += 'Special delivery instructions:\n' + w.deliveryInstructionsDetails + '\n';
-      }
       
-      note += `\n${formatHeading('Payment', 'custom', customHeadingFormat)}\n`;
-      if (w.supplierName && w.supplierName.trim()) {
-        note += `Supplier Name: ${w.supplierName}\n`;
+      if (hasPaymentData(w)) {
+        note += `\n${formatHeading('Payment', 'custom', customHeadingFormat)}\n`;
+        if (w.supplierName && w.supplierName.trim()) {
+          note += `Supplier Name: ${w.supplierName}\n`;
+        }
+        if (w.supplierId && w.supplierId.trim()) {
+          note += `Supplier ID: ${w.supplierId}\n`;
+        }
+        if (w.paymentCardNumber && w.paymentCardNumber.trim()) {
+          note += `Payment card number: ${w.paymentCardNumber}\n`;
+        }
+        if (w.amount && w.amount > 0) {
+          note += `Amount: $${w.amount.toFixed(2)}\n`;
+        }
+        if (w.recoveryRate && w.recoveryRate > 0) {
+          note += `Recovery rate: $${w.recoveryRate.toFixed(2)}\n`;
+        }
+        if (w.directCredit === 'yes' && w.paymentReference) {
+          note += `Reference number: ${w.paymentReference}\n`;
+        }
       }
-      if (w.supplierId && w.supplierId.trim()) {
-        note += `Supplier ID: ${w.supplierId}\n`;
+      if (hasIncomeData(w.income)) {
+        note += `\n${formatHeading('Income', 'custom', customHeadingFormat)}\n`;
+        note += formatIncomeLines(w.income, w.incomeLabels);
+        w.costs.forEach((cost: { amount: number; cost: string }) => {
+          if (cost.amount > 0) note += `-$${cost.amount.toFixed(2)} ${cost.cost}\n`;
+        });
+        if (w.costs.length > 0) {
+          const totalIncome = (Object.values(w.income) as number[]).reduce((sum: number, value: number) => sum + (value || 0), 0);
+          const totalCosts = w.costs.reduce((sum: number, cost: { amount: number; cost: string }) => sum + (cost.amount || 0), 0);
+          const remainingIncome = totalIncome - totalCosts;
+          note += '--------------\n';
+          note += `Client is left with $${remainingIncome.toFixed(2)}\n`;
+        }
       }
-      if (w.paymentCardNumber && w.paymentCardNumber.trim()) {
-        note += `Payment card number: ${w.paymentCardNumber}\n`;
+      if (hasReasonableStepsData(w.reasonableSteps)) {
+        note += `\n${formatHeading('Reasonable Steps', 'custom', customHeadingFormat)}\n`;
+        note += `${w.reasonableSteps}\n`;
       }
-      if (w.amount && w.amount > 0) {
-        note += `Amount: $${w.amount.toFixed(2)}\n`;
+      if (hasOutcomeData(w.decision, w.decisionReason)) {
+        note += `\n${formatHeading('Outcome', 'custom', customHeadingFormat)}\n`;
+        if (w.decision === 'approved') note += 'APPLICATION APPROVED\n';
+        else if (w.decision === 'declined') note += 'APPLICATION DECLINED\n';
+        if (w.decisionReason) note += `${w.decisionReason}\n`;
       }
-      if (w.recoveryRate && w.recoveryRate > 0) {
-        note += `Recovery rate: $${w.recoveryRate.toFixed(2)}\n`;
-      }
-      if (w.directCredit === 'yes' && w.paymentReference) {
-        note += `Reference number: ${w.paymentReference}\n`;
-      }
-      note += `\n${formatHeading('Income', 'custom', customHeadingFormat)}\n`;
-      note += formatIncomeLines(w.income, w.incomeLabels);
-      w.costs.forEach((cost: { amount: number; cost: string }) => {
-        if (cost.amount > 0) note += `-$${cost.amount.toFixed(2)} ${cost.cost}\n`;
-      });
-      if (w.costs.length > 0) {
-        const totalIncome = (Object.values(w.income) as number[]).reduce((sum: number, value: number) => sum + (value || 0), 0);
-        const totalCosts = w.costs.reduce((sum: number, cost: { amount: number; cost: string }) => sum + (cost.amount || 0), 0);
-        const remainingIncome = totalIncome - totalCosts;
-        note += '--------------\n';
-        note += `Client is left with $${remainingIncome.toFixed(2)}\n`;
-      }
-      note += `\n${formatHeading('Reasonable Steps', 'custom', customHeadingFormat)}\n`;
-      if (w.reasonableSteps) note += `${w.reasonableSteps}\n`;
-      note += `\n${formatHeading('Outcome', 'custom', customHeadingFormat)}\n`;
-      if (w.decision === 'approved') note += 'APPLICATION APPROVED\n';
-      else if (w.decision === 'declined') note += 'APPLICATION DECLINED\n';
-      if (w.decisionReason) note += `${w.decisionReason}\n`;
       return note;
     } else {
       // Food note output (existing logic)
@@ -1471,34 +1744,41 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       }
       if (f.foodAmountRequested > 0) note += `Amount requesting: $${f.foodAmountRequested.toFixed(2)}\n`;
       
-      note += `\n${formatHeading('Payment', 'custom', customHeadingFormat)}\n`;
-      note += `Supplier Name: Food Supplier Group\n`;
-      if (f.amount > 0) note += `Total Cost: $${f.amount.toFixed(2)}\n`;
-      if (f.directCredit === 'yes' && f.paymentReference) {
-        note += `Reference number: ${f.paymentReference}\n`;
-      }
-      if (f.directCredit !== 'yes' && f.paymentCardNumber && f.paymentCardNumber.trim()) {
-        note += `Payment card number: ${f.paymentCardNumber}\n`;
+      // Food always has supplier name, but check for other payment data
+      if (f.amount > 0 || (f.directCredit === 'yes' && f.paymentReference) || (f.directCredit !== 'yes' && f.paymentCardNumber && f.paymentCardNumber.trim())) {
+        note += `\n${formatHeading('Payment', 'custom', customHeadingFormat)}\n`;
+        note += `Supplier Name: Food Supplier Group\n`;
+        if (f.amount > 0) note += `Total Cost: $${f.amount.toFixed(2)}\n`;
+        if (f.directCredit === 'yes' && f.paymentReference) {
+          note += `Reference number: ${f.paymentReference}\n`;
+        }
+        if (f.directCredit !== 'yes' && f.paymentCardNumber && f.paymentCardNumber.trim()) {
+          note += `Payment card number: ${f.paymentCardNumber}\n`;
+        }
       }
       
-      note += `\n${formatHeading('Income', 'custom', customHeadingFormat)}\n`;
-      note += formatIncomeLines(f.income, f.incomeLabels);
-      f.costs.forEach((cost: { amount: number; cost: string }) => {
-        if (cost.amount > 0) note += `-$${cost.amount.toFixed(2)} ${cost.cost}\n`;
-      });
-      if (f.costs.length > 0) {
-        note += '--------------\n';
-        note += `Client is left with $${remainingIncome.toFixed(2)}\n`;
+      if (hasIncomeData(f.income)) {
+        note += `\n${formatHeading('Income', 'custom', customHeadingFormat)}\n`;
+        note += formatIncomeLines(f.income, f.incomeLabels);
+        f.costs.forEach((cost: { amount: number; cost: string }) => {
+          if (cost.amount > 0) note += `-$${cost.amount.toFixed(2)} ${cost.cost}\n`;
+        });
+        if (f.costs.length > 0) {
+          note += '--------------\n';
+          note += `Client is left with $${remainingIncome.toFixed(2)}\n`;
+        }
       }
-      note += '\n';
-      if (f.reasonableSteps) {
+      if (hasReasonableStepsData(f.reasonableSteps)) {
+        note += '\n';
         note += `${formatHeading('Reasonable Steps', 'custom', customHeadingFormat)}\n`;
         note += `${f.reasonableSteps}\n\n`;
       }
-      note += `${formatHeading('Outcome', 'custom', customHeadingFormat)}\n`;
-      if (f.decision === 'approved') note += 'APPLICATION APPROVED\n';
-      else if (f.decision === 'declined') note += 'APPLICATION DECLINED\n';
-      if (f.decisionReason) note += `${f.decisionReason}\n`;
+      if (hasOutcomeData(f.decision, f.decisionReason)) {
+        note += `${formatHeading('Outcome', 'custom', customHeadingFormat)}\n`;
+        if (f.decision === 'approved') note += 'APPLICATION APPROVED\n';
+        else if (f.decision === 'declined') note += 'APPLICATION DECLINED\n';
+        if (f.decisionReason) note += `${f.decisionReason}\n`;
+      }
       return note;
     }
   };

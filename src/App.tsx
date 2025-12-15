@@ -1,10 +1,11 @@
 import { useEffect, lazy, Suspense } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Navigation from './components/Navigation';
 import Home from './components/Home';
 import { keepAliveService } from './services/keepAliveService';
 import type { IncomeLabels } from './components/IncomeSection';
 import { SettingsProvider, useSettings } from './contexts/SettingsContext';
+import { initAnalytics, trackPageView } from './utils/analytics';
 
 // Lazy load components for better performance
 const FoodPage = lazy(() => import('./components/FoodPage'));
@@ -29,7 +30,9 @@ const ADSDPage = lazy(() => import('./components/ADSDPage'));
 const PetrolCalculator = lazy(() => import('./components/PetrolCalculator'));
 const AbsenceFromNZPage = lazy(() => import('./components/AbsenceFromNZPage'));
 const MultiNeedPage = lazy(() => import('./components/MultiNeedPage'));
+const ChangeOfAddressPage = lazy(() => import('./components/ChangeOfAddressPage'));
 const GenericTemplatePage = lazy(() => import('./components/GenericTemplatePage'));
+const AnalyticsPage = lazy(() => import('./components/AnalyticsPage'));
 
 export interface Service {
   id: string;
@@ -642,19 +645,49 @@ export interface AbsenceFromNZFormData {
   arrearsAmount: number;
 }
 
+export interface ChangeOfAddressFormData {
+  generalComments: string;
+  newAddress: string;
+  dateOfMove: string;
+  dateNotified: string;
+  asZone: string;
+  accommodationType: string;
+  accommodationCosts: Array<{
+    label: string;
+    amount: number;
+    frequency: 'daily' | 'weekly' | 'fortnightly' | 'monthly';
+  }>;
+  tenancyAgreementProvided: string;
+  newASRate: number;
+  clientEligibleForTAS: string;
+  arrearsCreated: string;
+  arrearsAmount: number;
+  debtCreated: string;
+  debtAmount: number;
+}
+
 function AppContent() {
   const { currentTheme, setCurrentTheme, customHeadingFormat, setCustomHeadingFormat } = useSettings();
+  const location = useLocation();
 
   // Initialize keep-alive service
   useEffect(() => {
     // Start the keep-alive service when the app mounts
     keepAliveService.start();
     
+    // Initialize analytics tracking
+    initAnalytics();
+    
     // Cleanup: stop the service when the app unmounts
     return () => {
       keepAliveService.stop();
     };
   }, []);
+
+  // Track page views on route changes
+  useEffect(() => {
+    trackPageView(location.pathname);
+  }, [location.pathname]);
 
   return (
     <>
@@ -690,6 +723,8 @@ function AppContent() {
         <Route path="/absence-from-nz" element={<AbsenceFromNZPage />} />
         <Route path="/multi-need" element={<MultiNeedPage />} />
         <Route path="/generic-template" element={<GenericTemplatePage />} />
+        <Route path="/change-of-address" element={<ChangeOfAddressPage />} />
+        <Route path="/analytics" element={<AnalyticsPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Suspense>

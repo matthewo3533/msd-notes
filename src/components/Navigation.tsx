@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import Settings from './Settings';
 
 interface NavigationProps {
@@ -44,6 +44,7 @@ const navigationItems: NavItem[] = [
   { id: 'tas-grant', title: 'TAS Grant', path: '/tas-grant', emoji: '📋', category: 'tools' },
   { id: 'declare-income', title: 'Declare Income', path: '/declare-income', emoji: '💰', category: 'tools' },
   { id: 'absence-from-nz', title: 'Absence from NZ', path: '/absence-from-nz', emoji: '✈️', category: 'tools' },
+  { id: 'change-of-address', title: 'Change of Address', path: '/change-of-address', emoji: '🏡', category: 'tools' },
   { id: 'petrol-calculator', title: 'Petrol Calculator', path: '/petrol-calculator', emoji: '⛽', category: 'tools' },
 ];
 
@@ -210,7 +211,15 @@ const Navigation: React.FC<NavigationProps> = ({ currentTheme, onThemeChange, cu
     }, 100);
   };
 
-  const handleNavItemClick = (path: string) => {
+  const handleNavItemClick = (path: string, event?: React.MouseEvent) => {
+    // Allow default link behavior for right-click, ctrl+click, etc.
+    if (event && (event.ctrlKey || event.metaKey || event.button === 1)) {
+      return;
+    }
+    // For regular clicks, prevent default and navigate programmatically
+    if (event) {
+      event.preventDefault();
+    }
     navigate(path);
     setActiveDropdown(null);
   };
@@ -344,12 +353,13 @@ const Navigation: React.FC<NavigationProps> = ({ currentTheme, onThemeChange, cu
         }}
       >
         <div className="nav-brand">
-          <button 
+          <Link 
+            to="/"
             className="brand-text brand-button"
-            onClick={() => handleNavItemClick('/')}
+            onClick={(e) => handleNavItemClick('/', e)}
           >
             MSD Note Grid
-          </button>
+          </Link>
         </div>
 
         <div className="nav-menu">
@@ -359,12 +369,13 @@ const Navigation: React.FC<NavigationProps> = ({ currentTheme, onThemeChange, cu
             onMouseEnter={() => handleMouseEnter('home')}
             onMouseLeave={() => handleMouseLeave()}
           >
-            <button 
+            <Link 
+              to="/"
               className={`nav-button ${isActiveRoute('/') ? 'current' : ''}`}
-              onClick={() => handleNavItemClick('/')}
+              onClick={(e) => handleNavItemClick('/', e)}
             >
               <span className="nav-text">Home</span>
-            </button>
+            </Link>
           </div>
 
           {/* Hardships */}
@@ -385,7 +396,6 @@ const Navigation: React.FC<NavigationProps> = ({ currentTheme, onThemeChange, cu
                 onMouseEnter={handleDropdownMouseEnter}
                 onMouseLeave={handleDropdownMouseLeave}
                 onWheel={(e) => e.preventDefault()}
-                onMouseDown={(e) => e.stopPropagation()}
               >
                 <div className="dropdown-header">
                   <div className="dropdown-title-row">
@@ -408,14 +418,15 @@ const Navigation: React.FC<NavigationProps> = ({ currentTheme, onThemeChange, cu
                 </div>
                 <div className="dropdown-items" onWheel={handleWheelScroll}>
                   {getFilteredHardships().map((item) => (
-                    <button
+                    <Link
                       key={item.id}
+                      to={item.path}
                       className={`dropdown-item ${isActiveRoute(item.path) ? 'current' : ''}`}
-                      onClick={() => handleNavItemClick(item.path)}
+                      onClick={(e) => handleNavItemClick(item.path, e)}
                     >
                       <span className="item-emoji">{item.emoji}</span>
                       <span className="item-title">{item.title}</span>
-                    </button>
+                    </Link>
                   ))}
                 </div>
               </div>
@@ -446,14 +457,15 @@ const Navigation: React.FC<NavigationProps> = ({ currentTheme, onThemeChange, cu
                 </div>
                 <div className="dropdown-items" onWheel={handleWheelScroll}>
                   {getCategoryItems('tools').map((item) => (
-                    <button
+                    <Link
                       key={item.id}
+                      to={item.path}
                       className={`dropdown-item ${isActiveRoute(item.path) ? 'current' : ''}`}
-                      onClick={() => handleNavItemClick(item.path)}
+                      onClick={(e) => handleNavItemClick(item.path, e)}
                     >
                       <span className="item-emoji">{item.emoji}</span>
                       <span className="item-title">{item.title}</span>
-                    </button>
+                    </Link>
                   ))}
                 </div>
               </div>
@@ -500,11 +512,12 @@ const Navigation: React.FC<NavigationProps> = ({ currentTheme, onThemeChange, cu
                   )}
                   <div className="global-search-results">
                     {getGlobalSearchResults().map((item) => (
-                      <button
+                      <Link
                         key={item.id}
+                        to={item.path}
                         className="global-search-item"
-                        onClick={() => {
-                          handleNavItemClick(item.path);
+                        onClick={(e) => {
+                          handleNavItemClick(item.path, e);
                           setIsGlobalSearchOpen(false);
                           setGlobalSearchQuery('');
                         }}
@@ -512,7 +525,7 @@ const Navigation: React.FC<NavigationProps> = ({ currentTheme, onThemeChange, cu
                         <span className="global-search-emoji">{item.emoji}</span>
                         <span className="global-search-title">{item.title}</span>
                         <span className="global-search-category">{item.category}</span>
-                      </button>
+                      </Link>
                     ))}
                   </div>
                   <button 
