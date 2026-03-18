@@ -1,13 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
-import type { MultiNeedFormData, NeedItem, HardshipNeedType, IncomeData, CostData } from '../../types/multiNeed';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Navigation } from 'swiper/modules';
+import type { MultiNeedFormData, NeedItem, HardshipNeedType, IncomeData, CostData, PaymentData } from '../../types/multiNeed';
+import { getNeedTypeLabel } from '../../types/multiNeed';
 import { createDefaultIncomeLabels, type IncomeLabels } from '../IncomeSection';
 import IncomeSection from '../IncomeSection';
 import FormattedTextarea from '../FormattedTextarea';
-import { getNeedTemplate, createBlankPayment, createBlankDecision, getNeedPaymentDefaults } from '../../utils/needTemplates';
-import NeedSectionFactory from '../need-sections/NeedSectionFactory';
-import NeedExtraSectionFactory from '../need-sections/NeedExtraSectionFactory';
+import { getNeedTemplate, createBlankPayment, getNeedPaymentDefaults } from '../../utils/needTemplates';
 import DecisionSection from '../DecisionSection';
-import { getNeedTypeLabel, hasExtraSection, getExtraSectionTitle } from '../../types/multiNeed';
+import 'swiper/css';
+import 'swiper/css/navigation';
 
 const roundToNearest50Cents = (value: number) => Math.ceil(value * 2) / 2;
 
@@ -18,16 +20,19 @@ interface MultiNeedContainerProps {
   onSelectorOpened?: () => void;
 }
 
-const MultiNeedContainer: React.FC<MultiNeedContainerProps> = ({ formData, onFormDataChange, autoOpenSelector = false, onSelectorOpened }) => {
+const MultiNeedContainer: React.FC<MultiNeedContainerProps> = ({
+  formData,
+  onFormDataChange,
+  autoOpenSelector = false,
+  onSelectorOpened
+}) => {
   const [showNeedSelector, setShowNeedSelector] = useState(false);
   const [permanentlyVisible, setPermanentlyVisible] = useState<Set<string>>(new Set());
   const [animateGrid, setAnimateGrid] = useState(false);
   const [selectedNeeds, setSelectedNeeds] = useState<Set<HardshipNeedType>>(new Set());
   const [recoveryOverrides, setRecoveryOverrides] = useState<Record<string, boolean>>({});
   const [expandedSections, setExpandedSections] = useState<Set<string>>(() => {
-    // Initialize with all sections expanded
-    const initialExpanded = new Set<string>(['client-id', 'income', 'decisions', 'reasonable-steps']);
-    // Add all need sections (general, extra, payment) - we'll add these dynamically
+    const initialExpanded = new Set<string>(['client-id', 'need-summary', 'income', 'payments', 'decisions', 'reasonable-steps']);
     return initialExpanded;
   });
   const [incomeLabels, setIncomeLabels] = useState<IncomeLabels>(() => {
@@ -49,41 +54,16 @@ const MultiNeedContainer: React.FC<MultiNeedContainerProps> = ({ formData, onFor
     }
   }, [formData.incomeLabels]);
 
-  // Expand all need sections when needs are added
-  useEffect(() => {
-    setExpandedSections(prev => {
-      const newExpanded = new Set(prev);
-      formData.needs.forEach((need) => {
-        const sectionKey = `need-${need.id}`;
-        newExpanded.add(`${sectionKey}-general`);
-        newExpanded.add(`${sectionKey}-extra`);
-        newExpanded.add(`${sectionKey}-payment`);
-      });
-      return newExpanded;
-    });
-  }, [formData.needs]);
-
   useEffect(() => {
     setRecoveryOverrides(prev => {
-      const needIds = new Set(formData.needs.map((need) => need.id));
+      const needIds = formData.needs.map((need) => need.id);
       const next: Record<string, boolean> = {};
-      needIds.forEach((id) => {
-        if (prev[id]) {
-          next[id] = true;
-        }
+      Object.keys(prev).forEach((key) => {
+        const kept = needIds.some((id) => key === id || key.startsWith(`${id}-`));
+        if (kept && prev[key]) next[key] = true;
       });
-
-      if (Object.keys(next).length === Object.keys(prev).length) {
-        let identical = true;
-        for (const key in next) {
-          if (!prev[key]) {
-            identical = false;
-            break;
-          }
-        }
-        if (identical) {
-          return prev;
-        }
+      if (Object.keys(next).length === Object.keys(prev).length && Object.keys(next).every((k) => prev[k])) {
+        return prev;
       }
       return next;
     });
@@ -94,7 +74,8 @@ const MultiNeedContainer: React.FC<MultiNeedContainerProps> = ({ formData, onFor
       openNeedSelector();
       onSelectorOpened?.();
     }
-  }, [autoOpenSelector, onSelectorOpened]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoOpenSelector]);
 
   // Intersection Observer for scroll animations
   useEffect(() => {
@@ -123,6 +104,18 @@ const MultiNeedContainer: React.FC<MultiNeedContainerProps> = ({ formData, onFor
     return () => observer.disconnect();
   }, [formData.needs.length]);
 
+  const toggleSection = (sectionKey: string) => {
+    setExpandedSections(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(sectionKey)) {
+        newSet.delete(sectionKey);
+      } else {
+        newSet.add(sectionKey);
+      }
+      return newSet;
+    });
+  };
+
   const openNeedSelector = (scroll = true) => {
     setShowNeedSelector(true);
     setSelectedNeeds(new Set());
@@ -130,13 +123,13 @@ const MultiNeedContainer: React.FC<MultiNeedContainerProps> = ({ formData, onFor
     if (scroll) {
       setTimeout(() => {
         if (needSelectorGridRef.current) {
-          needSelectorGridRef.current.scrollIntoView({ 
-            behavior: 'smooth', 
+          needSelectorGridRef.current.scrollIntoView({
+            behavior: 'smooth',
             block: 'center'
           });
         } else if (addNeedButtonRef.current) {
-          addNeedButtonRef.current.scrollIntoView({ 
-            behavior: 'smooth', 
+          addNeedButtonRef.current.scrollIntoView({
+            behavior: 'smooth',
             block: 'center'
           });
         }
@@ -147,37 +140,21 @@ const MultiNeedContainer: React.FC<MultiNeedContainerProps> = ({ formData, onFor
   const handleToggleSelector = () => {
     const newState = !showNeedSelector;
     setShowNeedSelector(newState);
-    
-    // Trigger animation and scroll when opening
+
     if (newState) {
       openNeedSelector();
     } else {
       setAnimateGrid(false);
-      setSelectedNeeds(new Set()); // Clear selections when closing
+      setSelectedNeeds(new Set());
     }
   };
 
   const handleToggleNeedSelection = (needType: HardshipNeedType) => {
     setSelectedNeeds(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(needType)) {
-        newSet.delete(needType);
-      } else {
-        newSet.add(needType);
-      }
-      return newSet;
-    });
-  };
-
-  const toggleSection = (sectionKey: string) => {
-    setExpandedSections(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(sectionKey)) {
-        newSet.delete(sectionKey);
-      } else {
-        newSet.add(sectionKey);
-      }
-      return newSet;
+      const next = new Set(prev);
+      if (next.has(needType)) next.delete(needType);
+      else next.add(needType);
+      return next;
     });
   };
 
@@ -194,32 +171,13 @@ const MultiNeedContainer: React.FC<MultiNeedContainerProps> = ({ formData, onFor
           ...createBlankPayment(),
           ...paymentDefaults
         },
-        decision: createBlankDecision()
-      };
+        decision: { decision: '', decisionReason: '' }
+      } satisfies NeedItem;
     });
 
-    const allNeeds = [...formData.needs, ...newNeeds];
-    onFormDataChange({
-      needs: allNeeds
-    });
-    
+    onFormDataChange({ needs: [...formData.needs, ...newNeeds] });
     setShowNeedSelector(false);
     setSelectedNeeds(new Set());
-    
-    // Scroll to the first newly added need after it's rendered
-    setTimeout(() => {
-      const firstNewNeedIndex = formData.needs.length;
-      const sectionKey = `need-${firstNewNeedIndex}`;
-      const newNeedElement = sectionRefs.current[`${sectionKey}-general`];
-      
-      if (newNeedElement) {
-        newNeedElement.scrollIntoView({ 
-          behavior: 'smooth', 
-          block: 'start',
-          inline: 'nearest'
-        });
-      }
-    }, 100);
   };
 
   const handleUpdateNeed = (needId: string, updates: Partial<NeedItem>) => {
@@ -282,20 +240,21 @@ const MultiNeedContainer: React.FC<MultiNeedContainerProps> = ({ formData, onFor
 
   const renderPaymentSection = (
     need: NeedItem,
-    onPaymentChange: (updates: Partial<NeedItem['payment']>) => void,
-    onDataChange: (updates: Partial<NeedItem['data']>) => void
+    payment: PaymentData,
+    onPaymentChange: (updates: Partial<PaymentData>) => void,
+    onDataChange: (updates: Partial<NeedItem['data']>) => void,
+    recoveryOverrideKey: string
   ) => {
-    const payment = need.payment;
     const directCredit = payment.directCredit || '';
-    const isRecoveryOverridden = recoveryOverrides[need.id] ?? false;
+    const isRecoveryOverridden = recoveryOverrides[recoveryOverrideKey] ?? false;
 
     const setRecoveryOverride = (overridden: boolean) => {
       setRecoveryOverrides((prev) => {
         const next = { ...prev };
         if (overridden) {
-          next[need.id] = true;
+          next[recoveryOverrideKey] = true;
         } else {
-          delete next[need.id];
+          delete next[recoveryOverrideKey];
         }
         return next;
       });
@@ -799,208 +758,146 @@ const MultiNeedContainer: React.FC<MultiNeedContainerProps> = ({ formData, onFor
         )}
       </div>
 
-      {/* All Needs */}
-      {formData.needs.map((need, index) => {
-        const sectionKey = `need-${need.id}`;
-        const label = getNeedTypeLabel(need.type);
-        const hasExtra = hasExtraSection(need.type);
-        const extraContent = hasExtra ? (
-          <NeedExtraSectionFactory
-            needType={need.type}
-            data={need.data}
-            onChange={(updates) => handleUpdateNeed(need.id, { data: { ...need.data, ...updates } })}
-          />
-        ) : null;
-        const status = need.decision.decision;
+      {/* Need (single narrative box) */}
+      <div
+        ref={(el) => { sectionRefs.current['need-summary'] = el; }}
+        data-section="need-summary"
+        className={`form-section-card ${permanentlyVisible.has('need-summary') ? 'section-visible' : ''}`}
+      >
+        <div className="section-header">
+          <h3>Need</h3>
+          <button 
+            className={`expand-collapse-btn ${!expandedSections.has('need-summary') ? 'collapsed' : ''}`}
+            type="button"
+            onClick={() => toggleSection('need-summary')}
+            aria-label={expandedSections.has('need-summary') ? 'Collapse section' : 'Expand section'}
+          >
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M4 6L8 10L12 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </button>
+        </div>
+        {expandedSections.has('need-summary') && (
+          <>
+            <div className="form-group" style={{ marginTop: '1rem' }}>
+              <FormattedTextarea
+                label="What is the client's need?"
+                value={formData.needSummary || ''}
+                onChange={(value) => onFormDataChange({ needSummary: value })}
+                placeholder="Describe the client's needs..."
+                className="form-control"
+              />
+            </div>
 
-        return (
-          <React.Fragment key={need.id}>
             <div
-              ref={(el) => { sectionRefs.current[`${sectionKey}-general`] = el; }}
-              data-section={`${sectionKey}-general`}
-              className={`form-section-card ${permanentlyVisible.has(`${sectionKey}-general`) ? 'section-visible' : ''}`}
+              ref={(el) => { addNeedButtonRef.current = el; }}
+              style={{
+                marginTop: '1rem',
+                paddingTop: '1rem',
+                borderTop: '1px solid var(--border-primary)'
+              }}
             >
-              <div className="section-header">
-                <h3>{`Need ${index + 1} - ${label}`}</h3>
-                <button 
-                  className={`expand-collapse-btn ${!expandedSections.has(`${sectionKey}-general`) ? 'collapsed' : ''}`}
-                  type="button"
-                  onClick={() => toggleSection(`${sectionKey}-general`)}
-                  aria-label={expandedSections.has(`${sectionKey}-general`) ? 'Collapse section' : 'Expand section'}
-                >
-                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M4 6L8 10L12 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                </button>
-              </div>
-              {expandedSections.has(`${sectionKey}-general`) && (
-                <>
-                  {status && (
-                    <div style={{ marginBottom: '1rem' }}>
-                      <span
+              <button
+                type="button"
+                className="add-cost-btn"
+                onClick={handleToggleSelector}
+                style={{
+                  width: '100%',
+                  padding: '0.75rem 1rem',
+                  fontSize: '0.95rem',
+                  fontWeight: '600'
+                }}
+              >
+                {showNeedSelector ? '✕ Cancel' : 'Add Need'}
+              </button>
+
+              {showNeedSelector && (
+                <div style={{
+                  marginTop: '1rem',
+                  width: '100%',
+                  maxWidth: '100%',
+                  backgroundColor: 'var(--bg-secondary)',
+                  borderRadius: '12px',
+                  border: '2px solid var(--border-primary)',
+                  padding: '1.25rem',
+                  boxSizing: 'border-box'
+                }}>
+                  <h3 style={{
+                    margin: '0 0 1rem 0',
+                    fontSize: '1.05rem',
+                    color: 'var(--text-primary)',
+                    fontWeight: '600'
+                  }}>
+                    Select Additional Need
+                  </h3>
+
+                  <div
+                    ref={needSelectorGridRef}
+                    className={`need-selector-grid ${animateGrid ? 'animate-in' : ''}`}
+                  >
+                    {availableNeedOptions.map(need => {
+                      const isSelected = selectedNeeds.has(need.type);
+                      return (
+                        <div
+                          key={need.type}
+                          className={`need-selector-card ${isSelected ? 'selected' : ''}`}
+                          onClick={() => handleToggleNeedSelection(need.type)}
+                        >
+                          <div className="need-selector-checkbox">
+                            {isSelected && <span className="need-selector-check">✓</span>}
+                          </div>
+                          <span className="need-selector-emoji">{need.emoji}</span>
+                          <div className="need-selector-title">{need.label}</div>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {excludedNeeds.length === needOptions.length ? (
+                    <p style={{
+                      textAlign: 'center',
+                      color: 'var(--text-secondary)',
+                      marginTop: '1rem',
+                      marginBottom: 0,
+                      fontSize: '0.9rem'
+                    }}>
+                      All available needs have been added.
+                    </p>
+                  ) : (
+                    <div style={{
+                      marginTop: '1rem',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      gap: '1rem'
+                    }}>
+                      <p style={{
+                        margin: 0,
+                        color: 'var(--text-secondary)',
+                        fontSize: '0.9rem'
+                      }}>
+                        {selectedNeeds.size > 0 ? `${selectedNeeds.size} need${selectedNeeds.size > 1 ? 's' : ''} selected` : 'Select one or more needs'}
+                      </p>
+                      <button
+                        className="add-cost-btn"
+                        onClick={handleAddSelectedNeeds}
+                        disabled={selectedNeeds.size === 0}
                         style={{
-                          padding: '0.25rem 0.75rem',
-                          borderRadius: '12px',
-                          fontSize: '0.85rem',
-                          fontWeight: 600,
-                          backgroundColor: status === 'approved' ? '#10b981' : '#ef4444',
-                          color: '#fff'
+                          padding: '0.65rem 1.25rem',
+                          fontSize: '0.95rem',
+                          opacity: selectedNeeds.size === 0 ? 0.5 : 1,
+                          cursor: selectedNeeds.size === 0 ? 'not-allowed' : 'pointer'
                         }}
                       >
-                        {status === 'approved' ? 'Approved' : 'Declined'}
-                      </span>
+                        Add Selected ({selectedNeeds.size})
+                      </button>
                     </div>
                   )}
-                  <NeedSectionFactory
-                    needType={need.type}
-                    data={need.data}
-                    onChange={(updates) => handleUpdateNeed(need.id, { data: { ...need.data, ...updates } })}
-                  />
-                </>
-              )}
-            </div>
-
-            {hasExtra && extraContent && (
-              <div
-                ref={(el) => { sectionRefs.current[`${sectionKey}-extra`] = el; }}
-                data-section={`${sectionKey}-extra`}
-                className={`form-section-card ${permanentlyVisible.has(`${sectionKey}-extra`) ? 'section-visible' : ''}`}
-              >
-                <div className="section-header">
-                  <h3>{getExtraSectionTitle(need.type)}</h3>
-                  <button 
-                    className={`expand-collapse-btn ${!expandedSections.has(`${sectionKey}-extra`) ? 'collapsed' : ''}`}
-                    type="button"
-                    onClick={() => toggleSection(`${sectionKey}-extra`)}
-                    aria-label={expandedSections.has(`${sectionKey}-extra`) ? 'Collapse section' : 'Expand section'}
-                  >
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M4 6L8 10L12 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                  </button>
-                </div>
-                {expandedSections.has(`${sectionKey}-extra`) && extraContent}
-              </div>
-            )}
-          </React.Fragment>
-        );
-      })}
-
-      {/* Add Need Button */}
-      <div 
-        ref={(el) => { 
-          sectionRefs.current['add-need'] = el;
-          addNeedButtonRef.current = el;
-        }}
-        data-section="add-need"
-        className={`form-section-card ${permanentlyVisible.has('add-need') ? 'section-visible' : ''}`}
-      >
-        <div style={{ 
-          marginTop: '2rem', 
-          paddingTop: '2rem', 
-          borderTop: '2px solid var(--border-secondary)',
-          width: '100%',
-          overflow: 'hidden',
-          boxSizing: 'border-box'
-        }}>
-          <button 
-            className="add-cost-btn" 
-            onClick={handleToggleSelector}
-            style={{ 
-              width: '100%',
-              padding: '1rem',
-              fontSize: '1rem',
-              fontWeight: '600'
-            }}
-          >
-            {showNeedSelector ? '✕ Cancel' : '➕ Add Another Need'}
-          </button>
-          
-          {showNeedSelector && (
-            <div style={{ 
-              marginTop: '1.5rem',
-              width: '100%',
-              maxWidth: '100%',
-              backgroundColor: 'var(--bg-secondary)',
-              borderRadius: '12px',
-              border: '2px solid var(--border-primary)',
-              padding: '1.5rem',
-              boxSizing: 'border-box'
-            }}>
-              <h3 style={{ 
-                margin: '0 0 1.5rem 0',
-                fontSize: '1.2rem',
-                color: 'var(--text-primary)',
-                fontWeight: '600'
-              }}>
-                Select Additional Need
-              </h3>
-              
-              <div 
-                ref={needSelectorGridRef}
-                className={`need-selector-grid ${animateGrid ? 'animate-in' : ''}`}
-              >
-                {availableNeedOptions.map(need => {
-                  const isSelected = selectedNeeds.has(need.type);
-                  return (
-                    <div
-                      key={need.type}
-                      className={`need-selector-card ${isSelected ? 'selected' : ''}`}
-                      onClick={() => handleToggleNeedSelection(need.type)}
-                    >
-                      <div className="need-selector-checkbox">
-                        {isSelected && <span className="need-selector-check">✓</span>}
-                      </div>
-                      <span className="need-selector-emoji">{need.emoji}</span>
-                      <div className="need-selector-title">{need.label}</div>
-                    </div>
-                  );
-                })}
-              </div>
-              
-              {excludedNeeds.length === needOptions.length ? (
-                <p style={{ 
-                  textAlign: 'center', 
-                  color: 'var(--text-secondary)', 
-                  marginTop: '1.5rem',
-                  marginBottom: 0,
-                  fontSize: '0.9rem'
-                }}>
-                  All available needs have been added.
-                </p>
-              ) : (
-                <div style={{ 
-                  marginTop: '1.5rem',
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  gap: '1rem'
-                }}>
-                  <p style={{ 
-                    margin: 0,
-                    color: 'var(--text-secondary)',
-                    fontSize: '0.9rem'
-                  }}>
-                    {selectedNeeds.size > 0 ? `${selectedNeeds.size} need${selectedNeeds.size > 1 ? 's' : ''} selected` : 'Select one or more needs'}
-                  </p>
-                  <button
-                    className="add-cost-btn"
-                    onClick={handleAddSelectedNeeds}
-                    disabled={selectedNeeds.size === 0}
-                    style={{
-                      padding: '0.75rem 1.5rem',
-                      fontSize: '0.95rem',
-                      opacity: selectedNeeds.size === 0 ? 0.5 : 1,
-                      cursor: selectedNeeds.size === 0 ? 'not-allowed' : 'pointer'
-                    }}
-                  >
-                    Add Selected ({selectedNeeds.size})
-                  </button>
                 </div>
               )}
             </div>
-          )}
-        </div>
+          </>
+        )}
       </div>
 
       {/* Income Section (Shared) */}
@@ -1022,41 +919,92 @@ const MultiNeedContainer: React.FC<MultiNeedContainerProps> = ({ formData, onFor
         />
       </div>
 
-      {/* All Payments */}
-      {formData.needs.map((need) => {
-        const sectionKey = `need-${need.id}`;
-        const label = getNeedTypeLabel(need.type);
-
+      {/* Payments (one per need) - horizontal Swiper */}
+      {formData.needs.length > 0 && (() => {
+        const sectionKey = 'payments';
+        const multi = formData.needs.length > 1;
         return (
           <div
-            key={`payment-${need.id}`}
-            ref={(el) => { sectionRefs.current[`${sectionKey}-payment`] = el; }}
-            data-section={`${sectionKey}-payment`}
-            className={`form-section-card ${permanentlyVisible.has(`${sectionKey}-payment`) ? 'section-visible' : ''}`}
+            ref={(el) => { sectionRefs.current[sectionKey] = el; }}
+            data-section={sectionKey}
+            className={`form-section-card ${permanentlyVisible.has(sectionKey) ? 'section-visible' : ''}`}
           >
             <div className="section-header">
-              <h3>{`Payment - ${label}`}</h3>
+              <h3>Payments</h3>
               <button 
-                className={`expand-collapse-btn ${!expandedSections.has(`${sectionKey}-payment`) ? 'collapsed' : ''}`}
+                className={`expand-collapse-btn ${!expandedSections.has(sectionKey) ? 'collapsed' : ''}`}
                 type="button"
-                onClick={() => toggleSection(`${sectionKey}-payment`)}
-                aria-label={expandedSections.has(`${sectionKey}-payment`) ? 'Collapse section' : 'Expand section'}
+                onClick={() => toggleSection(sectionKey)}
+                aria-label={expandedSections.has(sectionKey) ? 'Collapse section' : 'Expand section'}
               >
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M4 6L8 10L12 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
               </button>
             </div>
-            {expandedSections.has(`${sectionKey}-payment`) && renderPaymentSection(
-              need,
-              (updates) =>
-                handleUpdateNeed(need.id, { payment: { ...need.payment, ...updates } }),
-              (dataUpdates) =>
-                handleUpdateNeed(need.id, { data: { ...need.data, ...(dataUpdates as any) } })
+            {expandedSections.has(sectionKey) && (
+              <div className="payments-swiper-wrapper" style={{ marginTop: '1rem' }}>
+                <Swiper
+                  modules={[Navigation]}
+                  spaceBetween={16}
+                  slidesPerView="auto"
+                  navigation
+                  className="payments-swiper"
+                  style={{ overflow: 'visible' }}
+                >
+                  {formData.needs.map((need) => (
+                    <SwiperSlide key={need.id} style={{ width: 'min(100%, 520px)', boxSizing: 'border-box' }}>
+                      <div className="payment-slide-card" style={{
+                        padding: '1rem',
+                        borderRadius: '12px',
+                        border: '1px solid var(--border-primary)',
+                        backgroundColor: 'var(--bg-secondary)',
+                        ...(multi
+                          ? { height: '560px', display: 'flex', flexDirection: 'column' as const }
+                          : { minHeight: '200px' })
+                      }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+                          <div
+                            style={{
+                              fontWeight: 600,
+                              fontSize: '1.45rem',
+                              lineHeight: 1.1,
+                              background: 'var(--accent-gradient)',
+                              WebkitBackgroundClip: 'text',
+                              color: 'transparent'
+                            }}
+                          >
+                            {getNeedTypeLabel(need.type)}
+                          </div>
+                        </div>
+                        {multi ? (
+                          <div style={{ flex: 1, overflow: 'auto', paddingRight: '0.25rem' }}>
+                            {renderPaymentSection(
+                              need,
+                              need.payment,
+                              (updates) => handleUpdateNeed(need.id, { payment: { ...need.payment, ...updates } }),
+                              (dataUpdates) => handleUpdateNeed(need.id, { data: { ...need.data, ...(dataUpdates as any) } }),
+                              need.id
+                            )}
+                          </div>
+                        ) : (
+                          renderPaymentSection(
+                            need,
+                            need.payment,
+                            (updates) => handleUpdateNeed(need.id, { payment: { ...need.payment, ...updates } }),
+                            (dataUpdates) => handleUpdateNeed(need.id, { data: { ...need.data, ...(dataUpdates as any) } }),
+                            need.id
+                          )
+                        )}
+                      </div>
+                    </SwiperSlide>
+                  ))}
+                </Swiper>
+              </div>
             )}
           </div>
         );
-      })}
+      })()}
 
       {/* Reasonable Steps */}
       <div 
@@ -1109,27 +1057,80 @@ const MultiNeedContainer: React.FC<MultiNeedContainerProps> = ({ formData, onFor
             </svg>
           </button>
         </div>
-        {expandedSections.has('decisions') && formData.needs.map((need, index) => {
-          const label = getNeedTypeLabel(need.type);
+        {expandedSections.has('decisions') && (() => {
+          const multi = formData.needs.length > 1;
           return (
-            <div key={`decision-${need.id}`} style={{ marginBottom: index < formData.needs.length - 1 ? '2rem' : 0 }}>
-              <h4 style={{ marginBottom: '1rem', fontSize: '1.1rem' }}>{label}</h4>
-              <DecisionSection
-                decision={need.decision.decision}
-                decisionReason={need.decision.decisionReason}
-                onDecisionChange={(value) =>
-                  handleUpdateNeed(need.id, {
-                    decision: { ...need.decision, decision: value as 'approved' | 'declined' | '' }
-                  })
-                }
-                onDecisionReasonChange={(value) =>
-                  handleUpdateNeed(need.id, { decision: { ...need.decision, decisionReason: value } })
-                }
-                isVisible={true}
-              />
-            </div>
+          <div className="decisions-swiper-wrapper" style={{ marginTop: '1rem' }}>
+            <Swiper
+              modules={[Navigation]}
+              spaceBetween={16}
+              slidesPerView="auto"
+              navigation
+              className="decisions-swiper"
+              style={{ overflow: 'visible' }}
+            >
+              {formData.needs.map((need) => (
+                <SwiperSlide key={`decision-${need.id}`} style={{ width: 'min(100%, 520px)', boxSizing: 'border-box' }}>
+                  <div className="decision-slide-card" style={{
+                    padding: '1rem',
+                    borderRadius: '12px',
+                    border: '1px solid var(--border-primary)',
+                    backgroundColor: 'var(--bg-secondary)'
+                  }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+                      <div
+                        style={{
+                          fontWeight: 600,
+                          fontSize: '1.45rem',
+                          lineHeight: 1.1,
+                          background: 'var(--accent-gradient)',
+                          WebkitBackgroundClip: 'text',
+                          color: 'transparent'
+                        }}
+                      >
+                        {getNeedTypeLabel(need.type)}
+                      </div>
+                    </div>
+                    {multi ? (
+                      <div style={{ flex: 1, overflow: 'auto', paddingRight: '0.25rem' }}>
+                        <DecisionSection
+                          decision={need.decision.decision}
+                          decisionReason={need.decision.decisionReason}
+                          onDecisionChange={(value) =>
+                            handleUpdateNeed(need.id, {
+                              decision: { ...need.decision, decision: value as 'approved' | 'declined' | '' }
+                            })
+                          }
+                          onDecisionReasonChange={(value) =>
+                            handleUpdateNeed(need.id, { decision: { ...need.decision, decisionReason: value } })
+                          }
+                          isVisible={true}
+                          hideHeader={true}
+                        />
+                      </div>
+                    ) : (
+                      <DecisionSection
+                        decision={need.decision.decision}
+                        decisionReason={need.decision.decisionReason}
+                        onDecisionChange={(value) =>
+                          handleUpdateNeed(need.id, {
+                            decision: { ...need.decision, decision: value as 'approved' | 'declined' | '' }
+                          })
+                        }
+                        onDecisionReasonChange={(value) =>
+                          handleUpdateNeed(need.id, { decision: { ...need.decision, decisionReason: value } })
+                        }
+                        isVisible={true}
+                        hideHeader={true}
+                      />
+                    )}
+                  </div>
+                </SwiperSlide>
+              ))}
+            </Swiper>
+          </div>
           );
-        })}
+        })()}
       </div>
 
     </div>

@@ -34,7 +34,7 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) 
     return {
       useTildes: true,
       useCapitals: false,
-      useBold: false
+      useBold: true
     };
   });
 

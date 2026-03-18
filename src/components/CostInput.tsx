@@ -130,18 +130,10 @@ const CostInput: React.FC<CostInputProps> = ({ value, onChange, placeholder = "T
         inputRef.current?.focus();
         break;
       case 'Tab':
-        e.preventDefault();
+        // Don't hijack normal tab order. Just close the dropdown and let the
+        // browser move focus (including Shift+Tab for reverse navigation).
         setShowDropdown(false);
         setSelectedIndex(-1);
-        // Move to next focusable element
-        const focusableElements = document.querySelectorAll(
-          'input:not([disabled]), button:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
-        );
-        const currentIndex = Array.from(focusableElements).indexOf(inputRef.current!);
-        const nextElement = focusableElements[currentIndex + 1] as HTMLElement;
-        if (nextElement) {
-          nextElement.focus();
-        }
         break;
     }
   };

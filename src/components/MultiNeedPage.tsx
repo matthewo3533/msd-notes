@@ -17,7 +17,8 @@ const MultiNeedPage: React.FC = () => {
     const defaultNeedType: HardshipNeedType = 'food';
     const paymentDefaults = getNeedPaymentDefaults(defaultNeedType);
     return {
-      clientId: null,
+      clientId: true,
+      needSummary: '',
       incomeLabels: createDefaultIncomeLabels(),
       income: {
         benefit: 0,
@@ -45,8 +46,12 @@ const MultiNeedPage: React.FC = () => {
   };
 
   const initialState = useMemo(() => {
-    const state = location.state as { multiNeedData?: MultiNeedFormData; autoOpenSelector?: boolean } | null;
-    return state?.multiNeedData ?? createDefaultFormData();
+    const state = location.state as { multiNeedData?: MultiNeedFormData } | null;
+    if (state?.multiNeedData) {
+      const data = state.multiNeedData;
+      return { ...data, clientId: data.clientId === false ? false : true };
+    }
+    return createDefaultFormData();
   }, [location.state]);
 
   const [formData, setFormData] = useState<MultiNeedFormData>(initialState);
@@ -58,7 +63,8 @@ const MultiNeedPage: React.FC = () => {
   useEffect(() => {
     const state = location.state as { multiNeedData?: MultiNeedFormData; autoOpenSelector?: boolean } | null;
     if (state?.multiNeedData) {
-      setFormData(state.multiNeedData);
+      const data = state.multiNeedData;
+      setFormData({ ...data, clientId: data.clientId === false ? false : true });
       setAutoOpenSelector(Boolean(state.autoOpenSelector));
       navigate(location.pathname, { replace: true, state: undefined });
     }
@@ -72,7 +78,8 @@ const MultiNeedPage: React.FC = () => {
     const defaultNeedType: HardshipNeedType = 'food';
     const paymentDefaults = getNeedPaymentDefaults(defaultNeedType);
     setFormData({
-      clientId: null,
+      clientId: true,
+      needSummary: '',
       incomeLabels: createDefaultIncomeLabels(),
       income: {
         benefit: 0,
@@ -129,7 +136,7 @@ const MultiNeedPage: React.FC = () => {
           onSelectorOpened={() => setAutoOpenSelector(false)}
         />
         <div className="note-section">
-          <NeedsOverview 
+          <NeedsOverview
             needs={formData.needs}
             onRemoveNeed={(needId) => {
               const updatedNeeds = formData.needs.filter(n => n.id !== needId);

@@ -1227,6 +1227,80 @@ body:not(.nav-dropdown-open) .container {
 .need-selector-grid.animate-in .need-selector-card:nth-child(16) { animation-delay: 0.8s; }
 .need-selector-grid.animate-in .need-selector-card:nth-child(17) { animation-delay: 0.85s; }
 
+/* Payments horizontal swiper (Multi-Need page) */
+.payments-swiper-wrapper {
+  overflow: hidden;
+}
+.payments-swiper {
+  padding-bottom: 2.5rem;
+}
+.payments-swiper .swiper-slide {
+  height: auto;
+}
+.payments-swiper .swiper-button-prev,
+.payments-swiper .swiper-button-next {
+  color: var(--text-primary);
+}
+
+/* Decisions horizontal swiper (Multi-Need page) */
+.decisions-swiper-wrapper {
+  overflow: hidden;
+}
+.decisions-swiper {
+  padding-bottom: 2.5rem;
+}
+.decisions-swiper .swiper-slide {
+  height: auto;
+}
+.decisions-swiper .swiper-button-prev,
+.decisions-swiper .swiper-button-next {
+  color: var(--text-primary);
+}
+
+/* Swiper nav buttons styled like expand-collapse-btn */
+.payments-swiper .swiper-button-prev,
+.payments-swiper .swiper-button-next,
+.decisions-swiper .swiper-button-prev,
+.decisions-swiper .swiper-button-next {
+  width: 37px;
+  height: 37px;
+  border-radius: 999px;
+  padding: 9px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-primary);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.payments-swiper .swiper-button-prev:hover,
+.payments-swiper .swiper-button-next:hover,
+.decisions-swiper .swiper-button-prev:hover,
+.decisions-swiper .swiper-button-next:hover {
+  background: var(--bg-secondary);
+  border-color: var(--accent-color);
+  color: var(--accent-color);
+  transform: scale(1.05);
+}
+.payments-swiper .swiper-button-prev:after,
+.payments-swiper .swiper-button-next:after,
+.decisions-swiper .swiper-button-prev:after,
+.decisions-swiper .swiper-button-next:after {
+  font-size: 13px;
+  font-weight: 900;
+  line-height: 1;
+}
+.payments-swiper .swiper-button-prev,
+.decisions-swiper .swiper-button-prev {
+  left: 8px;
+}
+.payments-swiper .swiper-button-next,
+.decisions-swiper .swiper-button-next {
+  right: 8px;
+}
+
 /* Responsive grid for needs overview */
 @media (max-width: 768px) {
   .needs-overview-grid {
@@ -2439,8 +2513,7 @@ input[type="number"]::-webkit-inner-spin-button {
 }
 
 .copy-btn::before {
-  content: '📋';
-  font-size: 1.1rem;
+  content: '';
 }
 
 /* Copy button with icon */
@@ -2512,6 +2585,27 @@ input[type="number"]::-webkit-inner-spin-button {
 
 .dollar-input input {
   padding-left: 1.75rem;
+}
+
+/* Calculated amount helper cue */
+.calculated-amount-input {
+  position: relative;
+}
+
+.calculated-amount-hint {
+  position: absolute;
+  right: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  background: color-mix(in srgb, var(--bg-secondary) 80%, transparent);
+  border: 1px solid var(--border-secondary);
+  padding: 0.15rem 0.4rem;
+  border-radius: 999px;
+  pointer-events: none;
+  user-select: none;
+  white-space: nowrap;
 }
 
 /* Remove number input spinners/arrows */

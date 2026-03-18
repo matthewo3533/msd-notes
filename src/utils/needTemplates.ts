@@ -210,6 +210,7 @@ export const getNeedPaymentDefaults = (type: HardshipNeedType): Partial<PaymentD
       supplierName: 'Food Supplier Group'
     },
     'glasses': {
+      supplierName: 'Optical Supplier Group',
       amount: 280
     },
     'dental': {

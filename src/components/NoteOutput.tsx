@@ -3,8 +3,8 @@ import { Link } from 'react-router-dom';
 import { FoodFormData, ClothingFormData, RentArrearsFormData, CarRepairsFormData, FuneralAssistanceFormData, StrandedTravelFormData, TASGrantFormData, DeclareIncomeFormData, ADSDFormData, EmergencyFormData, TransitionToWorkFormData, AbsenceFromNZFormData, ChangeOfAddressFormData } from '../App';
 import { DEFAULT_INCOME_LABELS, IncomeLabels } from './IncomeSection';
 import { formatHeading, CustomHeadingFormat } from '../utils/headingFormatter';
-import type { MultiNeedFormData, NeedItem } from '../types/multiNeed';
-import { getNeedTypeLabel, hasExtraSection, getExtraSectionTitle } from '../types/multiNeed';
+import type { MultiNeedFormData } from '../types/multiNeed';
+import { getNeedTypeLabel } from '../types/multiNeed';
 
 interface NoteOutputProps {
   formData: any;
@@ -13,7 +13,7 @@ interface NoteOutputProps {
   customHeadingFormat?: CustomHeadingFormat;
 }
 
-const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onReset, customHeadingFormat = { useTildes: true, useCapitals: false, useBold: false } }) => {
+const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onReset, customHeadingFormat = { useTildes: true, useCapitals: false, useBold: true } }) => {
   type IncomeKey = keyof IncomeLabels;
   type IncomeRecord = Record<IncomeKey, number>;
   type IncomeLabelsInput = Partial<IncomeLabels> | undefined;
@@ -121,148 +121,18 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
     }
   };
 
-  // Generate note content for a single need
-  const generateNeedContent = (need: NeedItem): string => {
-    let content = '';
-    const data = need.data as any;
-
-    // Common fields
-    if (data.whyNeedFood) content += `${data.whyNeedFood}\n\n`;
-    if (data.whyNeedClothing) content += `${data.whyNeedClothing}\n\n`;
-    if (data.whyNeedEmergencyPayment) content += `${data.whyNeedEmergencyPayment}\n\n`;
-    if (data.whyNeedBeds) content += `${data.whyNeedBeds}\n\n`;
-    if (data.whyNeedBedding) content += `${data.whyNeedBedding}\n\n`;
-    if (data.whyNeedFurniture) content += `${data.whyNeedFurniture}\n\n`;
-    if (data.whyNeedGlasses) content += `${data.whyNeedGlasses}\n\n`;
-    if (data.whyNeedADSD) content += `${data.whyNeedADSD}\n\n`;
-    if (data.whyNeedWhiteware) content += `${data.whyNeedWhiteware}\n\n`;
-    if (data.whyNeedPower) content += `${data.whyNeedPower}\n\n`;
-    if (need.type === 'electricity' && data.powerAccountNumber) {
-      content += `Power account number: ${data.powerAccountNumber}\n`;
-    }
-    if (data.whyNeedDental) content += `${data.whyNeedDental}\n\n`;
-    if (data.whyNeedCarRepairs) content += `${data.whyNeedCarRepairs}\n\n`;
-    if (data.whyNeedRentArrears) content += `${data.whyNeedRentArrears}\n\n`;
-    if (data.whyNeedAccommodation) content += `${data.whyNeedAccommodation}\n\n`;
-    if (data.whyNeedFuneralAssistance) content += `${data.whyNeedFuneralAssistance}\n\n`;
-    if (data.whyNeedStrandedTravelAssistance) content += `${data.whyNeedStrandedTravelAssistance}\n\n`;
-    if (data.whyNeedTransitionToWork) content += `${data.whyNeedTransitionToWork}\n\n`;
-
-    if (data.canMeetNeedOtherWay) {
-      content += `Can meet need other way: ${data.canMeetNeedOtherWay}\n\n`;
-    }
-
-    if (data.rentArrearsVerification) {
-      content += `Rent arrears verification: ${data.rentArrearsVerification}\n\n`;
-    }
-
-    // Food-specific
-    if (data.foodAmountRequested > 0) {
-      content += `Amount requested: $${data.foodAmountRequested.toFixed(2)}\n`;
-    }
-    if (data.currentFoodBalance !== undefined) {
-      content += `Current food balance: $${data.currentFoodBalance.toFixed(2)}\n`;
-    }
-    if (data.hardshipUnforeseen) {
-      content += `Hardship unforeseen: ${data.hardshipUnforeseen}\n`;
-    }
-    if (data.unforeseenCircumstance) {
-      content += `Unforeseen circumstance: ${data.unforeseenCircumstance}\n`;
-    }
-
-    // Furniture-specific
-    if (data.furnitureType) {
-      content += `Furniture type: ${data.furnitureType}\n`;
-    }
-
-    return content;
-  };
-
-  // Generate extra section content (car details, whiteware info, etc.)
-  const generateExtraSectionContent = (need: NeedItem): string => {
-    let content = '';
-    const data = need.data as any;
-
-    if (need.type === 'car-repairs') {
-      content += `${formatHeading(getExtraSectionTitle(need.type), 'custom', customHeadingFormat)}\n`;
-      if (data.vehicleMakeModel) content += `Vehicle: ${data.vehicleMakeModel}\n`;
-      if (data.licensePlate) content += `License plate: ${data.licensePlate}\n`;
-      if (data.odometer) content += `Odometer: ${data.odometer}\n`;
-      if (data.vehicleOwner) content += `Owner: ${data.vehicleOwner}\n`;
-      if (data.nztaVerification) content += `NZTA verification: ${data.nztaVerification}\n`;
-      content += '\n';
-    } else if (need.type === 'whiteware') {
-      content += `${formatHeading(getExtraSectionTitle(need.type), 'custom', customHeadingFormat)}\n`;
-      if (data.householdSize) content += `Household size: ${data.householdSize}\n`;
-      content += '\n';
-    } else if (need.type === 'dental') {
-      content += `${formatHeading(getExtraSectionTitle(need.type), 'custom', customHeadingFormat)}\n`;
-      if (data.sngEligible) content += `SNG eligible: ${data.sngEligible}\n`;
-      if (data.sngBalance !== undefined) content += `SNG balance: $${data.sngBalance.toFixed(2)}\n`;
-      content += '\n';
-    } else if (need.type === 'bond-rent') {
-      content += `${formatHeading(getExtraSectionTitle(need.type), 'custom', customHeadingFormat)}\n`;
-      if (data.newAddress) content += `New address: ${data.newAddress}\n`;
-      if (data.asZone) content += `AS Zone: ${data.asZone}\n`;
-      if (data.weeklyRent) content += `Weekly rent: $${data.weeklyRent.toFixed(2)}\n`;
-      if (data.tenancyStartDate) content += `Tenancy start: ${data.tenancyStartDate}\n`;
-      if (data.bondAmount) content += `Bond amount: $${data.bondAmount.toFixed(2)}\n`;
-      if (data.rentInAdvanceAmount) content += `Rent in advance: $${data.rentInAdvanceAmount.toFixed(2)}\n`;
-      if (data.bondPaymentAmount) content += `Bond payment amount: $${data.bondPaymentAmount.toFixed(2)}\n`;
-      if (data.rentAdvancePaymentAmount)
-        content += `Rent in advance payment amount: $${data.rentAdvancePaymentAmount.toFixed(2)}\n`;
-      if (data.tenancyAffordable) content += `Tenancy affordable: ${data.tenancyAffordable}\n`;
-      content += '\n';
-    } else if (need.type === 'funeral-assistance' || need.type === 'stranded-travel') {
-      content += `${formatHeading(getExtraSectionTitle(need.type), 'custom', customHeadingFormat)}\n`;
-      if (data.petrolAssistance) content += `Petrol assistance: ${data.petrolAssistance}\n`;
-      if (data.startLocation) content += `From: ${data.startLocation}\n`;
-      if (data.destination) content += `To: ${data.destination}\n`;
-      if (data.returnTrip) content += `Return trip: ${data.returnTrip}\n`;
-      if (data.distance) content += `Distance: ${data.distance} km\n`;
-      if (data.travelCost) content += `Travel cost: $${data.travelCost.toFixed(2)}\n`;
-      content += '\n';
-    } else if (need.type === 'transition-to-work') {
-      content += `${formatHeading(getExtraSectionTitle(need.type), 'custom', customHeadingFormat)}\n`;
-      if (data.helpType) content += `Help type: ${data.helpType}\n`;
-      if (data.employerName) content += `Employer: ${data.employerName}\n`;
-      if (data.startDate) content += `Start date: ${data.startDate}\n`;
-      if (data.hoursPerWeek) content += `Hours per week: ${data.hoursPerWeek}\n`;
-      if (data.firstPayday) content += `First payday: ${data.firstPayday}\n`;
-      if (data.contractUploaded) content += `Contract uploaded: ${data.contractUploaded}\n`;
-      if (data.petrolAssistance) {
-        content += `Petrol assistance: ${data.petrolAssistance}\n`;
-        if (data.startLocation) content += `From: ${data.startLocation}\n`;
-        if (data.destination) content += `To: ${data.destination}\n`;
-        if (data.distance) content += `Distance: ${data.distance} km\n`;
-        if (data.travelCost) content += `Travel cost: $${data.travelCost.toFixed(2)}\n`;
-      }
-      content += '\n';
-    }
-
-    return content;
-  };
-
   // Generate multi-need note
   const generateMultiNeedNote = (data: MultiNeedFormData): string => {
     let note = '';
 
-    // CCID
-    note += `CCID: ${data.clientId ? 'Yes' : 'No'}\n\n`;
+    // CCID (default to Yes unless explicitly No)
+    note += `CCID: ${data.clientId === false ? 'No' : 'Yes'}\n\n`;
 
-    // All Needs
-    data.needs.forEach((need, index) => {
-      note += `${formatHeading(`Need ${index + 1} - ${getNeedTypeLabel(need.type)}`, 'custom', customHeadingFormat)}\n`;
-      note += generateNeedContent(need);
-      
-      note += '\n\n';
-      
-      // Add extra sections if applicable
-      if (hasExtraSection(need.type)) {
-        note += generateExtraSectionContent(need);
-        note += '\n';
-      }
-    });
+    // Need (single box) - only show when user entered text
+    if (data.needSummary && data.needSummary.trim()) {
+      note += `${formatHeading('Need', 'custom', customHeadingFormat)}\n`;
+      note += `${data.needSummary.trim()}\n\n`;
+    }
 
     // Reasonable Steps (once, after all needs)
     if (data.reasonableSteps && data.reasonableSteps.trim()) {
@@ -291,21 +161,28 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       note += `\nClient is left with: $${remaining.toFixed(2)}\n\n`;
     }
 
-    // All Payments
+    // All Payments (support need.payments array or single need.payment)
+    const writePaymentBlock = (payment: any, heading: string) => {
+      if (!hasPaymentData(payment)) return;
+      note += `${formatHeading(heading, 'custom', customHeadingFormat)}\n`;
+      if (payment.supplierName) note += `Supplier Name: ${payment.supplierName}\n`;
+      if (payment.supplierId) note += `Supplier ID: ${payment.supplierId}\n`;
+      if (payment.paymentCardNumber) note += `Payment card number: ${payment.paymentCardNumber}\n`;
+      if (payment.amount > 0) note += `Amount: $${payment.amount.toFixed(2)}\n`;
+      if (payment.recoveryRate > 0) note += `Recovery rate: $${payment.recoveryRate.toFixed(2)}\n`;
+      if (payment.bankAccount) note += `Bank account: ${payment.bankAccount}\n`;
+      if (payment.directCredit) note += `Direct credit: ${payment.directCredit}\n`;
+      if (payment.paymentReference) note += `Payment reference: ${payment.paymentReference}\n`;
+      if (payment.powerAccountNumber) note += `Power account number: ${payment.powerAccountNumber}\n`;
+      note += '\n';
+    };
     data.needs.forEach((need) => {
-      if (hasPaymentData(need.payment)) {
-        note += `${formatHeading(`Payment - ${getNeedTypeLabel(need.type)}`, 'custom', customHeadingFormat)}\n`;
-        if (need.payment.supplierName) note += `Supplier Name: ${need.payment.supplierName}\n`;
-        if (need.payment.supplierId) note += `Supplier ID: ${need.payment.supplierId}\n`;
-        if (need.payment.paymentCardNumber) note += `Payment card number: ${need.payment.paymentCardNumber}\n`;
-        if (need.payment.amount > 0) note += `Amount: $${need.payment.amount.toFixed(2)}\n`;
-        if (need.payment.recoveryRate > 0) note += `Recovery rate: $${need.payment.recoveryRate.toFixed(2)}\n`;
-        if (need.payment.bankAccount) note += `Bank account: ${need.payment.bankAccount}\n`;
-        if (need.payment.directCredit) note += `Direct credit: ${need.payment.directCredit}\n`;
-        if (need.payment.paymentReference) note += `Payment reference: ${need.payment.paymentReference}\n`;
-        if (need.payment.powerAccountNumber) note += `Power account number: ${need.payment.powerAccountNumber}\n`;
-        note += '\n';
-      }
+      const payments = need.payments && need.payments.length > 0 ? need.payments : [need.payment];
+      const label = getNeedTypeLabel(need.type);
+      payments.forEach((payment, i) => {
+        const heading = payments.length === 1 ? `Payment - ${label}` : `Payment ${i + 1} - ${label}`;
+        writePaymentBlock(payment, heading);
+      });
     });
 
     // Per-Need Decisions
@@ -1774,7 +1651,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
         note += `${f.reasonableSteps}\n\n`;
       }
       if (hasOutcomeData(f.decision, f.decisionReason)) {
-        note += `${formatHeading('Outcome', 'custom', customHeadingFormat)}\n`;
+        note += `\n${formatHeading('Outcome', 'custom', customHeadingFormat)}\n`;
         if (f.decision === 'approved') note += 'APPLICATION APPROVED\n';
         else if (f.decision === 'declined') note += 'APPLICATION DECLINED\n';
         if (f.decisionReason) note += `${f.decisionReason}\n`;

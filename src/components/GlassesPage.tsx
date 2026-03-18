@@ -15,7 +15,7 @@ const GlassesPage: React.FC = () => {
     whyNeedGlasses: '',
     reasonableSteps: '',
     canMeetNeedOtherWay: '',
-    supplierName: '',
+    supplierName: 'Optical Supplier Group',
     supplierId: '',
     amount: 280, // Default amount for glasses
     recoveryRate: 0,
@@ -46,7 +46,7 @@ const GlassesPage: React.FC = () => {
       whyNeedGlasses: '',
       reasonableSteps: '',
       canMeetNeedOtherWay: '',
-      supplierName: '',
+      supplierName: 'Optical Supplier Group',
       supplierId: '',
       amount: 280, // Default amount for glasses
       recoveryRate: 0,

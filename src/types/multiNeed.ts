@@ -214,12 +214,14 @@ export type NeedData =
   | StrandedTravelNeedData
   | TransitionToWorkNeedData;
 
-// Individual need item
+// Individual need item (payment = single, payments = multiple for horizontal swiper; use payments when present)
 export interface NeedItem {
   id: string;
   type: HardshipNeedType;
   data: NeedData;
   payment: PaymentData;
+  /** When set, used for multiple payment sections (e.g. horizontal swiper). Otherwise payment is used. */
+  payments?: PaymentData[];
   decision: DecisionData;
 }
 
@@ -227,6 +229,8 @@ export interface NeedItem {
 export interface MultiNeedFormData {
   // Shared across all needs
   clientId: boolean | null;
+  /** Single narrative description of the client's need(s) for the note. */
+  needSummary?: string;
   incomeLabels?: IncomeLabels;
   income: IncomeData;
   costs: CostData[];

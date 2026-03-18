@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import CostInput from './CostInput';
+import CalculatedAmountInput from './CalculatedAmountInput';
 import IncomePieChart from './IncomePieChart';
 import ExpandableSection from './ExpandableSection';
 
@@ -175,14 +176,12 @@ const IncomeSection: React.FC<IncomeSectionProps> = ({
           )}
         </div>
         <div className="dollar-input">
-          <input
-            type="number"
-            className="form-control"
-            value={income[field] || ''}
-            onChange={(e) => onIncomeChange(field, parseFloat(e.target.value) || 0)}
+          <CalculatedAmountInput
+            value={income[field] || 0}
+            onValueChange={(value) => onIncomeChange(field, value)}
             placeholder="Enter amount"
-            step="0.01"
-            min="0"
+            min={0}
+            className="form-control"
           />
         </div>
       </div>
@@ -269,13 +268,11 @@ const IncomeSection: React.FC<IncomeSectionProps> = ({
             {costs.map((cost, index) => (
               <div key={index} className="cost-row">
                 <div className="dollar-input">
-                  <input
-                    type="number"
+                  <CalculatedAmountInput
+                    value={cost.amount || 0}
+                    onValueChange={(value) => onCostChange(index, 'amount', value)}
                     placeholder="Amount"
-                    value={cost.amount || ''}
-                    onChange={(e) => onCostChange(index, 'amount', parseFloat(e.target.value) || 0)}
-                    step="0.01"
-                    min="0"
+                    min={0}
                   />
                 </div>
                 <CostInput

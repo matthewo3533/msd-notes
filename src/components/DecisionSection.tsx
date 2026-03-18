@@ -8,6 +8,8 @@ interface DecisionSectionProps {
   onDecisionChange: (decision: string) => void;
   onDecisionReasonChange: (reason: string) => void;
   isVisible?: boolean;
+  /** When true, renders the content without the ExpandableSection header. */
+  hideHeader?: boolean;
 }
 
 const DecisionSection: React.FC<DecisionSectionProps> = ({
@@ -15,15 +17,11 @@ const DecisionSection: React.FC<DecisionSectionProps> = ({
   decisionReason,
   onDecisionChange,
   onDecisionReasonChange,
-  isVisible = false
+  isVisible = false,
+  hideHeader = false
 }) => {
-  return (
-    <ExpandableSection
-      title="Decision"
-      dataSection="decision"
-      isVisible={isVisible}
-      defaultExpanded={true}
-    >
+  const content = (
+    <>
       <div className="form-group">
         <label>Do you want to approve or decline this application?</label>
         <div className="decision-buttons">
@@ -53,6 +51,21 @@ const DecisionSection: React.FC<DecisionSectionProps> = ({
           />
         </div>
       )}
+    </>
+  );
+
+  if (hideHeader) {
+    return content;
+  }
+
+  return (
+    <ExpandableSection
+      title="Decision"
+      dataSection="decision"
+      isVisible={isVisible}
+      defaultExpanded={true}
+    >
+      {content}
     </ExpandableSection>
   );
 };
