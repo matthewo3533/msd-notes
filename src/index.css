@@ -4714,6 +4714,17 @@ input[type="number"] {
   border-left: 3px solid var(--accent-primary);
 }
 
+.travel-cost-total {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-primary);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  text-align: center;
+}
+
 /* Error message styling */
 .error-message {
   background: #fee;

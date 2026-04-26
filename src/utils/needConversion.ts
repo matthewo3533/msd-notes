@@ -54,7 +54,13 @@ export const convertToMultiNeed = (
       const e = formData as EmergencyFormData;
       needData = {
         whyNeedEmergencyPayment: e.whyNeedEmergencyPayment,
-        canMeetNeedOtherWay: e.canMeetNeedOtherWay
+        canMeetNeedOtherWay: e.canMeetNeedOtherWay,
+        petrolAssistance: e.petrolAssistance,
+        startLocation: e.startLocation,
+        destination: e.destination,
+        returnTrip: e.returnTrip,
+        distance: e.distance,
+        travelCost: e.travelCost
       };
       break;
 

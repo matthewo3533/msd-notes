@@ -581,6 +581,22 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
         note += `${e.whyNeedEmergencyPayment}\n`;
       }
 
+      if (e.petrolAssistance === 'yes') {
+        note += `\n${formatHeading('Travel Details', 'custom', customHeadingFormat)}\n`;
+        if (e.startLocation && e.destination) {
+          note += `Travelling from: ${e.startLocation} to ${e.destination}\n`;
+        }
+        if (e.returnTrip) {
+          note += `Return trip: ${e.returnTrip === 'yes' ? 'Yes' : 'No'}\n`;
+        }
+        if (e.distance > 0) {
+          note += `Distance: ${e.distance.toFixed(1)} km\n`;
+        }
+        if (e.travelCost > 0) {
+          note += `Calculated Cost of travel: $${e.travelCost.toFixed(2)}\n`;
+        }
+      }
+
       if (hasPaymentData(e)) {
         note += `\n${formatHeading('Payment', 'custom', customHeadingFormat)}\n`;
         if (e.supplierName && e.supplierName.trim()) {
@@ -635,6 +651,22 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       note += `${formatHeading('Need', 'custom', customHeadingFormat)}\n`;
       if (e.whyNeedEmergencyPayment) {
         note += `${e.whyNeedEmergencyPayment}\n`;
+      }
+
+      if (e.petrolAssistance === 'yes') {
+        note += `\n${formatHeading('Travel Details', 'custom', customHeadingFormat)}\n`;
+        if (e.startLocation && e.destination) {
+          note += `Travelling from: ${e.startLocation} to ${e.destination}\n`;
+        }
+        if (e.returnTrip) {
+          note += `Return trip: ${e.returnTrip === 'yes' ? 'Yes' : 'No'}\n`;
+        }
+        if (e.distance > 0) {
+          note += `Distance: ${e.distance.toFixed(1)} km\n`;
+        }
+        if (e.travelCost > 0) {
+          note += `Calculated Cost of travel: $${e.travelCost.toFixed(2)}\n`;
+        }
       }
 
       if (hasPaymentData(e)) {

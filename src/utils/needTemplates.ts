@@ -56,7 +56,13 @@ const clothingTemplate: ClothingNeedData = {
 
 const emergencyTemplate: EmergencyNeedData = {
   whyNeedEmergencyPayment: '',
-  canMeetNeedOtherWay: ''
+  canMeetNeedOtherWay: '',
+  petrolAssistance: '',
+  startLocation: '',
+  destination: '',
+  returnTrip: '',
+  distance: 0,
+  travelCost: 0
 };
 
 const bedsTemplate: BedsNeedData = {

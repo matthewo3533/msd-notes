@@ -70,6 +70,12 @@ export interface ClothingNeedData {
 export interface EmergencyNeedData {
   whyNeedEmergencyPayment: string;
   canMeetNeedOtherWay: string;
+  petrolAssistance: string;
+  startLocation: string;
+  destination: string;
+  returnTrip: string;
+  distance: number;
+  travelCost: number;
 }
 
 export interface BedsNeedData {
@@ -273,7 +279,8 @@ export const hasExtraSection = (type: HardshipNeedType): boolean => {
     'funeral-assistance',
     'stranded-travel',
     'transition-to-work',
-    'dental'
+    'dental',
+    'emergency'
   ].includes(type);
 };
 
@@ -286,7 +293,8 @@ export const getExtraSectionTitle = (type: HardshipNeedType): string => {
     'funeral-assistance': 'Travel Details',
     'stranded-travel': 'Travel Details',
     'transition-to-work': 'Employment Info',
-    'dental': 'Dental Info'
+    'dental': 'Dental Info',
+    'emergency': 'Travel Details'
   };
   return titles[type] || '';
 };

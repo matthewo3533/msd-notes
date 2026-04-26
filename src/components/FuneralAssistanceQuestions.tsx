@@ -120,7 +120,8 @@ const FuneralAssistanceQuestions: React.FC<FuneralAssistanceQuestionsProps> = ({
   const [toPlaceId, setToPlaceId] = useState<string>('');
   
   // Layout management for suggestions
-  const [suggestionsHeight, setSuggestionsHeight] = useState(0);
+  const [fromSuggestionsHeight, setFromSuggestionsHeight] = useState(0);
+  const [toSuggestionsHeight, setToSuggestionsHeight] = useState(0);
   const [carDropdownHeight, setCarDropdownHeight] = useState(0);
   
   // Cache for distance calculations to minimize API calls
@@ -255,9 +256,8 @@ const FuneralAssistanceQuestions: React.FC<FuneralAssistanceQuestionsProps> = ({
         setShowToSuggestions(false);
         setFromLocationSuggestions([]);
         setToLocationSuggestions([]);
-        if (!showFromSuggestions && !showToSuggestions) {
-          setSuggestionsHeight(0);
-        }
+        setFromSuggestionsHeight(0);
+        setToSuggestionsHeight(0);
       }
     };
 
@@ -425,14 +425,14 @@ const FuneralAssistanceQuestions: React.FC<FuneralAssistanceQuestionsProps> = ({
     const suggestions = await searchPlaces(query);
     setFromLocationSuggestions(suggestions);
     setShowFromSuggestions(suggestions.length > 0);
-    setSuggestionsHeight(Math.min(suggestions.length * 50, 200));
+    setFromSuggestionsHeight(Math.min(suggestions.length * 50, 200));
   };
 
   const handleToLocationSearch = async (query: string) => {
     const suggestions = await searchPlaces(query);
     setToLocationSuggestions(suggestions);
     setShowToSuggestions(suggestions.length > 0);
-    setSuggestionsHeight(Math.min(suggestions.length * 50, 200));
+    setToSuggestionsHeight(Math.min(suggestions.length * 50, 200));
   };
 
   const handleFromLocationSelect = async (location: Location) => {
@@ -440,7 +440,7 @@ const FuneralAssistanceQuestions: React.FC<FuneralAssistanceQuestionsProps> = ({
     setFromPlaceId(location.placeId);
     setFromLocationSuggestions([]);
     setShowFromSuggestions(false);
-    setSuggestionsHeight(0);
+    setFromSuggestionsHeight(0);
     
     // Calculate distance if both locations are set
     if (toPlaceId) {
@@ -453,7 +453,7 @@ const FuneralAssistanceQuestions: React.FC<FuneralAssistanceQuestionsProps> = ({
     setToPlaceId(location.placeId);
     setToLocationSuggestions([]);
     setShowToSuggestions(false);
-    setSuggestionsHeight(0);
+    setToSuggestionsHeight(0);
     
     // Calculate distance if both locations are set
     if (fromPlaceId) {
@@ -623,7 +623,7 @@ const FuneralAssistanceQuestions: React.FC<FuneralAssistanceQuestionsProps> = ({
                 </div>
               )}
             </div>
-            <div className="suggestions-spacer" style={{ height: `${suggestionsHeight}px` }}></div>
+            <div className="suggestions-spacer" style={{ height: `${fromSuggestionsHeight}px` }}></div>
           </div>
 
           <div className="form-group">
@@ -658,7 +658,7 @@ const FuneralAssistanceQuestions: React.FC<FuneralAssistanceQuestionsProps> = ({
                 </div>
               )}
             </div>
-            <div className="suggestions-spacer" style={{ height: `${suggestionsHeight}px` }}></div>
+            <div className="suggestions-spacer" style={{ height: `${toSuggestionsHeight}px` }}></div>
           </div>
 
           <div className="form-group">
@@ -771,7 +771,7 @@ const FuneralAssistanceQuestions: React.FC<FuneralAssistanceQuestionsProps> = ({
           {calculatedCost !== null && (
             <div className="form-group">
               <label>Calculated Cost of travel:</label>
-              <div className="form-control-static">
+              <div className="form-control-static travel-cost-total">
                 ${calculatedCost.toFixed(2)}
               </div>
             </div>
@@ -846,3 +846,5 @@ const FuneralAssistanceQuestions: React.FC<FuneralAssistanceQuestionsProps> = ({
 };
 
 export default FuneralAssistanceQuestions;
+
+

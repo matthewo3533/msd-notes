@@ -106,6 +106,12 @@ export interface EmergencyFormData {
   whyNeedEmergencyPayment: string;
   reasonableSteps: string;
   canMeetNeedOtherWay: string;
+  petrolAssistance: string;
+  startLocation: string;
+  destination: string;
+  returnTrip: string;
+  distance: number;
+  travelCost: number;
   supplierName: string;
   supplierId: string;
   amount: number;

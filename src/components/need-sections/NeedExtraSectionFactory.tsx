@@ -7,6 +7,7 @@ import {
   WhitewareNeedData,
   DentalNeedData,
   BondRentNeedData,
+  EmergencyNeedData,
   FuneralAssistanceNeedData,
   StrandedTravelNeedData,
   TransitionToWorkNeedData
@@ -294,9 +295,11 @@ const NeedExtraSectionFactory: React.FC<NeedExtraSectionFactoryProps> = ({ needT
     );
   }
 
-  if (needType === 'funeral-assistance' || needType === 'stranded-travel') {
+  if (needType === 'emergency' || needType === 'funeral-assistance' || needType === 'stranded-travel') {
     const travelData =
-      needType === 'funeral-assistance'
+      needType === 'emergency'
+        ? (data as EmergencyNeedData)
+        : needType === 'funeral-assistance'
         ? (data as FuneralAssistanceNeedData)
         : (data as StrandedTravelNeedData);
 
@@ -311,59 +314,63 @@ const NeedExtraSectionFactory: React.FC<NeedExtraSectionFactoryProps> = ({ needT
             { label: 'No', value: 'no' }
           ]
         )}
-        <div className="form-group">
-          <label>Start location</label>
-          <input
-            type="text"
-            className="form-control"
-            value={travelData.startLocation || ''}
-            onChange={(e) => onChange({ startLocation: e.target.value } as Partial<NeedData>)}
-            placeholder="Start location"
-          />
-        </div>
-        <div className="form-group">
-          <label>Destination</label>
-          <input
-            type="text"
-            className="form-control"
-            value={travelData.destination || ''}
-            onChange={(e) => onChange({ destination: e.target.value } as Partial<NeedData>)}
-            placeholder="Destination"
-          />
-        </div>
-        {renderRadioGroup(
-          'Return trip required?',
-          travelData.returnTrip || '',
-          (value) => onChange({ returnTrip: value } as Partial<NeedData>),
-          [
-            { label: 'Yes', value: 'yes' },
-            { label: 'No', value: 'no' }
-          ]
+        {travelData.petrolAssistance === 'yes' && (
+          <>
+            <div className="form-group">
+              <label>Start location</label>
+              <input
+                type="text"
+                className="form-control"
+                value={travelData.startLocation || ''}
+                onChange={(e) => onChange({ startLocation: e.target.value } as Partial<NeedData>)}
+                placeholder="Start location"
+              />
+            </div>
+            <div className="form-group">
+              <label>Destination</label>
+              <input
+                type="text"
+                className="form-control"
+                value={travelData.destination || ''}
+                onChange={(e) => onChange({ destination: e.target.value } as Partial<NeedData>)}
+                placeholder="Destination"
+              />
+            </div>
+            {renderRadioGroup(
+              'Return trip required?',
+              travelData.returnTrip || '',
+              (value) => onChange({ returnTrip: value } as Partial<NeedData>),
+              [
+                { label: 'Yes', value: 'yes' },
+                { label: 'No', value: 'no' }
+              ]
+            )}
+            <div className="form-group">
+              <label>Distance (km)</label>
+              <input
+                type="number"
+                className="form-control"
+                value={travelData.distance || ''}
+                onChange={(e) => onChange({ distance: parseFloat(e.target.value) || 0 } as Partial<NeedData>)}
+                placeholder="Distance in km"
+              />
+            </div>
+            <div className="form-group">
+              <label>Travel cost</label>
+              <div className="dollar-input">
+                <input
+                  type="number"
+                  className="form-control"
+                  value={travelData.travelCost || ''}
+                  onChange={(e) => onChange({ travelCost: parseFloat(e.target.value) || 0 } as Partial<NeedData>)}
+                  placeholder="0.00"
+                  step="0.01"
+                  min="0"
+                />
+              </div>
+            </div>
+          </>
         )}
-        <div className="form-group">
-          <label>Distance (km)</label>
-          <input
-            type="number"
-            className="form-control"
-            value={travelData.distance || ''}
-            onChange={(e) => onChange({ distance: parseFloat(e.target.value) || 0 } as Partial<NeedData>)}
-            placeholder="Distance in km"
-          />
-        </div>
-        <div className="form-group">
-          <label>Travel cost</label>
-          <div className="dollar-input">
-            <input
-              type="number"
-              className="form-control"
-              value={travelData.travelCost || ''}
-              onChange={(e) => onChange({ travelCost: parseFloat(e.target.value) || 0 } as Partial<NeedData>)}
-              placeholder="0.00"
-              step="0.01"
-              min="0"
-            />
-          </div>
-        </div>
       </>
     );
   }
