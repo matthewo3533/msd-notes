@@ -125,8 +125,8 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
   const generateMultiNeedNote = (data: MultiNeedFormData): string => {
     let note = '';
 
-    // CCID (default to Yes unless explicitly No)
-    note += `CCID: ${data.clientId === false ? 'No' : 'Yes'}\n\n`;
+    // Client ID (default to Yes unless explicitly No)
+    note += `Client ID: ${data.clientId === false ? 'No' : 'Yes'}\n\n`;
 
     // Need (single box) - only show when user entered text
     if (data.needSummary && data.needSummary.trim()) {
@@ -519,7 +519,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       // Clothing note output
       const c: ClothingFormData = formData;
       let note = '';
-      note += `CCID: ${c.clientId === false ? 'No' : 'Yes'}\n\n`;
+      note += `Client ID: ${c.clientId === false ? 'No' : 'Yes'}\n\n`;
       note += `${formatHeading('Need', 'custom', customHeadingFormat)}\n`;
       if (c.whyNeedClothing) {
         note += `${c.whyNeedClothing}\n`;
@@ -575,7 +575,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       // Emergency Payment note output (same template as clothing)
       const e: EmergencyFormData = formData;
       let note = '';
-      note += `CCID: ${e.clientId === false ? 'No' : 'Yes'}\n\n`;
+      note += `Client ID: ${e.clientId === false ? 'No' : 'Yes'}\n\n`;
       note += `${formatHeading('Need', 'custom', customHeadingFormat)}\n`;
       if (e.whyNeedEmergencyPayment) {
         note += `${e.whyNeedEmergencyPayment}\n`;
@@ -647,7 +647,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       // Generic Template note output (same template as emergency)
       const e: EmergencyFormData = formData;
       let note = '';
-      note += `CCID: ${e.clientId === false ? 'No' : 'Yes'}\n\n`;
+      note += `Client ID: ${e.clientId === false ? 'No' : 'Yes'}\n\n`;
       note += `${formatHeading('Need', 'custom', customHeadingFormat)}\n`;
       if (e.whyNeedEmergencyPayment) {
         note += `${e.whyNeedEmergencyPayment}\n`;
@@ -719,7 +719,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       // Transition to Work Grant note output
       const t: TransitionToWorkFormData = formData;
       let note = '';
-      note += `CCID: ${t.clientId === false ? 'No' : 'Yes'}\n\n`;
+      note += `Client ID: ${t.clientId === false ? 'No' : 'Yes'}\n\n`;
       
       note += `${formatHeading('Need', 'custom', customHeadingFormat)}\n`;
       if (t.helpType) {
@@ -840,7 +840,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       // ADSD note output
       const a: ADSDFormData = formData;
       let note = '';
-      note += `CCID: ${a.clientId === false ? 'No' : 'Yes'}\n\n`;
+      note += `Client ID: ${a.clientId === false ? 'No' : 'Yes'}\n\n`;
       note += `${formatHeading('Need', 'custom', customHeadingFormat)}\n`;
       if (a.whyNeedADSD) {
         note += `${a.whyNeedADSD}\n`;
@@ -893,7 +893,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       // Rent Arrears note output
       const r: RentArrearsFormData = formData;
       let note = '';
-      note += `CCID: ${r.clientId === false ? 'No' : 'Yes'}\n\n`;
+      note += `Client ID: ${r.clientId === false ? 'No' : 'Yes'}\n\n`;
       note += `${formatHeading('Need', 'custom', customHeadingFormat)}\n`;
       if (r.whyNeedRentArrears) {
         note += `${r.whyNeedRentArrears}\n`;
@@ -953,7 +953,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       // Car Repairs note output
       const c: CarRepairsFormData = formData;
       let note = '';
-      note += `CCID: ${c.clientId === false ? 'No' : 'Yes'}\n\n`;
+      note += `Client ID: ${c.clientId === false ? 'No' : 'Yes'}\n\n`;
       note += `${formatHeading('Need', 'custom', customHeadingFormat)}\n`;
       if (c.whyNeedCarRepairs) {
         note += `${c.whyNeedCarRepairs}\n`;
@@ -1020,7 +1020,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       // Funeral Assistance note output
       const f: FuneralAssistanceFormData = formData;
       let note = '';
-      note += `CCID: ${f.clientId === false ? 'No' : 'Yes'}\n\n`;
+      note += `Client ID: ${f.clientId === false ? 'No' : 'Yes'}\n\n`;
       note += `${formatHeading('Need', 'custom', customHeadingFormat)}\n`;
       if (f.whyNeedFuneralAssistance) {
         note += `${f.whyNeedFuneralAssistance}\n`;
@@ -1093,7 +1093,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       // Stranded Travel note output (same template as funeral assistance)
       const s: StrandedTravelFormData = formData;
       let note = '';
-      note += `CCID: ${s.clientId === false ? 'No' : 'Yes'}\n\n`;
+      note += `Client ID: ${s.clientId === false ? 'No' : 'Yes'}\n\n`;
       note += `${formatHeading('Need', 'custom', customHeadingFormat)}\n`;
       if (s.whyNeedStrandedTravelAssistance) {
         note += `${s.whyNeedStrandedTravelAssistance}\n`;
@@ -1166,7 +1166,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       // Bond/Rent in Advance note output
       const b = formData;
       let note = '';
-      note += `CCID: ${b.clientId === false ? 'No' : 'Yes'}\n\n`;
+      note += `Client ID: ${b.clientId === false ? 'No' : 'Yes'}\n\n`;
       note += `${formatHeading('Need', 'custom', customHeadingFormat)}\n`;
       if (b.whyNeedAccommodation) note += `${b.whyNeedAccommodation}\n`;
 
@@ -1237,7 +1237,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       // Electricity note output (similar to clothing)
       const e = formData;
       let note = '';
-      note += `CCID: ${e.clientId === false ? 'No' : 'Yes'}\n\n`;
+      note += `Client ID: ${e.clientId === false ? 'No' : 'Yes'}\n\n`;
       note += `${formatHeading('Need', 'custom', customHeadingFormat)}\n`;
       if (e.whyNeedPower) note += `${e.whyNeedPower}\n`;
 
@@ -1292,7 +1292,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       // Dental note output
       const d = formData;
       let note = '';
-      note += `CCID: ${d.clientId === false ? 'No' : 'Yes'}\n\n`;
+      note += `Client ID: ${d.clientId === false ? 'No' : 'Yes'}\n\n`;
       note += `${formatHeading('Need', 'custom', customHeadingFormat)}\n`;
       if (d.whyNeedDental) note += `${d.whyNeedDental}\n`;
 
@@ -1352,7 +1352,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       // Beds note output (like clothing, but beds wording)
       const b = formData;
       let note = '';
-      note += `CCID: ${b.clientId === false ? 'No' : 'Yes'}\n\n`;
+      note += `Client ID: ${b.clientId === false ? 'No' : 'Yes'}\n\n`;
       note += `${formatHeading('Need', 'custom', customHeadingFormat)}\n`;
       if (b.whyNeedBeds) note += `${b.whyNeedBeds}\n`;
 
@@ -1406,7 +1406,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       // Furniture note output (like beds, but furniture wording)
       const f = formData;
       let note = '';
-      note += `CCID: ${f.clientId === false ? 'No' : 'Yes'}\n\n`;
+      note += `Client ID: ${f.clientId === false ? 'No' : 'Yes'}\n\n`;
       note += `${formatHeading('Need', 'custom', customHeadingFormat)}\n`;
       if (f.whyNeedFurniture) note += `${f.whyNeedFurniture}\n`;
       if (f.furnitureType) note += `Client is requesting help with a ${f.furnitureType}\n`;
@@ -1461,7 +1461,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       // Bedding note output (like beds, with SNG logic)
       const b = formData;
       let note = '';
-      note += `CCID: ${b.clientId === false ? 'No' : 'Yes'}\n\n`;
+      note += `Client ID: ${b.clientId === false ? 'No' : 'Yes'}\n\n`;
       note += `${formatHeading('Need', 'custom', customHeadingFormat)}\n`;
       if (b.whyNeedBedding) note += `${b.whyNeedBedding}\n`;
 
@@ -1519,7 +1519,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       // Glasses note output (similar to clothing)
       const g = formData;
       let note = '';
-      note += `CCID: ${g.clientId === false ? 'No' : 'Yes'}\n\n`;
+      note += `Client ID: ${g.clientId === false ? 'No' : 'Yes'}\n\n`;
       note += `${formatHeading('Need', 'custom', customHeadingFormat)}\n`;
       if (g.whyNeedGlasses) note += `${g.whyNeedGlasses}\n`;
 
@@ -1573,7 +1573,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       // Whiteware note output
       const w = formData;
       let note = '';
-      note += `CCID: ${w.clientId === false ? 'No' : 'Yes'}\n\n`;
+      note += `Client ID: ${w.clientId === false ? 'No' : 'Yes'}\n\n`;
       note += `${formatHeading('Need', 'custom', customHeadingFormat)}\n`;
       if (w.whyNeedWhiteware) note += `${w.whyNeedWhiteware}\n`;
 
@@ -1640,7 +1640,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       const totalCosts = f.costs.reduce((sum: number, cost: { amount: number; cost: string }) => sum + (cost.amount || 0), 0);
       const remainingIncome = totalIncome - totalCosts;
       let note = '';
-      note += `CCID: ${f.clientId === false ? 'No' : 'Yes'}\n\n`;
+      note += `Client ID: ${f.clientId === false ? 'No' : 'Yes'}\n\n`;
       note += `${formatHeading('Need', 'custom', customHeadingFormat)}\n`;
       if (f.whyNeedFood) note += `${f.whyNeedFood}\n`;
 

@@ -224,7 +224,7 @@ const CarRepairsQuestions: React.FC<CarRepairsQuestionsProps> = ({ formData, onF
           <h3>General Questions</h3>
         </div>
         <div className="form-group">
-          <label>Has the client been ID'd?</label>
+          <label>Client ID</label>
           <div className="radio-group">
             <label className={`radio-btn ${formData.clientId === true ? 'selected' : ''}`}>Yes
               <input

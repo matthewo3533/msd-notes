@@ -130,7 +130,7 @@ const FurnitureQuestions: React.FC<FurnitureQuestionsProps> = ({ formData, onFor
         defaultExpanded={true}
       >
         <div className="form-group">
-          <label>Has the client been ID'd?</label>
+          <label>Client ID</label>
           <div className="radio-group">
             <label className={`radio-btn ${formData.clientId === true ? 'selected' : ''}`}>Yes
               <input
