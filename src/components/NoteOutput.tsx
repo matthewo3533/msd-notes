@@ -292,11 +292,18 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       // Accommodation Details
       const hasCosts = c.accommodationCosts && c.accommodationCosts.length > 0;
 
+      const landlordName = [c.landlordFirstName?.trim(), c.landlordLastNameInitial?.trim()]
+        .filter(Boolean)
+        .join(', ');
+
       if (
         c.asZone ||
         c.accommodationType ||
         hasCosts ||
         c.tenancyAgreementProvided ||
+        c.landlordType ||
+        landlordName ||
+        (c.landlordOrganisationName && c.landlordOrganisationName.trim()) ||
         (c.newASRate && c.newASRate > 0) ||
         c.clientEligibleForTAS
       ) {
@@ -325,6 +332,18 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
         }
         if (c.tenancyAgreementProvided) {
           note += `Tenancy agreement provided: ${c.tenancyAgreementProvided === 'yes' ? 'Yes' : 'No'}\n`;
+        }
+        if (c.landlordType) {
+          note += `Landlord type: ${c.landlordType}\n`;
+        }
+        if (
+          (c.landlordType === 'Current Client' || c.landlordType === 'Non-Current Client') &&
+          landlordName
+        ) {
+          note += `Landlord name: ${landlordName}\n`;
+        }
+        if (c.landlordType === 'Organisation' && c.landlordOrganisationName && c.landlordOrganisationName.trim()) {
+          note += `Organisation name: ${c.landlordOrganisationName.trim()}\n`;
         }
         if (c.newASRate && c.newASRate > 0) {
           note += `New AS rate: $${c.newASRate.toFixed(2)}\n`;
@@ -433,6 +452,27 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       
       if (t.verificationReceived) {
         note += `If allowable costs are updated has verification been received? ${t.verificationReceived === 'yes' ? 'Yes' : 'No'}\n`;
+      }
+
+      if (t.landlordDetailsCorrect) {
+        note += `Client's landlord details are correct: ${t.landlordDetailsCorrect === 'yes' ? 'Yes' : 'No'}\n`;
+        if (t.landlordDetailsCorrect === 'no') {
+          const landlordName = [t.landlordFirstName?.trim(), t.landlordLastNameInitial?.trim()]
+            .filter(Boolean)
+            .join(', ');
+          if (t.landlordType) {
+            note += `Landlord type: ${t.landlordType}\n`;
+          }
+          if (
+            (t.landlordType === 'Current Client' || t.landlordType === 'Non-Current Client') &&
+            landlordName
+          ) {
+            note += `Landlord name: ${landlordName}\n`;
+          }
+          if (t.landlordType === 'Organisation' && t.landlordOrganisationName && t.landlordOrganisationName.trim()) {
+            note += `Organisation name: ${t.landlordOrganisationName.trim()}\n`;
+          }
+        }
       }
       
       if (t.disabilityCostsChanged) {

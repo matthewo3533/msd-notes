@@ -616,6 +616,11 @@ export interface TASGrantFormData {
   assetsCorrect: string;
   relationshipDetailsCorrect: string;
   verificationReceived: string;
+  landlordDetailsCorrect: string;
+  landlordType: string;
+  landlordFirstName: string;
+  landlordLastNameInitial: string;
+  landlordOrganisationName: string;
   deficiency: number;
   tasRatePayable: number;
   necessaryReasonableSteps: string;
@@ -664,6 +669,10 @@ export interface ChangeOfAddressFormData {
     frequency: 'daily' | 'weekly' | 'fortnightly' | 'monthly';
   }>;
   tenancyAgreementProvided: string;
+  landlordType: string;
+  landlordFirstName: string;
+  landlordLastNameInitial: string;
+  landlordOrganisationName: string;
   newASRate: number;
   clientEligibleForTAS: string;
   arrearsCreated: string;

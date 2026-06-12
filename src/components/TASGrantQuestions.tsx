@@ -55,6 +55,26 @@ const TASGrantQuestions: React.FC<TASGrantQuestionsProps> = ({ formData, onFormD
   }, []);
 
   const handleInputChange = (field: keyof TASGrantFormData, value: any) => {
+    if (field === 'landlordDetailsCorrect' && value !== 'no') {
+      onFormDataChange({
+        landlordDetailsCorrect: value,
+        landlordType: '',
+        landlordFirstName: '',
+        landlordLastNameInitial: '',
+        landlordOrganisationName: '',
+      });
+      return;
+    }
+    if (field === 'landlordType') {
+      const type = value || '';
+      onFormDataChange({
+        landlordType: type,
+        landlordFirstName: '',
+        landlordLastNameInitial: '',
+        landlordOrganisationName: '',
+      });
+      return;
+    }
     onFormDataChange({ [field]: value });
   };
 
@@ -253,6 +273,108 @@ const TASGrantQuestions: React.FC<TASGrantQuestionsProps> = ({ formData, onFormD
             </label>
           </div>
         </div>
+
+        <div className="form-group">
+          <label>Are client's landlord details correct?</label>
+          <div className="radio-group">
+            <label className={`radio-btn ${formData.landlordDetailsCorrect === 'yes' ? 'selected' : ''}`}>Yes
+              <input
+                type="checkbox"
+                name="landlordDetailsCorrectYes"
+                checked={formData.landlordDetailsCorrect === 'yes'}
+                onChange={() => handleInputChange('landlordDetailsCorrect', formData.landlordDetailsCorrect === 'yes' ? '' : 'yes')}
+                className="visually-hidden"
+              />
+            </label>
+            <label className={`radio-btn ${formData.landlordDetailsCorrect === 'no' ? 'selected' : ''}`}>No
+              <input
+                type="checkbox"
+                name="landlordDetailsCorrectNo"
+                checked={formData.landlordDetailsCorrect === 'no'}
+                onChange={() => handleInputChange('landlordDetailsCorrect', formData.landlordDetailsCorrect === 'no' ? '' : 'no')}
+                className="visually-hidden"
+              />
+            </label>
+          </div>
+        </div>
+
+        {formData.landlordDetailsCorrect === 'no' && (
+          <>
+            <div className="form-group">
+              <label>Landlord is a</label>
+              <div className="radio-group">
+                <label className={`radio-btn ${formData.landlordType === 'Current Client' ? 'selected' : ''}`}>Current Client
+                  <input
+                    type="checkbox"
+                    name="landlordTypeCurrentClient"
+                    checked={formData.landlordType === 'Current Client'}
+                    onChange={() => handleInputChange('landlordType', formData.landlordType === 'Current Client' ? '' : 'Current Client')}
+                    className="visually-hidden"
+                  />
+                </label>
+                <label className={`radio-btn ${formData.landlordType === 'Non-Current Client' ? 'selected' : ''}`}>Non-Current Client
+                  <input
+                    type="checkbox"
+                    name="landlordTypeNonCurrentClient"
+                    checked={formData.landlordType === 'Non-Current Client'}
+                    onChange={() => handleInputChange('landlordType', formData.landlordType === 'Non-Current Client' ? '' : 'Non-Current Client')}
+                    className="visually-hidden"
+                  />
+                </label>
+                <label className={`radio-btn ${formData.landlordType === 'Organisation' ? 'selected' : ''}`}>Organisation
+                  <input
+                    type="checkbox"
+                    name="landlordTypeOrganisation"
+                    checked={formData.landlordType === 'Organisation'}
+                    onChange={() => handleInputChange('landlordType', formData.landlordType === 'Organisation' ? '' : 'Organisation')}
+                    className="visually-hidden"
+                  />
+                </label>
+              </div>
+            </div>
+
+            {(formData.landlordType === 'Current Client' || formData.landlordType === 'Non-Current Client') && (
+              <div className="form-group">
+                <div className="split-input-row">
+                  <div>
+                    <label>First name</label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      value={formData.landlordFirstName}
+                      onChange={(e) => handleInputChange('landlordFirstName', e.target.value)}
+                      placeholder="First name"
+                    />
+                  </div>
+                  <div>
+                    <label>Last name initial</label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      value={formData.landlordLastNameInitial}
+                      onChange={(e) => handleInputChange('landlordLastNameInitial', e.target.value.slice(0, 1).toUpperCase())}
+                      placeholder="Initial"
+                      maxLength={1}
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {formData.landlordType === 'Organisation' && (
+              <div className="form-group">
+                <label>Organisation name</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  value={formData.landlordOrganisationName}
+                  onChange={(e) => handleInputChange('landlordOrganisationName', e.target.value)}
+                  placeholder="eg. Lodge"
+                />
+              </div>
+            )}
+          </>
+        )}
       </div>
 
       {/* Disability Costs, TAS Costs and Income Section */}
