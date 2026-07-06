@@ -33,6 +33,7 @@ const AbsenceFromNZPage = lazy(() => import('./components/AbsenceFromNZPage'));
 const MultiNeedPage = lazy(() => import('./components/MultiNeedPage'));
 const ChangeOfAddressPage = lazy(() => import('./components/ChangeOfAddressPage'));
 const GenericTemplatePage = lazy(() => import('./components/GenericTemplatePage'));
+const BenefitGrantPage = lazy(() => import('./components/BenefitGrantPage'));
 const AnalyticsPage = lazy(() => import('./components/AnalyticsPage'));
 
 export interface Service {
@@ -682,6 +683,76 @@ export interface ChangeOfAddressFormData {
   debtAmount: number;
 }
 
+export type BenefitGrantDocumentStatus = 'unassigned' | 'provided' | 'not-provided';
+
+export interface BenefitGrantDocument {
+  name: string;
+  status: BenefitGrantDocumentStatus;
+}
+
+export interface BenefitGrantFormData {
+  benefitType: string;
+  // Section 1: Identity
+  onlineIdentityCheck: string;
+  documentsSighted: string;
+  documents: BenefitGrantDocument[];
+  irdValidated: string;
+  irdRequired: string;
+  irdRequiredDetail: string;
+  irdEvidenceRequired: string;
+  irdEvidenceRequiredDetail: string;
+  irdEvidenceLetterSent: string;
+  evidenceReceived: string;
+  // Section 2: Entitlement
+  dateOfReps: string;
+  dateOfEvent: string;
+  reasonForEvent: string;
+  holidayPay: string;
+  income4Weeks: number;
+  income26Weeks: number;
+  income52Weeks: number;
+  entitlementDate: string;
+  standDown: string;
+  commencementDate: string;
+  // Section 3: Payment
+  benefitRate: number;
+  asRate: number;
+  tasRate: number;
+  daRate: number;
+  wepRate: number;
+  bankAccount: string;
+  accommodationCost: number;
+  hirePurchaseCosts: number;
+  daCosts: number;
+  // Section 4: Employment
+  jsProfileUpdated: string;
+  cvStatus: string;
+  driversLicense: string;
+  employmentDiscussion: string;
+  barriersToEmployment: string;
+  roiCompleted: string;
+  arrears: number;
+  arrearsPeriodFrom: string;
+  arrearsPeriodTo: string;
+  // Notes
+  applicationNotes: string;
+}
+
+export const BENEFIT_GRANT_DOCUMENT_NAMES = [
+  'Benefit application',
+  '4x Payslips',
+  'Final Payslip',
+  'Bank Account Verification',
+  'Asset Verification',
+  'Tenancy Agreement',
+  'CV',
+  'Medical certificate',
+  'IRD income summary',
+];
+
+export const createBenefitGrantDocuments = (): BenefitGrantDocument[] =>
+  BENEFIT_GRANT_DOCUMENT_NAMES.map((name) => ({ name, status: 'unassigned' as const }));
+
 function AppContent() {
   const { currentTheme, setCurrentTheme, customHeadingFormat, setCustomHeadingFormat } = useSettings();
   const location = useLocation();
@@ -740,6 +811,7 @@ function AppContent() {
         <Route path="/absence-from-nz" element={<AbsenceFromNZPage />} />
         <Route path="/multi-need" element={<MultiNeedPage />} />
         <Route path="/generic-template" element={<GenericTemplatePage />} />
+        <Route path="/benefit-grant" element={<BenefitGrantPage />} />
         <Route path="/change-of-address" element={<ChangeOfAddressPage />} />
         <Route path="/analytics" element={<AnalyticsPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />

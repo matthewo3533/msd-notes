@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { FoodFormData, ClothingFormData, RentArrearsFormData, CarRepairsFormData, FuneralAssistanceFormData, StrandedTravelFormData, TASGrantFormData, DeclareIncomeFormData, ADSDFormData, EmergencyFormData, TransitionToWorkFormData, AbsenceFromNZFormData, ChangeOfAddressFormData } from '../App';
+import { FoodFormData, ClothingFormData, RentArrearsFormData, CarRepairsFormData, FuneralAssistanceFormData, StrandedTravelFormData, TASGrantFormData, DeclareIncomeFormData, ADSDFormData, EmergencyFormData, TransitionToWorkFormData, AbsenceFromNZFormData, ChangeOfAddressFormData, BenefitGrantFormData } from '../App';
 import { DEFAULT_INCOME_LABELS, IncomeLabels } from './IncomeSection';
 import { formatHeading, CustomHeadingFormat } from '../utils/headingFormatter';
 import { confirmLeaveIfRecentInput } from '../utils/recentInputActivity';
@@ -9,7 +9,7 @@ import { getNeedTypeLabel } from '../types/multiNeed';
 
 interface NoteOutputProps {
   formData: any;
-  service?: 'food' | 'clothing' | 'electricity' | 'dental' | 'beds' | 'bedding' | 'furniture' | 'glasses' | 'whiteware' | 'tas-grant' | 'declare-income' | 'bond-rent' | 'rent-arrears' | 'car-repairs' | 'funeral-assistance' | 'stranded-travel' | 'adsd' | 'emergency' | 'transition-to-work' | 'petrol-calculator' | 'absence-from-nz' | 'multi-need' | 'generic-template' | 'change-of-address';
+  service?: 'food' | 'clothing' | 'electricity' | 'dental' | 'beds' | 'bedding' | 'furniture' | 'glasses' | 'whiteware' | 'tas-grant' | 'declare-income' | 'bond-rent' | 'rent-arrears' | 'car-repairs' | 'funeral-assistance' | 'stranded-travel' | 'adsd' | 'emergency' | 'transition-to-work' | 'petrol-calculator' | 'absence-from-nz' | 'multi-need' | 'generic-template' | 'change-of-address' | 'benefit-grant';
   onReset?: () => void;
   customHeadingFormat?: CustomHeadingFormat;
 }
@@ -374,6 +374,144 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       }
       
       return note;
+    } else if (service === 'benefit-grant') {
+      // Benefit Grant note output
+      const b: BenefitGrantFormData = formData;
+      const yn = (v: string) => (v === 'yes' ? 'Yes' : v === 'no' ? 'No' : '');
+      let note = '';
+
+      // Notes (why have they applied) - plain text at the top, no heading
+      if (b.applicationNotes && b.applicationNotes.trim()) {
+        note += b.applicationNotes.trim() + '\n\n';
+      }
+
+      // Documents - plain text at the top, no heading
+      const providedDocs = (b.documents || [])
+        .filter((doc) => doc.status === 'provided')
+        .map((doc) => doc.name);
+      const awaitingDocs = (b.documents || [])
+        .filter((doc) => doc.status === 'not-provided')
+        .map((doc) => doc.name);
+      if (providedDocs.length > 0) {
+        note += `Documents provided:\n${providedDocs.map((name) => `✅ ${name}`).join('\n')}\n\n`;
+      }
+      if (awaitingDocs.length > 0) {
+        note += `Awaiting documents:\n${awaitingDocs.map((name) => `⏳ ${name}`).join('\n')}\n\n`;
+      }
+
+      // Identity
+      const identityLines: string[] = [];
+      if (b.onlineIdentityCheck) {
+        identityLines.push(`Online identity check: ${yn(b.onlineIdentityCheck)}`);
+      }
+      if (b.documentsSighted) {
+        identityLines.push(`Primary and supporting documents sighted: ${yn(b.documentsSighted)}`);
+      }
+      if (b.irdValidated) {
+        identityLines.push(`IRD number validated: ${yn(b.irdValidated)}`);
+        if (b.irdValidated === 'no') {
+          if (b.irdRequired) {
+            let line = `IRD number required: ${yn(b.irdRequired)}`;
+            if (b.irdRequired === 'no' && b.irdRequiredDetail && b.irdRequiredDetail.trim()) {
+              line += ` - ${b.irdRequiredDetail.trim()}`;
+            }
+            identityLines.push(line);
+          }
+          if (b.irdEvidenceRequired) {
+            let line = `IRD number evidence required: ${yn(b.irdEvidenceRequired)}`;
+            if (b.irdEvidenceRequired === 'no' && b.irdEvidenceRequiredDetail && b.irdEvidenceRequiredDetail.trim()) {
+              line += ` - ${b.irdEvidenceRequiredDetail.trim()}`;
+            }
+            identityLines.push(line);
+          }
+          if (b.irdEvidenceLetterSent) {
+            identityLines.push(`IRD number evidence request letter sent: ${yn(b.irdEvidenceLetterSent)}`);
+          }
+          if (b.evidenceReceived) {
+            identityLines.push(`Evidence received: ${yn(b.evidenceReceived)}`);
+          }
+        }
+      }
+      if (identityLines.length > 0) {
+        note += `${formatHeading('Identity', 'custom', customHeadingFormat)}\n`;
+        note += identityLines.join('\n') + '\n\n';
+      }
+
+      // Entitlement
+      const entitlementLines: string[] = [];
+      if (b.dateOfReps) entitlementLines.push(`Date of reps: ${formatCalendarDate(b.dateOfReps)}`);
+      if (b.dateOfEvent) entitlementLines.push(`Date of event: ${formatCalendarDate(b.dateOfEvent)}`);
+      if (b.reasonForEvent && b.reasonForEvent.trim()) {
+        entitlementLines.push(`Reason for event: ${b.reasonForEvent.trim()}`);
+      }
+      if (b.holidayPay) entitlementLines.push(`Holiday pay: ${yn(b.holidayPay)}`);
+      if (b.income4Weeks > 0) entitlementLines.push(`4 weeks income: $${b.income4Weeks.toFixed(2)}`);
+      if (b.income26Weeks > 0) entitlementLines.push(`26 weeks income: $${b.income26Weeks.toFixed(2)}`);
+      if (b.income52Weeks > 0) entitlementLines.push(`52 weeks income: $${b.income52Weeks.toFixed(2)}`);
+      if (b.entitlementDate) entitlementLines.push(`Entitlement date: ${formatCalendarDate(b.entitlementDate)}`);
+      if (b.standDown) entitlementLines.push(`Stand down: ${b.standDown}`);
+      if (b.commencementDate) entitlementLines.push(`Commencement date: ${formatCalendarDate(b.commencementDate)}`);
+      if (entitlementLines.length > 0) {
+        note += `${formatHeading('Entitlement', 'custom', customHeadingFormat)}\n`;
+        note += entitlementLines.join('\n') + '\n\n';
+      }
+
+      // Payment
+      const paymentLines: string[] = [];
+      if (b.benefitRate > 0) {
+        paymentLines.push(`Payment ${b.benefitType || 'benefit'} at: $${b.benefitRate.toFixed(2)}`);
+      }
+      if (b.asRate > 0) paymentLines.push(`Payment AS at $${b.asRate.toFixed(2)}`);
+      if (b.tasRate > 0) paymentLines.push(`Payment TAS at $${b.tasRate.toFixed(2)}`);
+      if (b.daRate > 0) paymentLines.push(`Payment DA at $${b.daRate.toFixed(2)}`);
+      if (b.wepRate > 0) paymentLines.push(`Payment WEP at $${b.wepRate.toFixed(2)}`);
+      if (b.bankAccount && b.bankAccount.trim()) {
+        paymentLines.push(`Bank Account: ${b.bankAccount.trim()}`);
+      }
+      const costLines: string[] = [];
+      if (b.accommodationCost > 0) costLines.push(`Accommodation Cost: $${b.accommodationCost.toFixed(2)}`);
+      if (b.hirePurchaseCosts > 0) costLines.push(`HP costs: $${b.hirePurchaseCosts.toFixed(2)}`);
+      if (b.daCosts > 0) costLines.push(`DA costs: $${b.daCosts.toFixed(2)}`);
+      if (paymentLines.length > 0 || costLines.length > 0) {
+        note += `${formatHeading('Payment', 'custom', customHeadingFormat)}\n`;
+        if (paymentLines.length > 0) {
+          note += paymentLines.join('\n') + '\n';
+        }
+        if (costLines.length > 0) {
+          if (paymentLines.length > 0) note += '\n';
+          note += costLines.join('\n') + '\n';
+        }
+        note += '\n';
+      }
+
+      // Employment
+      const employmentLines: string[] = [];
+      if (b.jsProfileUpdated) {
+        employmentLines.push(`JS Profile checked and updated: ${yn(b.jsProfileUpdated)}`);
+      }
+      if (b.cvStatus) {
+        employmentLines.push(`CV: ${b.cvStatus === 'provided' ? 'Provided' : 'Not provided'}`);
+      }
+      if (b.driversLicense) employmentLines.push(`Driver's License: ${b.driversLicense}`);
+      if (b.employmentDiscussion && b.employmentDiscussion.trim()) {
+        employmentLines.push(`Employment Discussion: ${b.employmentDiscussion.trim()}`);
+      }
+      if (b.barriersToEmployment && b.barriersToEmployment.trim()) {
+        employmentLines.push(`Barriers to employment: ${b.barriersToEmployment.trim()}`);
+      }
+      if (b.roiCompleted) employmentLines.push(`ROI completed: ${yn(b.roiCompleted)}`);
+      if (b.arrears > 0) employmentLines.push(`Arrears: $${b.arrears.toFixed(2)}`);
+      if (b.arrearsPeriodFrom || b.arrearsPeriodTo) {
+        const from = b.arrearsPeriodFrom ? formatCalendarDate(b.arrearsPeriodFrom) : '';
+        const to = b.arrearsPeriodTo ? formatCalendarDate(b.arrearsPeriodTo) : '';
+        employmentLines.push(`Arrears Period: ${from} to ${to}`);
+      }
+      if (employmentLines.length > 0) {
+        note += `${formatHeading('Employment', 'custom', customHeadingFormat)}\n`;
+        note += employmentLines.join('\n') + '\n\n';
+      }
+
+      return note.trimEnd() ? note.trimEnd() + '\n' : '';
     } else if (service === 'declare-income') {
       // Declare Income note output
       const d: DeclareIncomeFormData = formData;
