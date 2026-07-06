@@ -5614,6 +5614,18 @@ input[type="number"] {
   gap: 1rem;
 }
 
+/* Benefit Grant - two-column field rows */
+.field-row-halves {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.field-row-halves .form-group {
+  margin-bottom: 0;
+}
+
 /* Benefit Grant - three-column field rows */
 .field-row-thirds {
   display: grid;
@@ -5634,6 +5646,7 @@ input[type="number"] {
 @media (max-width: 640px) {
   .doc-dnd-boxes,
   .arrears-period-inputs,
+  .field-row-halves,
   .field-row-thirds {
     grid-template-columns: 1fr;
   }

@@ -73,6 +73,18 @@ const ReasonInput: React.FC<{
     inputRef.current?.focus();
   };
 
+  const handleFocus = () => {
+    setFiltered(
+      value.trim()
+        ? REASON_OPTIONS.filter((o) => o.toLowerCase().includes(value.toLowerCase()))
+        : REASON_OPTIONS
+    );
+    if (!showDropdown) {
+      setShowDropdown(true);
+      setSelectedIndex(-1);
+    }
+  };
+
   const handleChange = (next: string) => {
     onChange(next);
     if (next.trim() === '') {
@@ -157,11 +169,7 @@ const ReasonInput: React.FC<{
           className="form-control"
           value={value}
           onChange={(e) => handleChange(e.target.value)}
-          onFocus={() => {
-            setFiltered(value.trim() ? REASON_OPTIONS.filter((o) => o.toLowerCase().includes(value.toLowerCase())) : REASON_OPTIONS);
-            setShowDropdown(true);
-            setSelectedIndex(-1);
-          }}
+          onFocus={handleFocus}
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
         />
@@ -171,6 +179,7 @@ const ReasonInput: React.FC<{
               <div
                 key={option}
                 className={`cost-suggestion ${index === selectedIndex ? 'selected' : ''}`}
+                onMouseDown={(e) => e.preventDefault()}
                 onClick={() => selectOption(option)}
               >
                 {option}
@@ -544,22 +553,24 @@ const BenefitGrantQuestions: React.FC<BenefitGrantQuestionsProps> = ({ formData,
         isVisible={visibleSections.has('entitlement')}
         defaultExpanded={true}
       >
-        <div className="form-group">
-          <label>Date of reps</label>
-          <Calendar
-            value={formData.dateOfReps}
-            onChange={(date) => handleInputChange('dateOfReps', date)}
-            placeholder="Select date of reps"
-          />
-        </div>
+        <div className="field-row-halves">
+          <div className="form-group">
+            <label>Date of reps</label>
+            <Calendar
+              value={formData.dateOfReps}
+              onChange={(date) => handleInputChange('dateOfReps', date)}
+              placeholder="Select date of reps"
+            />
+          </div>
 
-        <div className="form-group">
-          <label>Date of event</label>
-          <Calendar
-            value={formData.dateOfEvent}
-            onChange={(date) => handleInputChange('dateOfEvent', date)}
-            placeholder="Select date of event"
-          />
+          <div className="form-group">
+            <label>Date of event</label>
+            <Calendar
+              value={formData.dateOfEvent}
+              onChange={(date) => handleInputChange('dateOfEvent', date)}
+              placeholder="Select date of event"
+            />
+          </div>
         </div>
 
         <div className="form-group">
@@ -620,13 +631,24 @@ const BenefitGrantQuestions: React.FC<BenefitGrantQuestionsProps> = ({ formData,
           </div>
         </div>
 
-        <div className="form-group">
-          <label>Entitlement date</label>
-          <Calendar
-            value={formData.entitlementDate}
-            onChange={(date) => handleInputChange('entitlementDate', date)}
-            placeholder="Select entitlement date"
-          />
+        <div className="field-row-halves">
+          <div className="form-group">
+            <label>Entitlement date</label>
+            <Calendar
+              value={formData.entitlementDate}
+              onChange={(date) => handleInputChange('entitlementDate', date)}
+              placeholder="Select entitlement date"
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Commencement date</label>
+            <Calendar
+              value={formData.commencementDate}
+              onChange={(date) => handleInputChange('commencementDate', date)}
+              placeholder="Select commencement date"
+            />
+          </div>
         </div>
 
         <div className="form-group">
@@ -644,15 +666,6 @@ const BenefitGrantQuestions: React.FC<BenefitGrantQuestionsProps> = ({ formData,
               </label>
             ))}
           </div>
-        </div>
-
-        <div className="form-group">
-          <label>Commencement date</label>
-          <Calendar
-            value={formData.commencementDate}
-            onChange={(date) => handleInputChange('commencementDate', date)}
-            placeholder="Select commencement date"
-          />
         </div>
       </ExpandableSection>
 
