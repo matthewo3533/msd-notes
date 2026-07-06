@@ -400,24 +400,24 @@ const BenefitGrantQuestions: React.FC<BenefitGrantQuestionsProps> = ({ formData,
               <div className="doc-dnd-pool-label">Documents</div>
               <div className="doc-chip-list">
                 {docsByStatus('unassigned').map((doc, i) => renderDocChip(doc.name, i))}
-              </div>
-              <div className="doc-add-row">
-                <input
-                  type="text"
-                  className="form-control"
-                  value={newDocName}
-                  onChange={(e) => setNewDocName(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      addDocument();
-                    }
-                  }}
-                  placeholder="Add another document..."
-                />
-                <button type="button" className="doc-add-btn" onClick={addDocument}>
-                  + Add
-                </button>
+                <div className="doc-add-inline">
+                  <input
+                    type="text"
+                    className="doc-add-input"
+                    value={newDocName}
+                    onChange={(e) => setNewDocName(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        addDocument();
+                      }
+                    }}
+                    placeholder="Add document..."
+                  />
+                  <button type="button" className="doc-add-btn" onClick={addDocument} title="Add document">
+                    +
+                  </button>
+                </div>
               </div>
             </div>
             <div className="doc-dnd-boxes">
