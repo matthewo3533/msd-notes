@@ -1,8 +1,9 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { FoodFormData, ClothingFormData, RentArrearsFormData, CarRepairsFormData, FuneralAssistanceFormData, StrandedTravelFormData, TASGrantFormData, DeclareIncomeFormData, ADSDFormData, EmergencyFormData, TransitionToWorkFormData, AbsenceFromNZFormData, ChangeOfAddressFormData } from '../App';
 import { DEFAULT_INCOME_LABELS, IncomeLabels } from './IncomeSection';
 import { formatHeading, CustomHeadingFormat } from '../utils/headingFormatter';
+import { confirmLeaveIfRecentInput } from '../utils/recentInputActivity';
 import type { MultiNeedFormData } from '../types/multiNeed';
 import { getNeedTypeLabel } from '../types/multiNeed';
 
@@ -14,6 +15,7 @@ interface NoteOutputProps {
 }
 
 const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onReset, customHeadingFormat = { useTildes: true, useCapitals: false, useBold: true } }) => {
+  const navigate = useNavigate();
   type IncomeKey = keyof IncomeLabels;
   type IncomeRecord = Record<IncomeKey, number>;
   type IncomeLabelsInput = Partial<IncomeLabels> | undefined;
@@ -1891,6 +1893,15 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
   const note = generateNote();
   const quickCopyFields = getQuickCopyFields();
 
+  const handleStartNewApplication = (event: React.MouseEvent<HTMLAnchorElement>) => {
+    event.preventDefault();
+    if (!confirmLeaveIfRecentInput()) {
+      return;
+    }
+    onReset?.();
+    navigate('/');
+  };
+
   return (
     <div className="note-output">
       <h3>Generated Note</h3>
@@ -1906,7 +1917,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
         <Link
           to="/"
           className="copy-btn copy-btn-with-icon"
-          onClick={() => onReset?.()}
+          onClick={handleStartNewApplication}
           style={{
             marginTop: '0.5rem',
             background: '#6c757d',

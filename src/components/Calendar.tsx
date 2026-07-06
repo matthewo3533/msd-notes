@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { recordInputActivity } from '../utils/recentInputActivity';
 
 interface CalendarProps {
   value?: string;
@@ -63,6 +64,7 @@ const Calendar: React.FC<CalendarProps> = ({ value, onChange, placeholder = "Sel
     const newDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
     setSelectedDate(newDate);
     onChange(formatDate(newDate));
+    recordInputActivity();
     setIsOpen(false);
   };
 

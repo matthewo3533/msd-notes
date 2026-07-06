@@ -5,6 +5,7 @@ import Home from './components/Home';
 import { keepAliveService } from './services/keepAliveService';
 import type { IncomeLabels } from './components/IncomeSection';
 import { SettingsProvider, useSettings } from './contexts/SettingsContext';
+import { useInputActivityListener } from './hooks/useInputActivityListener';
 import { initAnalytics, trackPageView } from './utils/analytics';
 
 // Lazy load components for better performance
@@ -684,6 +685,7 @@ export interface ChangeOfAddressFormData {
 function AppContent() {
   const { currentTheme, setCurrentTheme, customHeadingFormat, setCustomHeadingFormat } = useSettings();
   const location = useLocation();
+  useInputActivityListener();
 
   // Initialize keep-alive service
   useEffect(() => {
