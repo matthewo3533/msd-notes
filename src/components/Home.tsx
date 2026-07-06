@@ -30,6 +30,7 @@ const services: Service[] = [
 
 const generalNotes: Service[] = [
   { id: 'tas-grant', title: 'TAS Grant/Reapplication', emoji: '📋' },
+  { id: 'benefit-grant', title: 'Benefit Grant', emoji: '📑' },
   { id: 'declare-income', title: 'Declare Income', emoji: '💰' },
   { id: 'absence-from-nz', title: 'Absence from NZ', emoji: '✈️' },
   { id: 'change-of-address', title: 'Change of Address', emoji: '🏡' },

@@ -105,6 +105,7 @@ const AnalyticsPage: React.FC = () => {
       '/tas-grant': 'TAS Grant',
       '/declare-income': 'Declare Income',
       '/absence-from-nz': 'Absence from NZ',
+      '/benefit-grant': 'Benefit Grant',
       '/change-of-address': 'Change of Address',
       '/petrol-calculator': 'Petrol Calculator',
       '/multi-need': 'Multi Need',
