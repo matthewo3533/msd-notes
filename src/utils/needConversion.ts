@@ -248,6 +248,7 @@ export const convertToMultiNeed = (
       powerAccountNumber: formData.powerAccountNumber || blankPayment.powerAccountNumber,
       bankAccount: formData.bankAccount || blankPayment.bankAccount
     },
+    additionalPayments: formData.additionalPayments || [],
     decision: {
       decision: formData.decision || '',
       decisionReason: formData.decisionReason || ''

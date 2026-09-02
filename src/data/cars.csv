@@ -1,0 +1,217 @@
+Model,L/100km
+Toyota Corolla 1.8L,7.1
+Toyota RAV4 Hybrid,5.3
+Ford Ranger,9.2
+Toyota Hilux,8.8
+Mitsubishi Eclipse Cross,7.2
+Mitsubishi ASX,7.8
+Kia Seltos,7.4
+Toyota Corolla,6.1
+Toyota Camry Hybrid,4.2
+Nissan Navara,9.5
+Mazda CX-5,7.8
+Honda CR-V,7.3
+Subaru Outback,8.2
+Toyota Prado,9.8
+Hyundai Tucson,7.6
+Kia Sportage,8.1
+Mazda3,6.8
+Volkswagen Golf,6.4
+Ford Falcon V6,9.5
+Ford Falcon V8,12.8
+Holden Commodore V6,10.5
+Holden Commodore V8,13.2
+Ford Territory,8.3
+Toyota Yaris,5.8
+Honda Civic,6.9
+Nissan X-Trail,7.9
+Subaru Forester,7.8
+Mazda CX-3,6.2
+Toyota C-HR Hybrid,4.7
+Kia Cerato,6.5
+Hyundai i30,6.7
+Peugeot 3008,7.1
+Mitsubishi Triton,9.1
+Toyota Fortuner,8.9
+Isuzu D-Max,9.3
+Suzuki Swift,5.9
+Volkswagen Tiguan,7.8
+BMW X3,8.4
+Mercedes-Benz GLC,8.2
+Audi Q5,8.6
+Lexus NX,6.8
+Toyota Vitz,5.4
+Nissan Qashqai,7.0
+Honda Accord,7.2
+Mazda6,7.5
+Subaru XV,7.6
+Toyota Rush,7.8
+Suzuki Vitara,6.8
+Kia Carnival,8.7
+Honda Odyssey,8.9
+Toyota Sienna,9.1
+Nissan Serena,7.8
+Mazda CX-9,9.2
+Mitsubishi Outlander,8.1
+Toyota Voxy,7.9
+Honda Vezel,6.8
+Subaru Levorg,7.4
+Mazda CX-30,6.9
+Volkswagen Polo,5.8
+Skoda Octavia,6.8
+Hyundai Elantra,6.4
+Kia Rio,5.9
+Toyota Aqua,3.9
+Honda Fit,5.2
+Nissan Note,5.8
+Suzuki Baleno,5.6
+Mitsubishi Mirage,4.8
+Daihatsu Move,4.9
+Toyota Vanguard,8.4
+Nissan Dualis,7.8
+Honda Stream,7.5
+Mazda Premacy,7.6
+Subaru Legacy,8.1
+Toyota Mark X,8.8
+Nissan Skyline V6,8.9
+Nissan Skyline V8,11.8
+Honda Stepwgn,7.8
+Mazda Axela,6.9
+Toyota Wish,7.2
+Nissan Wingroad,6.8
+Subaru Impreza,7.1
+Honda Freed,6.4
+Suzuki Solio,5.8
+Daihatsu Tanto,4.6
+Toyota Porte,5.9
+Nissan Cube,6.2
+Mazda Demio,5.4
+Honda Life,5.1
+Suzuki Wagon R,4.8
+Mitsubishi eK Wagon,4.9
+Daihatsu Mira,4.2
+Toyota Pixis,4.5
+Nissan Dayz,4.7
+Suzuki Alto,4.1
+Honda N-Box,4.8
+Daihatsu Cocoa,4.9
+Mitsubishi Delica,9.8
+Toyota Hiace,10.2
+Nissan NV200,8.9
+Mazda Bongo,9.5
+Isuzu Elf,11.8
+Toyota Dyna,12.1
+Hino Dutro,13.2
+Ford Focus,6.8
+Ford Fiesta,5.9
+Ford Mondeo,7.4
+Ford Kuga,7.6
+Toyota Land Cruiser,11.2
+Nissan Patrol,12.8
+Mitsubishi Pajero,10.9
+Jeep Cherokee,9.1
+Jeep Wrangler,11.4
+Land Rover Discovery,10.8
+BMW 3 Series,7.2
+BMW 5 Series,8.1
+Mercedes-Benz C-Class,7.6
+Mercedes-Benz E-Class,8.4
+Audi A4,7.1
+Audi A6,8.2
+Lexus IS,7.8
+Lexus GS,8.9
+Volvo XC90,9.2
+Volvo XC60,8.1
+Acura MDX,9.8
+Infiniti QX70,10.2
+Cadillac Escalade,14.1
+Lincoln Navigator,13.8
+Chevrolet Tahoe,12.9
+GMC Yukon,13.1
+Dodge Durango,11.6
+Ford Expedition,12.4
+Toyota Sequoia,12.8
+Nissan Armada,13.5
+Honda Pilot,9.4
+Acura TLX,8.2
+Infiniti Q50,8.8
+Lexus ES,6.9
+Genesis G90,10.1
+Cadillac CT6,9.8
+Lincoln Continental,9.6
+Chrysler 300,9.9
+Dodge Charger,10.2
+Ford Mustang V6,8.9
+Ford Mustang V8,12.1
+Chevrolet Camaro V6,9.2
+Chevrolet Camaro V8,12.8
+Dodge Challenger V6,9.4
+Dodge Challenger V8,13.1
+Toyota 86,7.6
+Subaru BRZ,7.8
+Mazda MX-5,6.9
+Nissan 370Z,10.8
+Honda S2000,9.2
+BMW Z4,8.4
+Mercedes-Benz SLK,8.8
+Audi TT,7.9
+Porsche 911,10.4
+Porsche Cayenne,11.2
+BMW X5,9.8
+Mercedes-Benz ML-Class,10.1
+Audi Q7,10.6
+Lexus GX,12.4
+Infiniti QX80,13.2
+Acura RDX,8.9
+Honda CR-Z,5.8
+Toyota Prius,4.1
+Honda Insight,4.4
+Hyundai Ioniq Hybrid,4.6
+Kia Niro Hybrid,4.8
+Lexus CT200h,4.9
+Camry Hybrid,4.2
+Accord Hybrid,5.1
+Fusion Hybrid,5.4
+Malibu Hybrid,5.6
+Altima Hybrid,5.2
+Sonata Hybrid,5.8
+Optima Hybrid,5.9
+Prius V,4.8
+Prius C,4.2
+Lexus ES Hybrid,5.1
+Lexus GS Hybrid,6.2
+BMW i8,2.1
+Acura NSX Hybrid,8.9
+Porsche Panamera Hybrid,3.1
+Mercedes-Benz S-Class Hybrid,6.8
+BMW 7 Series Hybrid,6.4
+Audi A8 Hybrid,6.9
+Lexus LS Hybrid,7.1
+Genesis G90 Hybrid,7.4
+Cadillac CT6 Hybrid,6.8
+Lincoln MKZ Hybrid,5.6
+Chrysler Pacifica Hybrid,2.4
+Honda Ridgeline,9.8
+Chevrolet Colorado,8.9
+GMC Canyon,9.1
+Nissan Frontier,10.2
+Toyota Tacoma,9.4
+Ford F-150,10.8
+Chevrolet Silverado,11.2
+GMC Sierra,11.4
+Ram 1500,10.9
+Nissan Titan,12.1
+Toyota Tundra,11.8
+Ford Super Duty,13.6
+Chevrolet Silverado HD,14.2
+GMC Sierra HD,14.1
+Ram 2500,13.8
+Ram 3500,15.2
+Ford Transit,9.8
+Chevrolet Express,12.4
+GMC Savana,12.6
+Nissan NV200,8.9
+Ram ProMaster,10.1
+Mercedes-Benz Sprinter,9.4
+Ford Transit Connect,7.8
+Chevrolet City Express,7.2

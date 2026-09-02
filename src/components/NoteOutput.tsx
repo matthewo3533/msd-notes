@@ -2,10 +2,11 @@ import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FoodFormData, ClothingFormData, RentArrearsFormData, CarRepairsFormData, FuneralAssistanceFormData, StrandedTravelFormData, TASGrantFormData, DeclareIncomeFormData, ADSDFormData, EmergencyFormData, TransitionToWorkFormData, AbsenceFromNZFormData, ChangeOfAddressFormData, BenefitGrantFormData } from '../App';
 import { DEFAULT_INCOME_LABELS, IncomeLabels } from './IncomeSection';
-import { formatHeading, CustomHeadingFormat } from '../utils/headingFormatter';
+import { formatHeading, CustomHeadingFormat, DEFAULT_CUSTOM_HEADING_FORMAT } from '../utils/headingFormatter';
 import { confirmLeaveIfRecentInput } from '../utils/recentInputActivity';
 import type { MultiNeedFormData } from '../types/multiNeed';
 import { getNeedTypeLabel } from '../types/multiNeed';
+import { formatAdditionalPaymentsNote, hasAdditionalPaymentData } from '../types/additionalPayment';
 
 interface NoteOutputProps {
   formData: any;
@@ -14,7 +15,7 @@ interface NoteOutputProps {
   customHeadingFormat?: CustomHeadingFormat;
 }
 
-const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onReset, customHeadingFormat = { useTildes: true, useCapitals: false, useBold: true } }) => {
+const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onReset, customHeadingFormat = DEFAULT_CUSTOM_HEADING_FORMAT }) => {
   const navigate = useNavigate();
   type IncomeKey = keyof IncomeLabels;
   type IncomeRecord = Record<IncomeKey, number>;
@@ -57,7 +58,8 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       (data.bankAccount && data.bankAccount.trim()) ||
       (data.bondAmount && data.bondAmount > 0) ||
       (data.rentInAdvanceAmount && data.rentInAdvanceAmount > 0) ||
-      (data.powerAccountNumber && data.powerAccountNumber.trim())
+      (data.powerAccountNumber && data.powerAccountNumber.trim()) ||
+      (Array.isArray(data.additionalPayments) && data.additionalPayments.some(hasAdditionalPaymentData))
     );
   };
 
@@ -164,18 +166,24 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
     }
 
     // All Payments (support need.payments array or single need.payment)
-    const writePaymentBlock = (payment: any, heading: string) => {
-      if (!hasPaymentData(payment)) return;
+    const writePaymentBlock = (payment: any, heading: string, extraPayments?: typeof data.needs[number]['additionalPayments']) => {
+      const extrasNote = formatAdditionalPaymentsNote(extraPayments);
+      if (!hasPaymentData(payment) && !extrasNote) return;
       note += `${formatHeading(heading, 'custom', customHeadingFormat)}\n`;
-      if (payment.supplierName) note += `Supplier Name: ${payment.supplierName}\n`;
-      if (payment.supplierId) note += `Supplier ID: ${payment.supplierId}\n`;
-      if (payment.paymentCardNumber) note += `Payment card number: ${payment.paymentCardNumber}\n`;
-      if (payment.amount > 0) note += `Amount: $${payment.amount.toFixed(2)}\n`;
-      if (payment.recoveryRate > 0) note += `Recovery rate: $${payment.recoveryRate.toFixed(2)}\n`;
-      if (payment.bankAccount) note += `Bank account: ${payment.bankAccount}\n`;
-      if (payment.directCredit) note += `Direct credit: ${payment.directCredit}\n`;
-      if (payment.paymentReference) note += `Payment reference: ${payment.paymentReference}\n`;
-      if (payment.powerAccountNumber) note += `Power account number: ${payment.powerAccountNumber}\n`;
+      if (hasPaymentData(payment)) {
+        if (payment.supplierName) note += `Supplier Name: ${payment.supplierName}\n`;
+        if (payment.supplierId) note += `Supplier ID: ${payment.supplierId}\n`;
+        if (payment.paymentCardNumber) note += `Payment card number: ${payment.paymentCardNumber}\n`;
+        if (payment.amount > 0) note += `Amount: $${payment.amount.toFixed(2)}\n`;
+        if (payment.recoveryRate > 0) note += `Recovery rate: $${payment.recoveryRate.toFixed(2)}\n`;
+        if (payment.bankAccount) note += `Bank account: ${payment.bankAccount}\n`;
+        if (payment.directCredit) note += `Direct credit: ${payment.directCredit}\n`;
+        if (payment.paymentReference) note += `Payment reference: ${payment.paymentReference}\n`;
+        if (payment.powerAccountNumber) note += `Power account number: ${payment.powerAccountNumber}\n`;
+      }
+      if (extrasNote) {
+        note += extrasNote;
+      }
       note += '\n';
     };
     data.needs.forEach((need) => {
@@ -183,7 +191,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       const label = getNeedTypeLabel(need.type);
       payments.forEach((payment, i) => {
         const heading = payments.length === 1 ? `Payment - ${label}` : `Payment ${i + 1} - ${label}`;
-        writePaymentBlock(payment, heading);
+        writePaymentBlock(payment, heading, i === payments.length - 1 ? need.additionalPayments : undefined);
       });
     });
 
@@ -456,6 +464,29 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
         note += entitlementLines.join('\n') + '\n\n';
       }
 
+      // Employment (not used for NONBEN)
+      const employmentLines: string[] = [];
+      if (b.benefitType !== 'NONBEN') {
+        if (b.jsProfileUpdated) {
+          employmentLines.push(`JS Profile checked and updated: ${yn(b.jsProfileUpdated)}`);
+        }
+        if (b.cvStatus) {
+          employmentLines.push(`CV: ${b.cvStatus === 'provided' ? 'Provided' : 'Not provided'}`);
+        }
+        if (b.driversLicense) employmentLines.push(`Driver's License: ${b.driversLicense}`);
+        if (b.employmentDiscussion && b.employmentDiscussion.trim()) {
+          employmentLines.push(`Employment Discussion: ${b.employmentDiscussion.trim()}`);
+        }
+        if (b.barriersToEmployment && b.barriersToEmployment.trim()) {
+          employmentLines.push(`Barriers to employment: ${b.barriersToEmployment.trim()}`);
+        }
+        if (b.roiCompleted) employmentLines.push(`ROI completed: ${yn(b.roiCompleted)}`);
+      }
+      if (employmentLines.length > 0) {
+        note += `${formatHeading('Employment', 'custom', customHeadingFormat)}\n`;
+        note += employmentLines.join('\n') + '\n\n';
+      }
+
       // Payment
       const paymentLines: string[] = [];
       if (b.benefitRate > 0) {
@@ -467,6 +498,12 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       if (b.wepRate > 0) paymentLines.push(`Payment WEP at $${b.wepRate.toFixed(2)}`);
       if (b.bankAccount && b.bankAccount.trim()) {
         paymentLines.push(`Bank Account: ${b.bankAccount.trim()}`);
+      }
+      if (b.arrears > 0) paymentLines.push(`Arrears: $${b.arrears.toFixed(2)}`);
+      if (b.arrearsPeriodFrom || b.arrearsPeriodTo) {
+        const from = b.arrearsPeriodFrom ? formatCalendarDate(b.arrearsPeriodFrom) : '';
+        const to = b.arrearsPeriodTo ? formatCalendarDate(b.arrearsPeriodTo) : '';
+        paymentLines.push(`Arrears Period: ${from} to ${to}`);
       }
       const costLines: string[] = [];
       if (b.accommodationCost > 0) costLines.push(`Accommodation Cost: $${b.accommodationCost.toFixed(2)}`);
@@ -482,33 +519,6 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
           note += costLines.join('\n') + '\n';
         }
         note += '\n';
-      }
-
-      // Employment
-      const employmentLines: string[] = [];
-      if (b.jsProfileUpdated) {
-        employmentLines.push(`JS Profile checked and updated: ${yn(b.jsProfileUpdated)}`);
-      }
-      if (b.cvStatus) {
-        employmentLines.push(`CV: ${b.cvStatus === 'provided' ? 'Provided' : 'Not provided'}`);
-      }
-      if (b.driversLicense) employmentLines.push(`Driver's License: ${b.driversLicense}`);
-      if (b.employmentDiscussion && b.employmentDiscussion.trim()) {
-        employmentLines.push(`Employment Discussion: ${b.employmentDiscussion.trim()}`);
-      }
-      if (b.barriersToEmployment && b.barriersToEmployment.trim()) {
-        employmentLines.push(`Barriers to employment: ${b.barriersToEmployment.trim()}`);
-      }
-      if (b.roiCompleted) employmentLines.push(`ROI completed: ${yn(b.roiCompleted)}`);
-      if (b.arrears > 0) employmentLines.push(`Arrears: $${b.arrears.toFixed(2)}`);
-      if (b.arrearsPeriodFrom || b.arrearsPeriodTo) {
-        const from = b.arrearsPeriodFrom ? formatCalendarDate(b.arrearsPeriodFrom) : '';
-        const to = b.arrearsPeriodTo ? formatCalendarDate(b.arrearsPeriodTo) : '';
-        employmentLines.push(`Arrears Period: ${from} to ${to}`);
-      }
-      if (employmentLines.length > 0) {
-        note += `${formatHeading('Employment', 'custom', customHeadingFormat)}\n`;
-        note += employmentLines.join('\n') + '\n\n';
       }
 
       return note.trimEnd() ? note.trimEnd() + '\n' : '';
@@ -725,6 +735,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
         if (c.directCredit === 'yes' && c.paymentReference) {
           note += `Reference number: ${c.paymentReference}\n`;
         }
+        note += formatAdditionalPaymentsNote(c.additionalPayments);
       }
       if (hasIncomeData(c.income)) {
         note += `\n${formatHeading('Income', 'custom', customHeadingFormat)}\n`;
@@ -797,6 +808,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
         if (e.directCredit === 'yes' && e.paymentReference) {
           note += `Reference number: ${e.paymentReference}\n`;
         }
+        note += formatAdditionalPaymentsNote(e.additionalPayments);
       }
       if (hasIncomeData(e.income)) {
         note += `\n${formatHeading('Income', 'custom', customHeadingFormat)}\n`;
@@ -869,6 +881,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
         if (e.directCredit === 'yes' && e.paymentReference) {
           note += `Reference number: ${e.paymentReference}\n`;
         }
+        note += formatAdditionalPaymentsNote(e.additionalPayments);
       }
       if (hasIncomeData(e.income)) {
         note += `\n${formatHeading('Income', 'custom', customHeadingFormat)}\n`;
@@ -963,6 +976,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
         if (t.directCredit === 'yes' && t.paymentReference) {
           note += `Reference number: ${t.paymentReference}\n`;
         }
+        note += formatAdditionalPaymentsNote(t.additionalPayments);
       }
       if (hasIncomeData(t.income)) {
         note += `\n${formatHeading('Income', 'custom', customHeadingFormat)}\n`;
@@ -1043,6 +1057,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
         if (a.directCredit === 'yes' && a.paymentReference) {
           note += `Reference number: ${a.paymentReference}\n`;
         }
+        note += formatAdditionalPaymentsNote(a.additionalPayments);
       }
       if (hasIncomeData(a.income)) {
         note += `\n${formatHeading('Income', 'custom', customHeadingFormat)}\n`;
@@ -1102,6 +1117,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
         if (r.directCredit === 'yes' && r.paymentReference) {
           note += `Reference number: ${r.paymentReference}\n`;
         }
+        note += formatAdditionalPaymentsNote(r.additionalPayments);
       }
       if (hasIncomeData(r.income)) {
         note += `\n${formatHeading('Tenancy Affordability', 'custom', customHeadingFormat)}\n`;
@@ -1169,6 +1185,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
         if (c.directCredit === 'yes' && c.paymentReference) {
           note += `Reference number: ${c.paymentReference}\n`;
         }
+        note += formatAdditionalPaymentsNote(c.additionalPayments);
       }
       if (hasIncomeData(c.income)) {
         note += `\n${formatHeading('Income', 'custom', customHeadingFormat)}\n`;
@@ -1242,6 +1259,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
         if (f.directCredit === 'yes' && f.paymentReference) {
           note += `Reference number: ${f.paymentReference}\n`;
         }
+        note += formatAdditionalPaymentsNote(f.additionalPayments);
       }
       if (hasIncomeData(f.income)) {
         note += `\n${formatHeading('Income', 'custom', customHeadingFormat)}\n`;
@@ -1315,6 +1333,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
         if (s.directCredit === 'yes' && s.paymentReference) {
           note += `Reference number: ${s.paymentReference}\n`;
         }
+        note += formatAdditionalPaymentsNote(s.additionalPayments);
       }
       if (hasIncomeData(s.income)) {
         note += `\n${formatHeading('Income', 'custom', customHeadingFormat)}\n`;
@@ -1385,6 +1404,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
         if (b.directCredit === 'yes' && b.paymentReference) {
           note += `Reference number: ${b.paymentReference}\n`;
         }
+        note += formatAdditionalPaymentsNote(b.additionalPayments);
       }
       
       if (hasIncomeData(b.income)) {
@@ -1442,6 +1462,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
         if (e.directCredit === 'yes' && e.paymentReference) {
           note += `Reference number: ${e.paymentReference}\n`;
         }
+        note += formatAdditionalPaymentsNote(e.additionalPayments);
       }
       if (hasIncomeData(e.income)) {
         note += `\n${formatHeading('Income', 'custom', customHeadingFormat)}\n`;
@@ -1502,6 +1523,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
         if (d.directCredit === 'yes' && d.paymentReference) {
           note += `Reference number: ${d.paymentReference}\n`;
         }
+        note += formatAdditionalPaymentsNote(d.additionalPayments);
       }
       if (hasIncomeData(d.income)) {
         note += `\n${formatHeading('Income', 'custom', customHeadingFormat)}\n`;
@@ -1556,6 +1578,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
         if (b.directCredit === 'yes' && b.paymentReference) {
           note += `Reference number: ${b.paymentReference}\n`;
         }
+        note += formatAdditionalPaymentsNote(b.additionalPayments);
       }
       if (hasIncomeData(b.income)) {
         note += `\n${formatHeading('Income', 'custom', customHeadingFormat)}\n`;
@@ -1611,6 +1634,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
         if (f.directCredit === 'yes' && f.paymentReference) {
           note += `Reference number: ${f.paymentReference}\n`;
         }
+        note += formatAdditionalPaymentsNote(f.additionalPayments);
       }
       if (hasIncomeData(f.income)) {
         note += `\n${formatHeading('Income', 'custom', customHeadingFormat)}\n`;
@@ -1669,6 +1693,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
         if (b.directCredit === 'yes' && b.paymentReference) {
           note += `Reference number: ${b.paymentReference}\n`;
         }
+        note += formatAdditionalPaymentsNote(b.additionalPayments);
       }
       if (hasIncomeData(b.income)) {
         note += `\n${formatHeading('Income', 'custom', customHeadingFormat)}\n`;
@@ -1723,6 +1748,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
         if (g.directCredit === 'yes' && g.paymentReference) {
           note += `Reference number: ${g.paymentReference}\n`;
         }
+        note += formatAdditionalPaymentsNote(g.additionalPayments);
       }
       if (hasIncomeData(g.income)) {
         note += `\n${formatHeading('Income', 'custom', customHeadingFormat)}\n`;
@@ -1787,6 +1813,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
         if (w.directCredit === 'yes' && w.paymentReference) {
           note += `Reference number: ${w.paymentReference}\n`;
         }
+        note += formatAdditionalPaymentsNote(w.additionalPayments);
       }
       if (hasIncomeData(w.income)) {
         note += `\n${formatHeading('Income', 'custom', customHeadingFormat)}\n`;
@@ -1834,15 +1861,22 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       if (f.foodAmountRequested > 0) note += `Amount requesting: $${f.foodAmountRequested.toFixed(2)}\n`;
       
       // Food always has supplier name, but check for other payment data
-      if (f.amount > 0 || (f.directCredit === 'yes' && f.paymentReference) || (f.directCredit !== 'yes' && f.paymentCardNumber && f.paymentCardNumber.trim())) {
+      const hasFoodPayment = f.amount > 0 || (f.directCredit === 'yes' && f.paymentReference) || (f.directCredit !== 'yes' && f.paymentCardNumber && f.paymentCardNumber.trim());
+      const foodAdditionalPayments = formatAdditionalPaymentsNote(f.additionalPayments);
+      if (hasFoodPayment || foodAdditionalPayments) {
         note += `\n${formatHeading('Payment', 'custom', customHeadingFormat)}\n`;
-        note += `Supplier Name: Food Supplier Group\n`;
-        if (f.amount > 0) note += `Total Cost: $${f.amount.toFixed(2)}\n`;
-        if (f.directCredit === 'yes' && f.paymentReference) {
-          note += `Reference number: ${f.paymentReference}\n`;
+        if (hasFoodPayment) {
+          note += `Supplier Name: Food Supplier Group\n`;
+          if (f.amount > 0) note += `Total Cost: $${f.amount.toFixed(2)}\n`;
+          if (f.directCredit === 'yes' && f.paymentReference) {
+            note += `Reference number: ${f.paymentReference}\n`;
+          }
+          if (f.directCredit !== 'yes' && f.paymentCardNumber && f.paymentCardNumber.trim()) {
+            note += `Payment card number: ${f.paymentCardNumber}\n`;
+          }
         }
-        if (f.directCredit !== 'yes' && f.paymentCardNumber && f.paymentCardNumber.trim()) {
-          note += `Payment card number: ${f.paymentCardNumber}\n`;
+        if (foodAdditionalPayments) {
+          note += hasFoodPayment ? foodAdditionalPayments : foodAdditionalPayments.replace(/^\n/, '');
         }
       }
       
@@ -2042,7 +2076,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
 
   return (
     <div className="note-output">
-      <h3>Generated Note</h3>
+      <h3 className="sidebar-panel-heading">Generated Note</h3>
       <pre>{note}</pre>
       <div className="note-actions">
         <button className="copy-btn copy-btn-with-icon" onClick={handleCopy}>
@@ -2075,7 +2109,7 @@ const NoteOutput: React.FC<NoteOutputProps> = ({ formData, service = 'food', onR
       
       {/* Quick Copy Section */}
       <div className={`quick-copy-section ${quickCopyFields.length === 0 ? 'quick-copy-empty' : ''}`}>
-        <h4>Quick Copy</h4>
+        <h4 className="sidebar-panel-heading">Quick Copy</h4>
         {quickCopyFields.length > 0 ? (
           <div className="quick-copy-grid">
             {quickCopyFields.map((field, index) => (

@@ -1,4 +1,5 @@
 import type { IncomeLabels } from '../components/IncomeSection';
+import type { AdditionalPayment } from './additionalPayment';
 
 // Hardship service types that support multi-need
 export type HardshipNeedType = 
@@ -228,6 +229,7 @@ export interface NeedItem {
   payment: PaymentData;
   /** When set, used for multiple payment sections (e.g. horizontal swiper). Otherwise payment is used. */
   payments?: PaymentData[];
+  additionalPayments?: AdditionalPayment[];
   decision: DecisionData;
 }
 

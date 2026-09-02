@@ -40,20 +40,14 @@ const NeedsOverview: React.FC<NeedsOverviewProps> = ({ needs, onRemoveNeed, onAd
 
   return (
     <div className="needs-overview">
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-        <h4 style={{ 
-          margin: 0, 
-          fontSize: '1rem',
-          color: 'var(--text-secondary)',
-          fontWeight: '600'
-        }}>
+      <div className="needs-overview-header">
+        <h4 className="sidebar-panel-heading">
           {singleNeed ? 'Need' : `Needs in Application (${needs.length})`}
         </h4>
         {!singleNeed && onAddNeed ? (
           <button
             className="add-cost-btn"
             onClick={onAddNeed}
-            style={{ padding: '0.5rem 1rem', fontSize: '0.95rem' }}
           >
             Add Need
           </button>

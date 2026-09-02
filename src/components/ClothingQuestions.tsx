@@ -4,6 +4,7 @@ import PaymentSection from './PaymentSection';
 import DecisionSection from './DecisionSection';
 import ExpandableSection from './ExpandableSection';
 import FormattedTextarea from './FormattedTextarea';
+import type { AdditionalPayment } from '../types/additionalPayment';
 
 interface ClothingFormData {
   clientId: boolean | null;
@@ -17,6 +18,7 @@ interface ClothingFormData {
   directCredit: string; // 'yes' | 'no' | ''
   paymentReference: string;
   paymentCardNumber: string;
+  additionalPayments?: AdditionalPayment[];
   incomeLabels?: IncomeLabels;
   income: {
     benefit: number;
@@ -202,6 +204,8 @@ const ClothingQuestions: React.FC<ClothingQuestionsProps> = ({ formData, onFormD
         onDirectCreditChange={(credit) => handleInputChange('directCredit', credit)}
         onPaymentReferenceChange={(reference) => handleInputChange('paymentReference', reference)}
         onPaymentCardNumberChange={(cardNumber) => handleInputChange('paymentCardNumber', cardNumber)}
+        additionalPayments={formData.additionalPayments}
+        onAdditionalPaymentsChange={(payments) => handleInputChange('additionalPayments', payments)}
         isVisible={visibleSections.has('payment')}
       />
 

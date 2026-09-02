@@ -1,4 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
+import AdditionalPaymentsBlock from './AdditionalPaymentsBlock';
+import type { AdditionalPayment } from '../types/additionalPayment';
 
 interface BondRentPaymentSectionProps {
   supplierName: string;
@@ -15,6 +17,8 @@ interface BondRentPaymentSectionProps {
   onRecoveryRateChange: (rate: number) => void;
   onDirectCreditChange: (credit: string) => void;
   onPaymentReferenceChange: (reference: string) => void;
+  additionalPayments?: AdditionalPayment[];
+  onAdditionalPaymentsChange?: (payments: AdditionalPayment[]) => void;
   sectionNumber?: number;
   isVisible?: boolean;
 }
@@ -38,6 +42,8 @@ const BondRentPaymentSection: React.FC<BondRentPaymentSectionProps> = ({
   onRecoveryRateChange,
   onDirectCreditChange,
   onPaymentReferenceChange,
+  additionalPayments = [],
+  onAdditionalPaymentsChange,
   sectionNumber = 3,
   isVisible = false
 }) => {
@@ -196,6 +202,12 @@ const BondRentPaymentSection: React.FC<BondRentPaymentSectionProps> = ({
             placeholder="Payment reference"
           />
         </div>
+      )}
+      {onAdditionalPaymentsChange && (
+        <AdditionalPaymentsBlock
+          payments={additionalPayments}
+          onChange={onAdditionalPaymentsChange}
+        />
       )}
     </div>
   );

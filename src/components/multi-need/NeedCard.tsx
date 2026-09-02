@@ -160,6 +160,8 @@ const NeedCard: React.FC<NeedCardProps> = ({ need, index, onUpdate, onRemove, ca
               onDirectCreditChange={(value) => handlePaymentChange({ directCredit: value })}
               onPaymentReferenceChange={(value) => handlePaymentChange({ paymentReference: value })}
               onPaymentCardNumberChange={(value) => handlePaymentChange({ paymentCardNumber: value })}
+              additionalPayments={need.additionalPayments}
+              onAdditionalPaymentsChange={(payments) => onUpdate(need.id, { additionalPayments: payments })}
               isVisible={true}
             />
           </div>

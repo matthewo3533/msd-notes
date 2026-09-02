@@ -1,9 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Navigation } from 'swiper/modules';
 import { BenefitGrantDocumentStatus, BenefitGrantFormData } from '../App';
 import ExpandableSection from './ExpandableSection';
 import Calendar from './Calendar';
 import FormattedTextarea from './FormattedTextarea';
 import CalculatedAmountInput from './CalculatedAmountInput';
+import 'swiper/css';
+import 'swiper/css/navigation';
 
 interface BenefitGrantQuestionsProps {
   formData: BenefitGrantFormData;
@@ -15,6 +19,7 @@ const BENEFIT_TYPES: { value: string; label: string }[] = [
   { value: 'SPS', label: 'Sole Parent Support' },
   { value: 'SLP', label: 'Supported Living Payment' },
   { value: 'EB', label: 'Emergency Benefit' },
+  { value: 'NONBEN', label: 'Non-beneficiary assistance' },
 ];
 
 const REASON_OPTIONS = [
@@ -227,6 +232,19 @@ const BenefitGrantQuestions: React.FC<BenefitGrantQuestionsProps> = ({ formData,
   const [newDocName, setNewDocName] = useState('');
   const [docsAnimate, setDocsAnimate] = useState(false);
   const docsAnimatedRef = useRef(false);
+  const [benefitSlidesPerView, setBenefitSlidesPerView] = useState(3);
+
+  useEffect(() => {
+    const updateBenefitSlides = () => {
+      const width = window.innerWidth;
+      if (width < 560) setBenefitSlidesPerView(1);
+      else if (width < 800) setBenefitSlidesPerView(2);
+      else setBenefitSlidesPerView(3);
+    };
+    updateBenefitSlides();
+    window.addEventListener('resize', updateBenefitSlides);
+    return () => window.removeEventListener('resize', updateBenefitSlides);
+  }, []);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -342,33 +360,43 @@ const BenefitGrantQuestions: React.FC<BenefitGrantQuestionsProps> = ({ formData,
   const docsByStatus = (status: BenefitGrantDocumentStatus) =>
     formData.documents.filter((doc) => doc.status === status);
 
+  const isNonBen = formData.benefitType === 'NONBEN';
+
   return (
     <div className="form-sections-container">
-      {/* Benefit Type - hero section */}
       <div
-        className={`benefit-type-hero ${visibleSections.has('benefit-type') ? 'section-visible' : ''}`}
+        className={`form-section-card ${visibleSections.has('benefit-type') ? 'section-visible' : ''}`}
         data-section="benefit-type"
       >
-        <div className="benefit-type-hero-header">
-          <h2 className="benefit-type-hero-title">Select benefit type</h2>
-          <p className="benefit-type-hero-subtitle">Choose the benefit you are granting for this application</p>
+        <div className="section-header">
+          <h3>Select benefit type</h3>
         </div>
-        <div className="benefit-type-grid">
-          {BENEFIT_TYPES.map((type, index) => (
-            <button
-              key={type.value}
-              type="button"
-              className={`benefit-type-card benefit-type-${type.value.toLowerCase()} ${formData.benefitType === type.value ? 'selected' : ''}`}
-              style={{ animationDelay: `${index * 0.08}s` }}
-              onClick={() =>
-                handleInputChange('benefitType', formData.benefitType === type.value ? '' : type.value)
-              }
-            >
-              <span className="benefit-type-check" aria-hidden="true">✓</span>
-              <span className="benefit-type-acronym">{type.value}</span>
-              <span className="benefit-type-label">{type.label}</span>
-            </button>
-          ))}
+        <p className="benefit-type-subtitle">Choose the benefit you are granting for this application</p>
+        <div className="benefit-type-swiper-wrapper">
+          <Swiper
+            modules={[Navigation]}
+            spaceBetween={16}
+            slidesPerView={benefitSlidesPerView}
+            slidesPerGroup={benefitSlidesPerView}
+            navigation
+            className="benefit-type-swiper"
+          >
+            {BENEFIT_TYPES.map((type) => (
+              <SwiperSlide key={type.value}>
+                <button
+                  type="button"
+                  className={`benefit-type-card benefit-type-${type.value.toLowerCase()} ${formData.benefitType === type.value ? 'selected' : ''}`}
+                  onClick={() =>
+                    handleInputChange('benefitType', formData.benefitType === type.value ? '' : type.value)
+                  }
+                >
+                  <span className="benefit-type-check" aria-hidden="true">✓</span>
+                  <span className="benefit-type-acronym">{type.value}</span>
+                  <span className="benefit-type-label">{type.label}</span>
+                </button>
+              </SwiperSlide>
+            ))}
+          </Swiper>
         </div>
       </div>
 
@@ -669,7 +697,94 @@ const BenefitGrantQuestions: React.FC<BenefitGrantQuestionsProps> = ({ formData,
         </div>
       </ExpandableSection>
 
-      {/* Section 3: Payment */}
+      {/* Employment - hidden for NONBEN */}
+      {!isNonBen && (
+        <ExpandableSection
+          title="Employment"
+          dataSection="employment"
+          isVisible={visibleSections.has('employment')}
+          defaultExpanded={true}
+        >
+          <div className="form-group">
+            <label>JS Profile checked and updated</label>
+            <YesNoGroup
+              value={formData.jsProfileUpdated}
+              onChange={(v) => handleInputChange('jsProfileUpdated', v)}
+              namePrefix="jsProfileUpdated"
+            />
+          </div>
+
+          <div className="form-group">
+            <label>CV</label>
+            <div className="radio-group">
+              <label className={`radio-btn ${formData.cvStatus === 'provided' ? 'selected' : ''}`}>Provided
+                <input
+                  type="checkbox"
+                  checked={formData.cvStatus === 'provided'}
+                  onChange={() => handleInputChange('cvStatus', formData.cvStatus === 'provided' ? '' : 'provided')}
+                  className="visually-hidden"
+                />
+              </label>
+              <label className={`radio-btn ${formData.cvStatus === 'not-provided' ? 'selected' : ''}`}>Not provided
+                <input
+                  type="checkbox"
+                  checked={formData.cvStatus === 'not-provided'}
+                  onChange={() => handleInputChange('cvStatus', formData.cvStatus === 'not-provided' ? '' : 'not-provided')}
+                  className="visually-hidden"
+                />
+              </label>
+            </div>
+          </div>
+
+          <div className="form-group">
+            <label>Driver's License</label>
+            <div className="radio-group">
+              {DRIVERS_LICENSE_OPTIONS.map((option) => (
+                <label key={option} className={`radio-btn ${formData.driversLicense === option ? 'selected' : ''}`}>
+                  {option}
+                  <input
+                    type="checkbox"
+                    checked={formData.driversLicense === option}
+                    onChange={() => handleInputChange('driversLicense', formData.driversLicense === option ? '' : option)}
+                    className="visually-hidden"
+                  />
+                </label>
+              ))}
+            </div>
+          </div>
+
+          <div className="form-group">
+            <FormattedTextarea
+              label="Employment Discussion"
+              value={formData.employmentDiscussion}
+              onChange={(v) => handleInputChange('employmentDiscussion', v)}
+              placeholder="Describe the employment discussion..."
+              className="form-control"
+            />
+          </div>
+
+          <div className="form-group">
+            <FormattedTextarea
+              label="Barriers to employment"
+              value={formData.barriersToEmployment}
+              onChange={(v) => handleInputChange('barriersToEmployment', v)}
+              placeholder="Describe any barriers to employment..."
+              className="form-control"
+            />
+          </div>
+
+          <div className="form-group">
+            <label>ROI completed</label>
+            <YesNoGroup
+              value={formData.roiCompleted}
+              onChange={(v) => handleInputChange('roiCompleted', v)}
+              namePrefix="roiCompleted"
+            />
+          </div>
+        </ExpandableSection>
+      )}
+
+      {/* Payment */}
       <ExpandableSection
         title="Payment"
         dataSection="payment"
@@ -793,91 +908,6 @@ const BenefitGrantQuestions: React.FC<BenefitGrantQuestionsProps> = ({ formData,
               />
             </div>
           </div>
-        </div>
-      </ExpandableSection>
-
-      {/* Section 4: Employment */}
-      <ExpandableSection
-        title="Employment"
-        dataSection="employment"
-        isVisible={visibleSections.has('employment')}
-        defaultExpanded={true}
-      >
-        <div className="form-group">
-          <label>JS Profile checked and updated</label>
-          <YesNoGroup
-            value={formData.jsProfileUpdated}
-            onChange={(v) => handleInputChange('jsProfileUpdated', v)}
-            namePrefix="jsProfileUpdated"
-          />
-        </div>
-
-        <div className="form-group">
-          <label>CV</label>
-          <div className="radio-group">
-            <label className={`radio-btn ${formData.cvStatus === 'provided' ? 'selected' : ''}`}>Provided
-              <input
-                type="checkbox"
-                checked={formData.cvStatus === 'provided'}
-                onChange={() => handleInputChange('cvStatus', formData.cvStatus === 'provided' ? '' : 'provided')}
-                className="visually-hidden"
-              />
-            </label>
-            <label className={`radio-btn ${formData.cvStatus === 'not-provided' ? 'selected' : ''}`}>Not provided
-              <input
-                type="checkbox"
-                checked={formData.cvStatus === 'not-provided'}
-                onChange={() => handleInputChange('cvStatus', formData.cvStatus === 'not-provided' ? '' : 'not-provided')}
-                className="visually-hidden"
-              />
-            </label>
-          </div>
-        </div>
-
-        <div className="form-group">
-          <label>Driver's License</label>
-          <div className="radio-group">
-            {DRIVERS_LICENSE_OPTIONS.map((option) => (
-              <label key={option} className={`radio-btn ${formData.driversLicense === option ? 'selected' : ''}`}>
-                {option}
-                <input
-                  type="checkbox"
-                  checked={formData.driversLicense === option}
-                  onChange={() => handleInputChange('driversLicense', formData.driversLicense === option ? '' : option)}
-                  className="visually-hidden"
-                />
-              </label>
-            ))}
-          </div>
-        </div>
-
-        <div className="form-group">
-          <FormattedTextarea
-            label="Employment Discussion"
-            value={formData.employmentDiscussion}
-            onChange={(v) => handleInputChange('employmentDiscussion', v)}
-            placeholder="Describe the employment discussion..."
-            className="form-control"
-          />
-        </div>
-
-        <div className="form-group">
-          <FormattedTextarea
-            label="Barriers to employment"
-            value={formData.barriersToEmployment}
-            onChange={(v) => handleInputChange('barriersToEmployment', v)}
-            placeholder="Describe any barriers to employment..."
-            className="form-control"
-          />
-        </div>
-
-        <div className="form-group">
-          <label>ROI completed</label>
-          <YesNoGroup
-            value={formData.roiCompleted}
-            onChange={(v) => handleInputChange('roiCompleted', v)}
-            namePrefix="roiCompleted"
-          />
         </div>
 
         <div className="form-group">

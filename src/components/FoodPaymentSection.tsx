@@ -1,4 +1,6 @@
 import React from 'react';
+import AdditionalPaymentsBlock from './AdditionalPaymentsBlock';
+import type { AdditionalPayment } from '../types/additionalPayment';
 
 interface FoodPaymentSectionProps {
   amount: number;
@@ -9,6 +11,8 @@ interface FoodPaymentSectionProps {
   onDirectCreditChange: (credit: string) => void;
   onPaymentReferenceChange: (reference: string) => void;
   onPaymentCardNumberChange: (cardNumber: string) => void;
+  additionalPayments?: AdditionalPayment[];
+  onAdditionalPaymentsChange?: (payments: AdditionalPayment[]) => void;
   sectionNumber?: number;
   isVisible?: boolean;
 }
@@ -22,6 +26,8 @@ const FoodPaymentSection: React.FC<FoodPaymentSectionProps> = ({
   onDirectCreditChange,
   onPaymentReferenceChange,
   onPaymentCardNumberChange,
+  additionalPayments = [],
+  onAdditionalPaymentsChange,
   sectionNumber = 2,
   isVisible = false,
 }) => {
@@ -106,6 +112,12 @@ const FoodPaymentSection: React.FC<FoodPaymentSectionProps> = ({
             placeholder="Payment card number"
           />
         </div>
+      )}
+      {onAdditionalPaymentsChange && (
+        <AdditionalPaymentsBlock
+          payments={additionalPayments}
+          onChange={onAdditionalPaymentsChange}
+        />
       )}
     </div>
   );

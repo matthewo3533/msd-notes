@@ -4,6 +4,7 @@ import PaymentSection from './PaymentSection';
 import DecisionSection from './DecisionSection';
 import ExpandableSection from './ExpandableSection';
 import FormattedTextarea from './FormattedTextarea';
+import type { AdditionalPayment } from '../types/additionalPayment';
 
 interface DentalFormData {
   clientId: boolean | null;
@@ -19,6 +20,7 @@ interface DentalFormData {
   directCredit: string;
   paymentReference: string;
   paymentCardNumber: string;
+  additionalPayments?: AdditionalPayment[];
   incomeLabels?: IncomeLabels;
   income: {
     benefit: number;
@@ -268,6 +270,8 @@ const DentalQuestions: React.FC<DentalQuestionsProps> = ({ formData, onFormDataC
         onDirectCreditChange={credit => handleInputChange('directCredit', credit)}
         onPaymentReferenceChange={reference => handleInputChange('paymentReference', reference)}
         onPaymentCardNumberChange={cardNumber => handleInputChange('paymentCardNumber', cardNumber)}
+        additionalPayments={formData.additionalPayments}
+        onAdditionalPaymentsChange={(payments) => handleInputChange('additionalPayments', payments)}
         isVisible={visibleSections.has('payment')}
       />
 

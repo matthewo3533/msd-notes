@@ -232,6 +232,8 @@ const WhitewareQuestions: React.FC<WhitewareQuestionsProps> = ({ formData, onFor
         onDirectCreditChange={(credit) => handleInputChange('directCredit', credit)}
         onPaymentReferenceChange={(reference) => handleInputChange('paymentReference', reference)}
         onPaymentCardNumberChange={(cardNumber) => handleInputChange('paymentCardNumber', cardNumber)}
+        additionalPayments={formData.additionalPayments}
+        onAdditionalPaymentsChange={(payments) => handleInputChange('additionalPayments', payments)}
         isVisible={visibleSections.has('payment')}
       />
 

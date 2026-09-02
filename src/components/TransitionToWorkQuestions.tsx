@@ -1,43 +1,11 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import IncomeSection, { IncomeLabels, createDefaultIncomeLabels } from './IncomeSection';
 import PaymentSection from './PaymentSection';
 import DecisionSection from './DecisionSection';
 import Calendar from './Calendar';
 import { TransitionToWorkFormData } from '../App';
 import FormattedTextarea from './FormattedTextarea';
-
-// Google Maps API TypeScript declarations
-declare global {
-  interface Window {
-    google: {
-      maps: {
-        places: {
-          AutocompleteService: new () => any;
-          PlacesService: new (div: HTMLElement) => any;
-          PlacesServiceStatus: {
-            OK: string;
-          };
-        };
-        Geocoder: new () => any;
-        GeocoderStatus: {
-          OK: string;
-        };
-        DistanceMatrixService: new () => any;
-        DistanceMatrixStatus: {
-          OK: string;
-          NOT_FOUND: string;
-          ZERO_RESULTS: string;
-        };
-        TravelMode: {
-          DRIVING: string;
-        };
-        UnitSystem: {
-          METRIC: string;
-        };
-      };
-    };
-  }
-}
+import carsCsv from '../data/cars.csv?raw';
 
 interface TransitionToWorkQuestionsProps {
   formData: TransitionToWorkFormData;
@@ -47,12 +15,6 @@ interface TransitionToWorkQuestionsProps {
 interface CarData {
   Model: string;
   'L/100km': number;
-}
-
-interface Location {
-  placeId: string;
-  description: string;
-  coordinates?: { lat: number; lng: number };
 }
 
 const TransitionToWorkQuestions: React.FC<TransitionToWorkQuestionsProps> = ({ formData, onFormDataChange }) => {
@@ -73,23 +35,7 @@ const TransitionToWorkQuestions: React.FC<TransitionToWorkQuestionsProps> = ({ f
   const [vehicleMileage, setVehicleMileage] = useState('');
   const [petrolCost, setPetrolCost] = useState('');
   const [calculatedCost, setCalculatedCost] = useState<number | null>(null);
-  
-  // Google Places API state
-  const [fromLocationSuggestions, setFromLocationSuggestions] = useState<Location[]>([]);
-  const [toLocationSuggestions, setToLocationSuggestions] = useState<Location[]>([]);
-  const [showFromSuggestions, setShowFromSuggestions] = useState(false);
-  const [showToSuggestions, setShowToSuggestions] = useState(false);
-  const [distanceCalculationError, setDistanceCalculationError] = useState<string>('');
-  const [showDistanceError, setShowDistanceError] = useState(false);
-  const [fromPlaceId, setFromPlaceId] = useState<string>('');
-  const [toPlaceId, setToPlaceId] = useState<string>('');
-  const [fromSuggestionsHeight, setFromSuggestionsHeight] = useState(0);
-  const [toSuggestionsHeight, setToSuggestionsHeight] = useState(0);
   const [carDropdownHeight, setCarDropdownHeight] = useState(0);
-  const distanceCache = useRef<Map<string, number>>(new Map());
-  const GOOGLE_API_KEY = (import.meta as any).env?.VITE_GOOGLE_API_KEY || '';
-  const autocompleteService = useRef<any>(null);
-  const distanceMatrixService = useRef<any>(null);
 
   useEffect(() => {
     const observer = new window.IntersectionObserver(
@@ -120,37 +66,11 @@ const TransitionToWorkQuestions: React.FC<TransitionToWorkQuestionsProps> = ({ f
     };
   }, []);
 
-  // Load Google Maps API
-  useEffect(() => {
-    const loadGoogleMapsAPI = () => {
-      if (window.google && window.google.maps) {
-        autocompleteService.current = new window.google.maps.places.AutocompleteService();
-        distanceMatrixService.current = new window.google.maps.DistanceMatrixService();
-        return;
-      }
-
-      const script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_API_KEY}&libraries=places`;
-      script.async = true;
-      script.defer = true;
-      script.onload = () => {
-        autocompleteService.current = new window.google.maps.places.AutocompleteService();
-        distanceMatrixService.current = new window.google.maps.DistanceMatrixService();
-      };
-      document.head.appendChild(script);
-    };
-
-    if (GOOGLE_API_KEY) {
-      loadGoogleMapsAPI();
-    }
-  }, [GOOGLE_API_KEY]);
-
   // Load car data from CSV
   useEffect(() => {
     const loadCarData = async () => {
       try {
-        const response = await fetch('/data/cars.csv');
-        const csvText = await response.text();
+        const csvText = carsCsv;
         const lines = csvText.split('\n');
         const cars: CarData[] = [];
         
@@ -201,30 +121,21 @@ const TransitionToWorkQuestions: React.FC<TransitionToWorkQuestionsProps> = ({ f
     }
   }, [showCarDropdown, filteredCars]);
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as Element;
       if (!target.closest('.car-selector')) {
         setShowCarDropdown(false);
       }
-      if (!target.closest('.location-input-container')) {
-        setShowFromSuggestions(false);
-        setShowToSuggestions(false);
-        setFromLocationSuggestions([]);
-        setToLocationSuggestions([]);
-        setFromSuggestionsHeight(0);
-        setToSuggestionsHeight(0);
-      }
     };
 
-    if (showCarDropdown || showFromSuggestions || showToSuggestions) {
+    if (showCarDropdown) {
       document.addEventListener('mousedown', handleClickOutside);
       return () => {
         document.removeEventListener('mousedown', handleClickOutside);
       };
     }
-  }, [showCarDropdown, showFromSuggestions, showToSuggestions]);
+  }, [showCarDropdown]);
 
   // Calculate cost when form data changes
   useEffect(() => {
@@ -309,150 +220,12 @@ const TransitionToWorkQuestions: React.FC<TransitionToWorkQuestionsProps> = ({ f
     setShowCarDropdown(false);
   };
 
-  const searchPlaces = async (query: string): Promise<Location[]> => {
-    if (!query.trim() || query.length < 3) return [];
-
-    if (!autocompleteService.current) {
-      console.error('Google Places API not loaded yet');
-      return [];
-    }
-
-    return new Promise((resolve) => {
-      autocompleteService.current.getPlacePredictions(
-        {
-          input: query,
-          componentRestrictions: { country: 'nz' }
-        },
-        (predictions: any[], status: string) => {
-          if (status === window.google.maps.places.PlacesServiceStatus.OK && predictions) {
-            const locations = predictions.map((prediction) => ({
-              placeId: prediction.place_id,
-              description: prediction.description
-            }));
-            resolve(locations);
-          } else {
-            resolve([]);
-          }
-        }
-      );
-    });
-  };
-
-  const calculateDistance = async (fromPid: string, toPid: string): Promise<number | null> => {
-    const cacheKey = `${fromPid}-${toPid}`;
-    if (distanceCache.current.has(cacheKey)) {
-      return distanceCache.current.get(cacheKey)!;
-    }
-
-    if (!distanceMatrixService.current) {
-      console.error('Google Distance Matrix API not loaded yet');
-      return null;
-    }
-
-    return new Promise((resolve) => {
-      distanceMatrixService.current.getDistanceMatrix(
-        {
-          origins: [{ placeId: fromPid }],
-          destinations: [{ placeId: toPid }],
-          travelMode: window.google.maps.TravelMode.DRIVING,
-          unitSystem: window.google.maps.UnitSystem.METRIC
-        },
-        (response: any, status: string) => {
-          if (status === window.google.maps.DistanceMatrixStatus.OK) {
-            const element = response.rows[0].elements[0];
-            if (element.status === window.google.maps.DistanceMatrixStatus.OK) {
-              const distKm = element.distance.value / 1000;
-              distanceCache.current.set(cacheKey, distKm);
-              resolve(distKm);
-            } else {
-              resolve(null);
-            }
-          } else {
-            resolve(null);
-          }
-        }
-      );
-    });
-  };
-
-  const handleFromLocationSearch = async (q: string) => {
-    const suggestions = await searchPlaces(q);
-    setFromLocationSuggestions(suggestions);
-    setShowFromSuggestions(suggestions.length > 0);
-    setFromSuggestionsHeight(Math.min(suggestions.length * 50, 200));
-  };
-
-  const handleToLocationSearch = async (q: string) => {
-    const suggestions = await searchPlaces(q);
-    setToLocationSuggestions(suggestions);
-    setShowToSuggestions(suggestions.length > 0);
-    setToSuggestionsHeight(Math.min(suggestions.length * 50, 200));
-  };
-
-  const handleFromLocationSelect = async (location: Location) => {
-    onFormDataChange({ startLocation: location.description });
-    setFromPlaceId(location.placeId);
-    setFromLocationSuggestions([]);
-    setShowFromSuggestions(false);
-    setFromSuggestionsHeight(0);
-
-    if (toPlaceId) {
-      await calculateDistanceBetweenLocations(location.placeId, toPlaceId);
-    }
-  };
-
-  const handleToLocationSelect = async (location: Location) => {
-    onFormDataChange({ destination: location.description });
-    setToPlaceId(location.placeId);
-    setToLocationSuggestions([]);
-    setShowToSuggestions(false);
-    setToSuggestionsHeight(0);
-
-    if (fromPlaceId) {
-      await calculateDistanceBetweenLocations(fromPlaceId, location.placeId);
-    }
-  };
-
-  const calculateDistanceBetweenLocations = async (fromPid: string, toPid: string) => {
-    setDistanceCalculationError('');
-    setShowDistanceError(false);
-
-    try {
-      const dist = await calculateDistance(fromPid, toPid);
-      if (dist !== null) {
-        onFormDataChange({ distance: dist });
-      } else {
-        setDistanceCalculationError('Unable to calculate distance. Please check the addresses.');
-        setShowDistanceError(true);
-      }
-    } catch {
-      setDistanceCalculationError('Error calculating distance. Please try again.');
-      setShowDistanceError(true);
-    }
-  };
-
   useEffect(() => {
     if (formData.petrolAssistance !== 'yes') {
-      setFromPlaceId('');
-      setToPlaceId('');
-      setDistanceCalculationError('');
-      setShowDistanceError(false);
+      setCalculatedCost(null);
+      onFormDataChange({ distance: 0, travelCost: 0 });
     }
   }, [formData.petrolAssistance]);
-
-  useEffect(() => {
-    if (!formData.startLocation) {
-      setFromPlaceId('');
-    }
-    if (!formData.destination) {
-      setToPlaceId('');
-    }
-    if (!formData.startLocation || !formData.destination) {
-      onFormDataChange({ distance: 0 });
-      setDistanceCalculationError('');
-      setShowDistanceError(false);
-    }
-  }, [formData.startLocation, formData.destination]);
 
   return (
     <div className="form-sections-container">
@@ -623,72 +396,24 @@ const TransitionToWorkQuestions: React.FC<TransitionToWorkQuestionsProps> = ({ f
 
           <div className="form-group">
             <label>From:</label>
-            <div className="location-input-container">
-              <input
-                type="text"
-                className="form-control"
-                value={formData.startLocation}
-                onChange={(e) => {
-                  handleInputChange('startLocation', e.target.value);
-                  handleFromLocationSearch(e.target.value);
-                }}
-                onFocus={() => {
-                  if (formData.startLocation) {
-                    handleFromLocationSearch(formData.startLocation);
-                  }
-                }}
-                placeholder="Enter starting location"
-              />
-              {showFromSuggestions && fromLocationSuggestions.length > 0 && (
-                <div className="address-suggestions">
-                  {fromLocationSuggestions.map((location, index) => (
-                    <div
-                      key={index}
-                      className="address-suggestion"
-                      onClick={() => handleFromLocationSelect(location)}
-                    >
-                      {location.description}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-            <div className="suggestions-spacer" style={{ height: `${fromSuggestionsHeight}px` }}></div>
+            <input
+              type="text"
+              className="form-control"
+              value={formData.startLocation}
+              onChange={(e) => handleInputChange('startLocation', e.target.value)}
+              placeholder="Enter starting location"
+            />
           </div>
 
           <div className="form-group">
             <label>To:</label>
-            <div className="location-input-container">
-              <input
-                type="text"
-                className="form-control"
-                value={formData.destination}
-                onChange={(e) => {
-                  handleInputChange('destination', e.target.value);
-                  handleToLocationSearch(e.target.value);
-                }}
-                onFocus={() => {
-                  if (formData.destination) {
-                    handleToLocationSearch(formData.destination);
-                  }
-                }}
-                placeholder="Enter destination"
-              />
-              {showToSuggestions && toLocationSuggestions.length > 0 && (
-                <div className="address-suggestions">
-                  {toLocationSuggestions.map((location, index) => (
-                    <div
-                      key={index}
-                      className="address-suggestion"
-                      onClick={() => handleToLocationSelect(location)}
-                    >
-                      {location.description}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-            <div className="suggestions-spacer" style={{ height: `${toSuggestionsHeight}px` }}></div>
+            <input
+              type="text"
+              className="form-control"
+              value={formData.destination}
+              onChange={(e) => handleInputChange('destination', e.target.value)}
+              placeholder="Enter destination"
+            />
           </div>
 
           <div className="form-group">
@@ -727,7 +452,7 @@ const TransitionToWorkQuestions: React.FC<TransitionToWorkQuestionsProps> = ({ f
                   const baseDistance = formData.returnTrip === 'yes' ? value / 2 : value;
                   handleInputChange('distance', baseDistance);
                 }}
-                placeholder="Enter distance manually or use address lookup above"
+                placeholder="Enter distance in kilometres"
                 step="0.1"
               />
               {formData.distance > 0 && (
@@ -738,7 +463,7 @@ const TransitionToWorkQuestions: React.FC<TransitionToWorkQuestionsProps> = ({ f
                       Total distance (return trip): {(formData.distance * 2).toFixed(1)} km
                     </>
                   ) : (
-                    `Calculated distance: ${formData.distance.toFixed(1)} km`
+                    `Distance: ${formData.distance.toFixed(1)} km`
                   )}
                 </div>
               )}
@@ -816,16 +541,6 @@ const TransitionToWorkQuestions: React.FC<TransitionToWorkQuestionsProps> = ({ f
             <br />
             With this in mind, use these numbers only as a guideline. Have a conversation with the client to determine what is realistic based on their situation and vehicle condition.
           </div>
-
-          {showDistanceError && (
-            <div className="form-group">
-              <div className="error-message">
-                {distanceCalculationError}
-                <br />
-                <small>You can manually enter the distance above.</small>
-              </div>
-            </div>
-          )}
         </div>
       )}
 
@@ -894,6 +609,8 @@ const TransitionToWorkQuestions: React.FC<TransitionToWorkQuestionsProps> = ({ f
         onDirectCreditChange={(credit) => handleInputChange('directCredit', credit)}
         onPaymentReferenceChange={(reference) => handleInputChange('paymentReference', reference)}
         onPaymentCardNumberChange={(cardNumber) => handleInputChange('paymentCardNumber', cardNumber)}
+        additionalPayments={formData.additionalPayments}
+        onAdditionalPaymentsChange={(payments) => handleInputChange('additionalPayments', payments)}
         isVisible={visibleSections.has('payment')}
       />
 

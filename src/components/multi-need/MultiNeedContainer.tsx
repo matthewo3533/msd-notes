@@ -8,6 +8,7 @@ import IncomeSection from '../IncomeSection';
 import FormattedTextarea from '../FormattedTextarea';
 import { getNeedTemplate, createBlankPayment, getNeedPaymentDefaults } from '../../utils/needTemplates';
 import DecisionSection from '../DecisionSection';
+import AdditionalPaymentsBlock from '../AdditionalPaymentsBlock';
 import 'swiper/css';
 import 'swiper/css/navigation';
 
@@ -986,15 +987,25 @@ const MultiNeedContainer: React.FC<MultiNeedContainerProps> = ({
                               (dataUpdates) => handleUpdateNeed(need.id, { data: { ...need.data, ...(dataUpdates as any) } }),
                               need.id
                             )}
+                            <AdditionalPaymentsBlock
+                              payments={need.additionalPayments || []}
+                              onChange={(payments) => handleUpdateNeed(need.id, { additionalPayments: payments })}
+                            />
                           </div>
                         ) : (
-                          renderPaymentSection(
-                            need,
-                            need.payment,
-                            (updates) => handleUpdateNeed(need.id, { payment: { ...need.payment, ...updates } }),
-                            (dataUpdates) => handleUpdateNeed(need.id, { data: { ...need.data, ...(dataUpdates as any) } }),
-                            need.id
-                          )
+                          <>
+                            {renderPaymentSection(
+                              need,
+                              need.payment,
+                              (updates) => handleUpdateNeed(need.id, { payment: { ...need.payment, ...updates } }),
+                              (dataUpdates) => handleUpdateNeed(need.id, { data: { ...need.data, ...(dataUpdates as any) } }),
+                              need.id
+                            )}
+                            <AdditionalPaymentsBlock
+                              payments={need.additionalPayments || []}
+                              onChange={(payments) => handleUpdateNeed(need.id, { additionalPayments: payments })}
+                            />
+                          </>
                         )}
                       </div>
                     </SwiperSlide>

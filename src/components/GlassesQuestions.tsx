@@ -193,6 +193,8 @@ const GlassesQuestions: React.FC<GlassesQuestionsProps> = ({ formData, onFormDat
         onDirectCreditChange={(credit) => handleInputChange('directCredit', credit)}
         onPaymentReferenceChange={(reference) => handleInputChange('paymentReference', reference)}
         onPaymentCardNumberChange={(cardNumber) => handleInputChange('paymentCardNumber', cardNumber)}
+        additionalPayments={formData.additionalPayments}
+        onAdditionalPaymentsChange={(payments) => handleInputChange('additionalPayments', payments)}
         isVisible={visibleSections.has('payment')}
       />
 

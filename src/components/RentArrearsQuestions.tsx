@@ -3,6 +3,7 @@ import IncomeSection, { IncomeLabels, createDefaultIncomeLabels } from './Income
 import PaymentSection from './PaymentSection';
 import DecisionSection from './DecisionSection';
 import FormattedTextarea from './FormattedTextarea';
+import type { AdditionalPayment } from '../types/additionalPayment';
 
 interface RentArrearsFormData {
   clientId: boolean | null;
@@ -17,6 +18,7 @@ interface RentArrearsFormData {
   directCredit: string; // 'yes' | 'no' | ''
   paymentReference: string;
   paymentCardNumber: string;
+  additionalPayments?: AdditionalPayment[];
   incomeLabels?: IncomeLabels;
   income: {
     benefit: number;
@@ -225,6 +227,8 @@ const RentArrearsQuestions: React.FC<RentArrearsQuestionsProps> = ({ formData, o
         onDirectCreditChange={(credit) => handleInputChange('directCredit', credit)}
         onPaymentReferenceChange={(reference) => handleInputChange('paymentReference', reference)}
         onPaymentCardNumberChange={(cardNumber) => handleInputChange('paymentCardNumber', cardNumber)}
+        additionalPayments={formData.additionalPayments}
+        onAdditionalPaymentsChange={(payments) => handleInputChange('additionalPayments', payments)}
         isVisible={visibleSections.has('payment')}
       />
 

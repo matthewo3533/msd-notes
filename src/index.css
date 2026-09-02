@@ -1,5 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Noto+Color+Emoji:wght@400;700&display=swap');
-
 /* Loading styles for lazy-loaded components */
 .loading {
   display: flex;
@@ -609,7 +607,7 @@ input[type="number"]:focus {
   position: relative;
   z-index: 2;
   transition: transform 0.3s ease;
-  font-family: "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji", "Android Emoji", "EmojiSymbols", "EmojiOne Mozilla", "Twemoji Mozilla", "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", "Android Emoji", "EmojiSymbols", "EmojiOne Mozilla", "Twemoji Mozilla", "Noto Emoji", sans-serif;
+  font-family: "Segoe UI Emoji", "Apple Color Emoji", "Segoe UI Symbol", sans-serif;
   -webkit-font-feature-settings: "emoji";
   font-feature-settings: "emoji";
   -webkit-font-smoothing: antialiased;
@@ -953,6 +951,116 @@ body {
   overflow-y: auto;
 }
 
+body.has-update-banner {
+  padding-top: calc(64px + 5.5rem);
+}
+
+.update-notification {
+  position: fixed;
+  top: 64px;
+  left: 0;
+  right: 0;
+  z-index: 999;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.12) 0%, rgba(118, 75, 162, 0.12) 100%);
+  border-bottom: 1px solid var(--border-primary);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.update-notification-content {
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 0.875rem 2rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.update-notification-icon {
+  font-size: 1.35rem;
+  flex-shrink: 0;
+  font-family: "Segoe UI Emoji", "Apple Color Emoji", "Segoe UI Symbol", sans-serif;
+}
+
+.update-notification-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.update-notification-title {
+  display: block;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  margin-bottom: 0.15rem;
+}
+
+.update-notification-message {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.update-notification-version {
+  margin: 0.35rem 0 0;
+  color: var(--text-muted, #888);
+  font-size: 0.8rem;
+}
+
+.update-notification-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-shrink: 0;
+}
+
+.update-notification-link {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.45rem 0.9rem;
+  border-radius: 8px;
+  background: var(--accent-gradient);
+  color: #fff;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.update-notification-link:hover {
+  opacity: 0.92;
+}
+
+.update-notification-dismiss {
+  padding: 0.45rem 0.9rem;
+  border-radius: 8px;
+  border: 1px solid var(--border-primary);
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.update-notification-dismiss:hover {
+  border-color: var(--accent-primary);
+}
+
+@media (max-width: 768px) {
+  body.has-update-banner {
+    padding-top: calc(64px + 8.5rem);
+  }
+
+  .update-notification-content {
+    flex-wrap: wrap;
+    padding: 0.875rem 1rem;
+  }
+
+  .update-notification-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}
+
 /* Prevent page scroll when dropdown is open */
 body.dropdown-active {
   overflow: hidden !important;
@@ -1015,6 +1123,20 @@ body:not(.nav-dropdown-open) .container {
   background: var(--bg-secondary);
   border-radius: 12px;
   border: 2px solid var(--border-primary);
+}
+
+.needs-overview-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.needs-overview-header .add-cost-btn {
+  padding: 0.5rem 1rem;
+  font-size: 0.95rem;
+  flex-shrink: 0;
 }
 
 .needs-overview-grid {
@@ -1261,7 +1383,9 @@ body:not(.nav-dropdown-open) .container {
 .payments-swiper .swiper-button-prev,
 .payments-swiper .swiper-button-next,
 .decisions-swiper .swiper-button-prev,
-.decisions-swiper .swiper-button-next {
+.decisions-swiper .swiper-button-next,
+.benefit-type-swiper .swiper-button-prev,
+.benefit-type-swiper .swiper-button-next {
   width: 37px;
   height: 37px;
   border-radius: 999px;
@@ -1278,7 +1402,9 @@ body:not(.nav-dropdown-open) .container {
 .payments-swiper .swiper-button-prev:hover,
 .payments-swiper .swiper-button-next:hover,
 .decisions-swiper .swiper-button-prev:hover,
-.decisions-swiper .swiper-button-next:hover {
+.decisions-swiper .swiper-button-next:hover,
+.benefit-type-swiper .swiper-button-prev:hover,
+.benefit-type-swiper .swiper-button-next:hover {
   background: var(--bg-secondary);
   border-color: var(--accent-color);
   color: var(--accent-color);
@@ -1287,17 +1413,21 @@ body:not(.nav-dropdown-open) .container {
 .payments-swiper .swiper-button-prev:after,
 .payments-swiper .swiper-button-next:after,
 .decisions-swiper .swiper-button-prev:after,
-.decisions-swiper .swiper-button-next:after {
+.decisions-swiper .swiper-button-next:after,
+.benefit-type-swiper .swiper-button-prev:after,
+.benefit-type-swiper .swiper-button-next:after {
   font-size: 13px;
   font-weight: 900;
   line-height: 1;
 }
 .payments-swiper .swiper-button-prev,
-.decisions-swiper .swiper-button-prev {
+.decisions-swiper .swiper-button-prev,
+.benefit-type-swiper .swiper-button-prev {
   left: 8px;
 }
 .payments-swiper .swiper-button-next,
-.decisions-swiper .swiper-button-next {
+.decisions-swiper .swiper-button-next,
+.benefit-type-swiper .swiper-button-next {
   right: 8px;
 }
 
@@ -1803,7 +1933,7 @@ body {
   position: relative;
   z-index: 2;
   transition: transform 0.3s ease;
-  font-family: "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji", "Android Emoji", "EmojiSymbols", "EmojiOne Mozilla", "Twemoji Mozilla", "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", "Android Emoji", "EmojiSymbols", "EmojiOne Mozilla", "Twemoji Mozilla", "Noto Emoji", sans-serif;
+  font-family: "Segoe UI Emoji", "Apple Color Emoji", "Segoe UI Symbol", sans-serif;
   -webkit-font-feature-settings: "emoji";
   font-feature-settings: "emoji";
   -webkit-font-smoothing: antialiased;
@@ -2337,6 +2467,49 @@ input[type="number"]::-webkit-inner-spin-button {
   font-weight: 600;
 }
 
+.additional-payments-block {
+  margin-top: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.additional-payment-form {
+  width: 100%;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-primary);
+}
+
+.additional-payment-form-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.additional-payment-form-title {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.remove-additional-payment-btn {
+  background: var(--danger-gradient);
+  color: white;
+  border: none;
+  padding: 0.35rem 0.9rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.remove-additional-payment-btn:hover {
+  transform: translateY(-1px);
+}
+
 .remove-cost-btn {
   background: var(--danger-gradient);
   color: white;
@@ -2477,13 +2650,24 @@ input[type="number"]::-webkit-inner-spin-button {
   transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
-.note-output h3 {
+.note-output h3,
+.quick-copy-section h4,
+.needs-overview-header h4,
+.sidebar-panel-heading {
   color: var(--text-primary);
-  margin-bottom: 1.25rem;
+  margin: 0 0 1.25rem 0;
   font-size: 1.4rem;
   font-weight: 600;
   text-align: left;
+  line-height: 1.3;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+}
+
+.needs-overview-header h4,
+.needs-overview-header .sidebar-panel-heading {
+  margin-bottom: 0;
+  flex: 1;
+  min-width: 0;
 }
 
 .note-output pre {
@@ -2579,23 +2763,30 @@ input[type="number"]::-webkit-inner-spin-button {
   text-decoration-color: #5a67d8;
 }
 
-/* Dollar input styling */
+/* Dollar input styling.
+   Use \0024 (not a raw $) so the single-file HTML inliner cannot treat
+   content: '$' as the special String.replace token $'. */
 .dollar-input {
   position: relative;
 }
 
 .dollar-input::before {
-  content: '$';
+  content: '\0024';
   position: absolute;
   left: 0.75rem;
-  top: 50%;
-  transform: translateY(-50%);
+  top: 0;
+  height: 2.75rem;
+  display: flex;
+  align-items: center;
   color: var(--text-muted);
   font-weight: 500;
-  z-index: 1;
+  z-index: 2;
+  pointer-events: none;
+  line-height: 1;
 }
 
-.dollar-input input {
+.dollar-input input,
+.dollar-input .form-control {
   padding-left: 1.75rem;
 }
 
@@ -2912,7 +3103,7 @@ input[type="number"] {
 /* Side-by-side layout for food questions */
 .food-layout {
   display: grid;
-  grid-template-columns: 1.1fr 450px;
+  grid-template-columns: minmax(0, 1.1fr) 450px;
   gap: 2rem;
   align-items: start;
   min-height: calc(100vh - 200px);
@@ -2961,6 +3152,8 @@ input[type="number"] {
 /* Form Sections Container */
 .form-sections-container {
   width: 100%;
+  max-width: 100%;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 2rem;
@@ -2984,6 +3177,8 @@ input[type="number"] {
   transform: translateY(30px);
   transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
   width: 100%;
+  max-width: 100%;
+  min-width: 0;
   position: relative;
   overflow: hidden;
 }
@@ -3208,7 +3403,7 @@ input[type="number"] {
 /* Responsive design for side-by-side layout */
 @media (max-width: 1200px) {
   .food-layout {
-    grid-template-columns: 1fr 400px;
+    grid-template-columns: minmax(0, 1fr) 400px;
     gap: 1.5rem;
   }
 }
@@ -3875,6 +4070,20 @@ input[type="number"] {
   transform: none;
 }
 
+.calendar-day.outside-month {
+  color: var(--text-muted, #8b95a8);
+  opacity: 0.55;
+}
+
+.calendar-day.outside-month:hover {
+  opacity: 0.85;
+}
+
+.calendar-day.outside-month.selected {
+  opacity: 1;
+  color: white;
+}
+
 /* Responsive calendar */
 @media (max-width: 480px) {
   .calendar-dropdown {
@@ -4182,14 +4391,6 @@ input[type="number"] {
           transition: all 0.3s ease-out;
         }
 
-.quick-copy-section h4 {
-  margin: 0 0 1rem 0;
-  color: var(--text-primary);
-  font-size: 1.1rem;
-  font-weight: 600;
-  text-align: center;
-}
-
         .quick-copy-section.quick-copy-empty {
           max-height: 0;
           opacity: 0;
@@ -4321,6 +4522,13 @@ input[type="number"] {
   font-weight: 500;
   color: var(--text-primary);
   font-size: 0.9rem;
+}
+
+.address-lookup-note {
+  margin: 0.4rem 0 0;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-style: italic;
 }
 
 .address-suggestions {
@@ -5184,70 +5392,33 @@ input[type="number"] {
   text-decoration: underline;
 }
 
-/* Benefit Grant - Benefit type hero section */
-.benefit-type-hero {
-  position: relative;
-  margin-bottom: 2rem;
-  padding: 2rem;
-  border-radius: 20px;
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-primary);
-  box-shadow: var(--shadow-primary);
-  overflow: hidden;
-  opacity: 0;
-  transform: translateY(16px);
-}
-
-.benefit-type-hero.section-visible {
-  animation: benefitHeroIn 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-}
-
-@keyframes benefitHeroIn {
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.benefit-type-hero::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(ellipse at 0% 0%, rgba(102, 126, 234, 0.18) 0%, transparent 55%),
-    radial-gradient(ellipse at 100% 100%, rgba(118, 75, 162, 0.14) 0%, transparent 55%);
-  pointer-events: none;
-}
-
-.benefit-type-hero-header {
-  position: relative;
-  z-index: 1;
-  text-align: center;
-  margin-bottom: 1.75rem;
-}
-
-.benefit-type-hero-title {
-  margin: 0 0 0.5rem;
-  font-size: 1.75rem;
-  font-weight: 700;
-  background: var(--accent-gradient);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.benefit-type-hero-subtitle {
-  margin: 0;
+/* Benefit Grant - Benefit type selector */
+.benefit-type-subtitle {
+  margin: -0.5rem 0 1.25rem;
   color: var(--text-muted);
   font-size: 1rem;
 }
 
-.benefit-type-grid {
+.benefit-type-swiper-wrapper {
+  overflow: visible;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
   position: relative;
-  z-index: 1;
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 1rem;
+}
+
+.benefit-type-swiper {
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  padding: 0.35rem 0 0.5rem;
+  box-sizing: border-box;
+}
+
+.benefit-type-swiper .swiper-slide {
+  height: auto;
+  display: flex;
+  box-sizing: border-box;
 }
 
 .benefit-type-card {
@@ -5256,8 +5427,11 @@ input[type="number"] {
   align-items: center;
   justify-content: flex-start;
   gap: 0.5rem;
-  padding: 1.5rem 1rem;
-  min-height: 120px;
+  padding: 1.75rem 1.25rem;
+  min-height: 150px;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
   background: var(--bg-primary);
   border: 2px solid var(--border-primary);
   border-radius: 16px;
@@ -5267,25 +5441,12 @@ input[type="number"] {
   overflow: hidden;
   color: var(--text-primary);
   box-shadow: var(--shadow-primary);
-  opacity: 0;
-  transform: translateY(12px) scale(0.97);
   transition:
     transform 0.35s cubic-bezier(0.4, 0, 0.2, 1),
     box-shadow 0.35s cubic-bezier(0.4, 0, 0.2, 1),
     border-color 0.25s ease,
     background 0.25s ease,
     color 0.25s ease;
-}
-
-.benefit-type-hero.section-visible .benefit-type-card {
-  animation: benefitCardIn 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-}
-
-@keyframes benefitCardIn {
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
 }
 
 .benefit-type-card::before {
@@ -5411,27 +5572,22 @@ input[type="number"] {
   --benefit-accent-solid: #f59e0b;
 }
 
-@media (max-width: 900px) {
-  .benefit-type-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
+.benefit-type-nonben {
+  --benefit-accent: linear-gradient(135deg, #06b6d4 0%, #0e7490 100%);
+  --benefit-accent-solid: #06b6d4;
+}
+
+.benefit-type-nonben .benefit-type-acronym {
+  font-size: 1.35rem;
 }
 
 @media (max-width: 480px) {
-  .benefit-type-hero {
-    padding: 1.25rem;
-  }
-
-  .benefit-type-hero-title {
-    font-size: 1.4rem;
-  }
-
-  .benefit-type-grid {
-    grid-template-columns: 1fr;
+  .benefit-type-swiper {
+    padding: 0.25rem 0 0.5rem;
   }
 
   .benefit-type-card {
-    min-height: 100px;
+    min-height: 120px;
   }
 }
 

@@ -4,6 +4,7 @@ import ADSDPaymentSection from './ADSDPaymentSection';
 import DecisionSection from './DecisionSection';
 import ExpandableSection from './ExpandableSection';
 import FormattedTextarea from './FormattedTextarea';
+import type { AdditionalPayment } from '../types/additionalPayment';
 
 interface ADSDFormData {
   clientId: boolean | null;
@@ -15,6 +16,7 @@ interface ADSDFormData {
   recoveryRate: number;
   directCredit: string; // 'yes' | 'no' | ''
   paymentReference: string;
+  additionalPayments?: AdditionalPayment[];
   incomeLabels?: IncomeLabels;
   income: {
     benefit: number;
@@ -196,6 +198,8 @@ const ADSDQuestions: React.FC<ADSDQuestionsProps> = ({ formData, onFormDataChang
         onRecoveryRateChange={(rate) => handleInputChange('recoveryRate', rate)}
         onDirectCreditChange={(credit) => handleInputChange('directCredit', credit)}
         onPaymentReferenceChange={(reference) => handleInputChange('paymentReference', reference)}
+        additionalPayments={formData.additionalPayments}
+        onAdditionalPaymentsChange={(payments) => handleInputChange('additionalPayments', payments)}
         isVisible={visibleSections.has('payment')}
       />
 

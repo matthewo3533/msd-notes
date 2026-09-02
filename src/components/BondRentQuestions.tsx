@@ -137,11 +137,8 @@ const BondRentQuestions: React.FC<BondRentQuestionsProps> = ({ formData, onFormD
         <div className="form-group">
           <AddressInput
             value={formData.newAddress}
-            onChange={(address, locationData) => {
+            onChange={(address) => {
               handleInputChange('newAddress', address);
-              if (locationData) {
-                handleInputChange('newAddressData', locationData);
-              }
             }}
             placeholder="Enter the client's new address"
             label="What's the client's new address?"
@@ -276,6 +273,8 @@ const BondRentQuestions: React.FC<BondRentQuestionsProps> = ({ formData, onFormD
         onRecoveryRateChange={(rate) => handleInputChange('recoveryRate', rate)}
         onDirectCreditChange={(credit) => handleInputChange('directCredit', credit)}
         onPaymentReferenceChange={(reference) => handleInputChange('paymentReference', reference)}
+        additionalPayments={formData.additionalPayments}
+        onAdditionalPaymentsChange={(payments) => handleInputChange('additionalPayments', payments)}
         isVisible={visibleSections.has('payment')}
       />
 

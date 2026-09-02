@@ -4,6 +4,7 @@ import PaymentSection from './PaymentSection';
 import DecisionSection from './DecisionSection';
 import ExpandableSection from './ExpandableSection';
 import FormattedTextarea from './FormattedTextarea';
+import type { AdditionalPayment } from '../types/additionalPayment';
 
 export interface FurnitureFormData {
   clientId: boolean | null;
@@ -18,6 +19,7 @@ export interface FurnitureFormData {
   directCredit: string;
   paymentReference: string;
   paymentCardNumber: string;
+  additionalPayments?: AdditionalPayment[];
   incomeLabels?: IncomeLabels;
   income: {
     benefit: number;
@@ -232,6 +234,8 @@ const FurnitureQuestions: React.FC<FurnitureQuestionsProps> = ({ formData, onFor
         onDirectCreditChange={(credit) => handleInputChange('directCredit', credit)}
         onPaymentReferenceChange={(reference) => handleInputChange('paymentReference', reference)}
         onPaymentCardNumberChange={(cardNumber) => handleInputChange('paymentCardNumber', cardNumber)}
+        additionalPayments={formData.additionalPayments}
+        onAdditionalPaymentsChange={(payments) => handleInputChange('additionalPayments', payments)}
         isVisible={visibleSections.has('payment')}
       />
       {/* Decision Section */}

@@ -1,5 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import ExpandableSection from './ExpandableSection';
+import AdditionalPaymentsBlock from './AdditionalPaymentsBlock';
+import type { AdditionalPayment } from '../types/additionalPayment';
 
 interface PaymentSectionProps {
   supplierName: string;
@@ -23,6 +25,8 @@ interface PaymentSectionProps {
   rentAdvanceAmount?: number;
   onBondAmountChange?: (amount: number) => void;
   onRentAdvanceAmountChange?: (amount: number) => void;
+  additionalPayments?: AdditionalPayment[];
+  onAdditionalPaymentsChange?: (payments: AdditionalPayment[]) => void;
 }
 
 function roundToNearest50Cents(value: number) {
@@ -50,7 +54,9 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
   bondAmount = 0,
   rentAdvanceAmount = 0,
   onBondAmountChange,
-  onRentAdvanceAmountChange
+  onRentAdvanceAmountChange,
+  additionalPayments = [],
+  onAdditionalPaymentsChange
 }) => {
   // Track if user has manually changed recovery rate
   const [userOverridden, setUserOverridden] = useState(false);
@@ -256,6 +262,12 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
             placeholder="Payment card number"
           />
         </div>
+      )}
+      {onAdditionalPaymentsChange && (
+        <AdditionalPaymentsBlock
+          payments={additionalPayments}
+          onChange={onAdditionalPaymentsChange}
+        />
       )}
     </ExpandableSection>
   );

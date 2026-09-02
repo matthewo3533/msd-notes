@@ -14,6 +14,7 @@ const cloneNeed = (need: NeedItem, index: number): NeedItem => ({
   id: `preview-${need.type}-${index}`,
   data: { ...(need.data as any) },
   payment: { ...need.payment },
+  additionalPayments: need.additionalPayments?.map((payment) => ({ ...payment })),
   decision: { ...need.decision }
 });
 

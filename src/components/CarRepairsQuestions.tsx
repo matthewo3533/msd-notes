@@ -3,6 +3,8 @@ import IncomeSection, { IncomeLabels, createDefaultIncomeLabels } from './Income
 import PaymentSection from './PaymentSection';
 import DecisionSection from './DecisionSection';
 import FormattedTextarea from './FormattedTextarea';
+import carsCsv from '../data/cars.csv?raw';
+import type { AdditionalPayment } from '../types/additionalPayment';
 
 interface CarData {
   Model: string;
@@ -26,6 +28,7 @@ interface CarRepairsFormData {
   directCredit: string; // 'yes' | 'no' | ''
   paymentReference: string;
   paymentCardNumber: string;
+  additionalPayments?: AdditionalPayment[];
   incomeLabels?: IncomeLabels;
   income: {
     benefit: number;
@@ -97,8 +100,7 @@ const CarRepairsQuestions: React.FC<CarRepairsQuestionsProps> = ({ formData, onF
   useEffect(() => {
     const loadCarData = async () => {
       try {
-        const response = await fetch('/data/cars.csv');
-        const csvText = await response.text();
+        const csvText = carsCsv;
         const lines = csvText.split('\n');
         const cars: CarData[] = [];
         
@@ -398,6 +400,8 @@ const CarRepairsQuestions: React.FC<CarRepairsQuestionsProps> = ({ formData, onF
         onDirectCreditChange={(credit) => handleInputChange('directCredit', credit)}
         onPaymentReferenceChange={(reference) => handleInputChange('paymentReference', reference)}
         onPaymentCardNumberChange={(cardNumber) => handleInputChange('paymentCardNumber', cardNumber)}
+        additionalPayments={formData.additionalPayments}
+        onAdditionalPaymentsChange={(payments) => handleInputChange('additionalPayments', payments)}
         isVisible={visibleSections.has('payment')}
       />
 

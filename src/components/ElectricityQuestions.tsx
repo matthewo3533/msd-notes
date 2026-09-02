@@ -4,6 +4,7 @@ import PaymentSection from './PaymentSection';
 import DecisionSection from './DecisionSection';
 import ExpandableSection from './ExpandableSection';
 import FormattedTextarea from './FormattedTextarea';
+import type { AdditionalPayment } from '../types/additionalPayment';
 
 interface ElectricityFormData {
   clientId: boolean | null;
@@ -17,6 +18,7 @@ interface ElectricityFormData {
   directCredit: string; // 'yes' | 'no' | ''
   paymentReference: string;
   paymentCardNumber: string;
+  additionalPayments?: AdditionalPayment[];
   powerAccountNumber: string;
   incomeLabels?: IncomeLabels;
   income: {
@@ -267,6 +269,8 @@ const ElectricityQuestions: React.FC<ElectricityQuestionsProps> = ({
         onDirectCreditChange={credit => handleInputChange('directCredit', credit)}
         onPaymentReferenceChange={reference => handleInputChange('paymentReference', reference)}
         onPaymentCardNumberChange={cardNumber => handleInputChange('paymentCardNumber', cardNumber)}
+        additionalPayments={formData.additionalPayments}
+        onAdditionalPaymentsChange={(payments) => handleInputChange('additionalPayments', payments)}
         isVisible={visibleSections.has('payment')}
       />
 

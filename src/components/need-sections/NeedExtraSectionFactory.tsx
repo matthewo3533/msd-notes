@@ -1,5 +1,6 @@
 import React from 'react';
 import FormattedTextarea from '../FormattedTextarea';
+import AddressInput from '../AddressInput';
 import {
   HardshipNeedType,
   NeedData,
@@ -212,13 +213,11 @@ const NeedExtraSectionFactory: React.FC<NeedExtraSectionFactoryProps> = ({ needT
     return (
       <>
         <div className="form-group">
-          <label>New address</label>
-          <input
-            type="text"
-            className="form-control"
+          <AddressInput
             value={bondData.newAddress || ''}
-            onChange={(e) => onChange({ newAddress: e.target.value } as Partial<NeedData>)}
+            onChange={(address) => onChange({ newAddress: address } as Partial<NeedData>)}
             placeholder="Enter new address"
+            label="New address"
           />
         </div>
         <div className="form-group">

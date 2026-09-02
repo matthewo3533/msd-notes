@@ -60,9 +60,10 @@ const Calendar: React.FC<CalendarProps> = ({ value, onChange, placeholder = "Sel
     return `${day}/${month}/${year}`;
   };
 
-  const handleDateSelect = (day: number) => {
-    const newDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
+  const handleDateSelect = (date: Date) => {
+    const newDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
     setSelectedDate(newDate);
+    setCurrentDate(newDate);
     onChange(formatDate(newDate));
     recordInputActivity();
     setIsOpen(false);
@@ -88,34 +89,46 @@ const Calendar: React.FC<CalendarProps> = ({ value, onChange, placeholder = "Sel
     setCurrentDate(newDate);
   };
 
+  const isSameDay = (a: Date, b: Date) =>
+    a.getDate() === b.getDate() &&
+    a.getMonth() === b.getMonth() &&
+    a.getFullYear() === b.getFullYear();
+
+  const renderDayCell = (date: Date, outsideMonth: boolean) => {
+    const isSelected = selectedDate ? isSameDay(selectedDate, date) : false;
+    const isToday = isSameDay(new Date(), date);
+    const key = `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
+
+    return (
+      <div
+        key={key}
+        className={`calendar-day${outsideMonth ? ' outside-month' : ''}${isSelected ? ' selected' : ''}${isToday ? ' today' : ''}`}
+        onClick={() => handleDateSelect(date)}
+      >
+        {date.getDate()}
+      </div>
+    );
+  };
+
   const renderCalendarDays = () => {
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
     const daysInMonth = getDaysInMonth(currentDate);
     const firstDayOfMonth = getFirstDayOfMonth(currentDate);
-    const days = [];
+    const days: React.ReactNode[] = [];
 
-    // Add empty cells for days before the first day of the month
-    for (let i = 0; i < firstDayOfMonth; i++) {
-      days.push(<div key={`empty-${i}`} className="calendar-day empty"></div>);
+    const daysInPrevMonth = getDaysInMonth(new Date(year, month - 1, 1));
+    for (let i = firstDayOfMonth - 1; i >= 0; i--) {
+      days.push(renderDayCell(new Date(year, month - 1, daysInPrevMonth - i), true));
     }
 
-    // Add days of the month
     for (let day = 1; day <= daysInMonth; day++) {
-      const date = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
-      const isSelected = selectedDate && 
-        selectedDate.getDate() === day && 
-        selectedDate.getMonth() === currentDate.getMonth() && 
-        selectedDate.getFullYear() === currentDate.getFullYear();
-      const isToday = new Date().toDateString() === date.toDateString();
+      days.push(renderDayCell(new Date(year, month, day), false));
+    }
 
-      days.push(
-        <div
-          key={day}
-          className={`calendar-day ${isSelected ? 'selected' : ''} ${isToday ? 'today' : ''}`}
-          onClick={() => handleDateSelect(day)}
-        >
-          {day}
-        </div>
-      );
+    const remaining = (7 - (days.length % 7)) % 7;
+    for (let day = 1; day <= remaining; day++) {
+      days.push(renderDayCell(new Date(year, month + 1, day), true));
     }
 
     return days;

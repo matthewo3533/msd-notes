@@ -6,6 +6,12 @@ export interface CustomHeadingFormat {
   useBold: boolean;
 }
 
+export const DEFAULT_CUSTOM_HEADING_FORMAT: CustomHeadingFormat = {
+  useTildes: true,
+  useCapitals: false,
+  useBold: true
+};
+
 /**
  * Formats a heading using custom format options
  * @param heading The heading text to format
@@ -27,32 +33,24 @@ export const formatHeading = (heading: string, _format: HeadingFormat, customFor
  */
 const formatCustomHeading = (heading: string, format: CustomHeadingFormat): string => {
   let text = heading;
-  
-  // Apply capitals first (before bold conversion)
+
   if (format.useCapitals) {
     text = text.toUpperCase();
   }
-  
-  // Then apply bold Unicode conversion
+
   if (format.useBold) {
     text = convertToBoldUnicode(text);
   }
-  
-  // Finally apply tildes or colon
+
   if (format.useTildes) {
     text = `~~~ ${text} ~~~`;
   } else if (format.useCapitals || format.useBold) {
     text = `${text}:`;
   }
-  
+
   return text;
 };
 
-/**
- * Converts text to Unicode bold characters
- * @param text The text to convert
- * @returns The text with Unicode bold characters
- */
 const convertToBoldUnicode = (text: string): string => {
   const boldMap: { [key: string]: string } = {
     'A': '𝗔', 'B': '𝗕', 'C': '𝗖', 'D': '𝗗', 'E': '𝗘', 'F': '𝗙', 'G': '𝗚', 'H': '𝗛',
@@ -72,4 +70,3 @@ const convertToBoldUnicode = (text: string): string => {
 
   return text.split('').map(char => boldMap[char] || char).join('');
 };
-

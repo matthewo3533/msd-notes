@@ -447,15 +447,17 @@ const ChangeOfAddressQuestions: React.FC<ChangeOfAddressQuestionsProps> = ({ for
         {formData.arrearsCreated === 'yes' && (
           <div className="form-group">
             <label>Arrears amount</label>
-            <input
-              type="number"
-              className="form-control"
-              value={formData.arrearsAmount || ''}
-              onChange={(e) => handleInputChange('arrearsAmount', parseFloat(e.target.value) || 0)}
-              placeholder="Enter arrears amount"
-              min="0"
-              step="0.01"
-            />
+            <div className="dollar-input">
+              <input
+                type="number"
+                className="form-control"
+                value={formData.arrearsAmount || ''}
+                onChange={(e) => handleInputChange('arrearsAmount', parseFloat(e.target.value) || 0)}
+                placeholder="Enter arrears amount"
+                min="0"
+                step="0.01"
+              />
+            </div>
           </div>
         )}
 
@@ -486,15 +488,17 @@ const ChangeOfAddressQuestions: React.FC<ChangeOfAddressQuestionsProps> = ({ for
         {formData.debtCreated === 'yes' && (
           <div className="form-group">
             <label>Debt amount</label>
-            <input
-              type="number"
-              className="form-control"
-              value={formData.debtAmount || ''}
-              onChange={(e) => handleInputChange('debtAmount', parseFloat(e.target.value) || 0)}
-              placeholder="Enter debt amount"
-              min="0"
-              step="0.01"
-            />
+            <div className="dollar-input">
+              <input
+                type="number"
+                className="form-control"
+                value={formData.debtAmount || ''}
+                onChange={(e) => handleInputChange('debtAmount', parseFloat(e.target.value) || 0)}
+                placeholder="Enter debt amount"
+                min="0"
+                step="0.01"
+              />
+            </div>
           </div>
         )}
       </div>

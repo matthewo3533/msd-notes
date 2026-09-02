@@ -1,51 +1,15 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import IncomeSection, { IncomeLabels, createDefaultIncomeLabels } from './IncomeSection';
 import PaymentSection from './PaymentSection';
 import DecisionSection from './DecisionSection';
 import ExpandableSection from './ExpandableSection';
 import { EmergencyFormData } from '../App';
 import FormattedTextarea from './FormattedTextarea';
-
-declare global {
-  interface Window {
-    google: {
-      maps: {
-        places: {
-          AutocompleteService: new () => any;
-          PlacesService: new (div: HTMLElement) => any;
-          PlacesServiceStatus: {
-            OK: string;
-          };
-        };
-        Geocoder: new () => any;
-        GeocoderStatus: {
-          OK: string;
-        };
-        DistanceMatrixService: new () => any;
-        DistanceMatrixStatus: {
-          OK: string;
-          NOT_FOUND: string;
-          ZERO_RESULTS: string;
-        };
-        TravelMode: {
-          DRIVING: string;
-        };
-        UnitSystem: {
-          METRIC: string;
-        };
-      };
-    };
-  }
-}
+import carsCsv from '../data/cars.csv?raw';
 
 interface CarData {
   Model: string;
   'L/100km': number;
-}
-
-interface Location {
-  placeId: string;
-  description: string;
 }
 
 interface GenericTemplateQuestionsProps {
@@ -69,21 +33,7 @@ const GenericTemplateQuestions: React.FC<GenericTemplateQuestionsProps> = ({ for
   const [vehicleMileage, setVehicleMileage] = useState('');
   const [petrolCost, setPetrolCost] = useState('');
   const [calculatedCost, setCalculatedCost] = useState<number | null>(null);
-  const [fromLocationSuggestions, setFromLocationSuggestions] = useState<Location[]>([]);
-  const [toLocationSuggestions, setToLocationSuggestions] = useState<Location[]>([]);
-  const [showFromSuggestions, setShowFromSuggestions] = useState(false);
-  const [showToSuggestions, setShowToSuggestions] = useState(false);
-  const [distanceCalculationError, setDistanceCalculationError] = useState<string>('');
-  const [showDistanceError, setShowDistanceError] = useState(false);
-  const [fromPlaceId, setFromPlaceId] = useState<string>('');
-  const [toPlaceId, setToPlaceId] = useState<string>('');
-  const [fromSuggestionsHeight, setFromSuggestionsHeight] = useState(0);
-  const [toSuggestionsHeight, setToSuggestionsHeight] = useState(0);
   const [carDropdownHeight, setCarDropdownHeight] = useState(0);
-  const distanceCache = useRef<Map<string, number>>(new Map());
-  const GOOGLE_API_KEY = (import.meta as any).env?.VITE_GOOGLE_API_KEY || '';
-  const autocompleteService = useRef<any>(null);
-  const distanceMatrixService = useRef<any>(null);
 
   useEffect(() => {
     const observer = new window.IntersectionObserver(
@@ -115,34 +65,9 @@ const GenericTemplateQuestions: React.FC<GenericTemplateQuestionsProps> = ({ for
   }, []);
 
   useEffect(() => {
-    const loadGoogleMapsAPI = () => {
-      if (window.google && window.google.maps) {
-        autocompleteService.current = new window.google.maps.places.AutocompleteService();
-        distanceMatrixService.current = new window.google.maps.DistanceMatrixService();
-        return;
-      }
-
-      const script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_API_KEY}&libraries=places`;
-      script.async = true;
-      script.defer = true;
-      script.onload = () => {
-        autocompleteService.current = new window.google.maps.places.AutocompleteService();
-        distanceMatrixService.current = new window.google.maps.DistanceMatrixService();
-      };
-      document.head.appendChild(script);
-    };
-
-    if (GOOGLE_API_KEY) {
-      loadGoogleMapsAPI();
-    }
-  }, [GOOGLE_API_KEY]);
-
-  useEffect(() => {
     const loadCarData = async () => {
       try {
-        const response = await fetch('/data/cars.csv');
-        const csvText = await response.text();
+        const csvText = carsCsv;
         const lines = csvText.split('\n');
         const cars: CarData[] = [];
 
@@ -195,23 +120,15 @@ const GenericTemplateQuestions: React.FC<GenericTemplateQuestionsProps> = ({ for
       if (!target.closest('.car-selector')) {
         setShowCarDropdown(false);
       }
-      if (!target.closest('.location-input-container')) {
-        setShowFromSuggestions(false);
-        setShowToSuggestions(false);
-        setFromLocationSuggestions([]);
-        setToLocationSuggestions([]);
-        setFromSuggestionsHeight(0);
-        setToSuggestionsHeight(0);
-      }
     };
 
-    if (showCarDropdown || showFromSuggestions || showToSuggestions) {
+    if (showCarDropdown) {
       document.addEventListener('mousedown', handleClickOutside);
       return () => {
         document.removeEventListener('mousedown', handleClickOutside);
       };
     }
-  }, [showCarDropdown, showFromSuggestions, showToSuggestions]);
+  }, [showCarDropdown]);
 
   useEffect(() => {
     if (formData.distance && petrolCost && (vehicleMileage || selectedCar)) {
@@ -295,137 +212,12 @@ const GenericTemplateQuestions: React.FC<GenericTemplateQuestionsProps> = ({ for
     setShowCarDropdown(false);
   };
 
-  const searchPlaces = async (query: string): Promise<Location[]> => {
-    if (!query.trim() || query.length < 3) return [];
-    if (!autocompleteService.current) return [];
-
-    return new Promise((resolve) => {
-      autocompleteService.current.getPlacePredictions(
-        {
-          input: query,
-          componentRestrictions: { country: 'nz' }
-        },
-        (predictions: any[], status: string) => {
-          if (status === window.google.maps.places.PlacesServiceStatus.OK && predictions) {
-            resolve(
-              predictions.map((prediction) => ({
-                placeId: prediction.place_id,
-                description: prediction.description
-              }))
-            );
-          } else {
-            resolve([]);
-          }
-        }
-      );
-    });
-  };
-
-  const calculateDistance = async (fromPid: string, toPid: string): Promise<number | null> => {
-    const cacheKey = `${fromPid}-${toPid}`;
-    if (distanceCache.current.has(cacheKey)) {
-      return distanceCache.current.get(cacheKey)!;
-    }
-
-    if (!distanceMatrixService.current) return null;
-
-    return new Promise((resolve) => {
-      distanceMatrixService.current.getDistanceMatrix(
-        {
-          origins: [{ placeId: fromPid }],
-          destinations: [{ placeId: toPid }],
-          travelMode: window.google.maps.TravelMode.DRIVING,
-          unitSystem: window.google.maps.UnitSystem.METRIC
-        },
-        (response: any, status: string) => {
-          if (status === window.google.maps.DistanceMatrixStatus.OK) {
-            const element = response.rows[0].elements[0];
-            if (element.status === window.google.maps.DistanceMatrixStatus.OK) {
-              const distKm = element.distance.value / 1000;
-              distanceCache.current.set(cacheKey, distKm);
-              resolve(distKm);
-              return;
-            }
-          }
-          resolve(null);
-        }
-      );
-    });
-  };
-
-  const handleFromLocationSearch = async (query: string) => {
-    const suggestions = await searchPlaces(query);
-    setFromLocationSuggestions(suggestions);
-    setShowFromSuggestions(suggestions.length > 0);
-    setFromSuggestionsHeight(Math.min(suggestions.length * 50, 200));
-  };
-
-  const handleToLocationSearch = async (query: string) => {
-    const suggestions = await searchPlaces(query);
-    setToLocationSuggestions(suggestions);
-    setShowToSuggestions(suggestions.length > 0);
-    setToSuggestionsHeight(Math.min(suggestions.length * 50, 200));
-  };
-
-  const calculateDistanceBetweenLocations = async (fromPid: string, toPid: string) => {
-    setDistanceCalculationError('');
-    setShowDistanceError(false);
-    try {
-      const dist = await calculateDistance(fromPid, toPid);
-      if (dist !== null) {
-        onFormDataChange({ distance: dist });
-      } else {
-        setDistanceCalculationError('Unable to calculate distance. Please check the addresses.');
-        setShowDistanceError(true);
-      }
-    } catch {
-      setDistanceCalculationError('Error calculating distance. Please try again.');
-      setShowDistanceError(true);
-    }
-  };
-
-  const handleFromLocationSelect = async (location: Location) => {
-    onFormDataChange({ startLocation: location.description });
-    setFromPlaceId(location.placeId);
-    setFromLocationSuggestions([]);
-    setShowFromSuggestions(false);
-    setFromSuggestionsHeight(0);
-    if (toPlaceId) {
-      await calculateDistanceBetweenLocations(location.placeId, toPlaceId);
-    }
-  };
-
-  const handleToLocationSelect = async (location: Location) => {
-    onFormDataChange({ destination: location.description });
-    setToPlaceId(location.placeId);
-    setToLocationSuggestions([]);
-    setShowToSuggestions(false);
-    setToSuggestionsHeight(0);
-    if (fromPlaceId) {
-      await calculateDistanceBetweenLocations(fromPlaceId, location.placeId);
-    }
-  };
-
   useEffect(() => {
     if (formData.petrolAssistance !== 'yes') {
-      setFromPlaceId('');
-      setToPlaceId('');
-      setDistanceCalculationError('');
-      setShowDistanceError(false);
       setCalculatedCost(null);
       onFormDataChange({ distance: 0, travelCost: 0 });
     }
   }, [formData.petrolAssistance]);
-
-  useEffect(() => {
-    if (!formData.startLocation) setFromPlaceId('');
-    if (!formData.destination) setToPlaceId('');
-    if (!formData.startLocation || !formData.destination) {
-      onFormDataChange({ distance: 0 });
-      setDistanceCalculationError('');
-      setShowDistanceError(false);
-    }
-  }, [formData.startLocation, formData.destination]);
 
   return (
     <div className="form-sections-container">
@@ -514,60 +306,24 @@ const GenericTemplateQuestions: React.FC<GenericTemplateQuestionsProps> = ({ for
         >
           <div className="form-group">
             <label>From:</label>
-            <div className="location-input-container">
-              <input
-                type="text"
-                className="form-control"
-                value={formData.startLocation}
-                onChange={(e) => {
-                  handleInputChange('startLocation', e.target.value);
-                  handleFromLocationSearch(e.target.value);
-                }}
-                onFocus={() => {
-                  if (formData.startLocation) handleFromLocationSearch(formData.startLocation);
-                }}
-                placeholder="Enter starting location"
-              />
-              {showFromSuggestions && fromLocationSuggestions.length > 0 && (
-                <div className="address-suggestions">
-                  {fromLocationSuggestions.map((location, index) => (
-                    <div key={index} className="address-suggestion" onClick={() => handleFromLocationSelect(location)}>
-                      {location.description}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-            <div className="suggestions-spacer" style={{ height: `${fromSuggestionsHeight}px` }}></div>
+            <input
+              type="text"
+              className="form-control"
+              value={formData.startLocation}
+              onChange={(e) => handleInputChange('startLocation', e.target.value)}
+              placeholder="Enter starting location"
+            />
           </div>
 
           <div className="form-group">
             <label>To:</label>
-            <div className="location-input-container">
-              <input
-                type="text"
-                className="form-control"
-                value={formData.destination}
-                onChange={(e) => {
-                  handleInputChange('destination', e.target.value);
-                  handleToLocationSearch(e.target.value);
-                }}
-                onFocus={() => {
-                  if (formData.destination) handleToLocationSearch(formData.destination);
-                }}
-                placeholder="Enter destination"
-              />
-              {showToSuggestions && toLocationSuggestions.length > 0 && (
-                <div className="address-suggestions">
-                  {toLocationSuggestions.map((location, index) => (
-                    <div key={index} className="address-suggestion" onClick={() => handleToLocationSelect(location)}>
-                      {location.description}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-            <div className="suggestions-spacer" style={{ height: `${toSuggestionsHeight}px` }}></div>
+            <input
+              type="text"
+              className="form-control"
+              value={formData.destination}
+              onChange={(e) => handleInputChange('destination', e.target.value)}
+              placeholder="Enter destination"
+            />
           </div>
 
           <div className="form-group">
@@ -604,7 +360,7 @@ const GenericTemplateQuestions: React.FC<GenericTemplateQuestionsProps> = ({ for
                   const baseDistance = formData.returnTrip === 'yes' ? value / 2 : value;
                   handleInputChange('distance', baseDistance);
                 }}
-                placeholder="Enter distance manually or use address lookup above"
+                placeholder="Enter distance in kilometres"
                 step="0.1"
               />
               {formData.distance > 0 && (
@@ -615,7 +371,7 @@ const GenericTemplateQuestions: React.FC<GenericTemplateQuestionsProps> = ({ for
                       Total distance (return trip): {(formData.distance * 2).toFixed(1)} km
                     </>
                   ) : (
-                    `Calculated distance: ${formData.distance.toFixed(1)} km`
+                    `Distance: ${formData.distance.toFixed(1)} km`
                   )}
                 </div>
               )}
@@ -689,16 +445,6 @@ const GenericTemplateQuestions: React.FC<GenericTemplateQuestionsProps> = ({ for
             <br />
             With this in mind, use these numbers only as a guideline. Have a conversation with the client to determine what is realistic based on their situation and vehicle condition.
           </div>
-
-          {showDistanceError && (
-            <div className="form-group">
-              <div className="error-message">
-                {distanceCalculationError}
-                <br />
-                <small>You can manually enter the distance above.</small>
-              </div>
-            </div>
-          )}
         </ExpandableSection>
       )}
 
@@ -731,6 +477,8 @@ const GenericTemplateQuestions: React.FC<GenericTemplateQuestionsProps> = ({ for
         onDirectCreditChange={(credit) => handleInputChange('directCredit', credit)}
         onPaymentReferenceChange={(reference) => handleInputChange('paymentReference', reference)}
         onPaymentCardNumberChange={(cardNumber) => handleInputChange('paymentCardNumber', cardNumber)}
+        additionalPayments={formData.additionalPayments}
+        onAdditionalPaymentsChange={(payments) => handleInputChange('additionalPayments', payments)}
         isVisible={visibleSections.has('payment')}
       />
 

@@ -1,40 +1,37 @@
-import { useEffect, lazy, Suspense } from 'react';
-import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import Navigation from './components/Navigation';
 import Home from './components/Home';
-import { keepAliveService } from './services/keepAliveService';
 import type { IncomeLabels } from './components/IncomeSection';
+import type { AdditionalPayment } from './types/additionalPayment';
 import { SettingsProvider, useSettings } from './contexts/SettingsContext';
 import { useInputActivityListener } from './hooks/useInputActivityListener';
-import { initAnalytics, trackPageView } from './utils/analytics';
 
-// Lazy load components for better performance
-const FoodPage = lazy(() => import('./components/FoodPage'));
-const ClothingPage = lazy(() => import('./components/ClothingPage'));
-const EmergencyPage = lazy(() => import('./components/EmergencyPage'));
-const TransitionToWorkPage = lazy(() => import('./components/TransitionToWorkPage'));
-const RentArrearsPage = lazy(() => import('./components/RentArrearsPage'));
-const CarRepairsPage = lazy(() => import('./components/CarRepairsPage'));
-const FuneralAssistancePage = lazy(() => import('./components/FuneralAssistancePage'));
-const StrandedTravelPage = lazy(() => import('./components/StrandedTravelPage'));
-const ElectricityPage = lazy(() => import('./components/ElectricityPage'));
-const DentalPage = lazy(() => import('./components/DentalPage'));
-const BedsPage = lazy(() => import('./components/BedsPage'));
-const BeddingPage = lazy(() => import('./components/BeddingPage'));
-const FurniturePage = lazy(() => import('./components/FurniturePage'));
-const GlassesPage = lazy(() => import('./components/GlassesPage'));
-const WhitewarePage = lazy(() => import('./components/WhitewarePage'));
-const BondRentPage = lazy(() => import('./components/BondRentPage'));
-const TASGrantPage = lazy(() => import('./components/TASGrantPage'));
-const DeclareIncomePage = lazy(() => import('./components/DeclareIncomePage'));
-const ADSDPage = lazy(() => import('./components/ADSDPage'));
-const PetrolCalculator = lazy(() => import('./components/PetrolCalculator'));
-const AbsenceFromNZPage = lazy(() => import('./components/AbsenceFromNZPage'));
-const MultiNeedPage = lazy(() => import('./components/MultiNeedPage'));
-const ChangeOfAddressPage = lazy(() => import('./components/ChangeOfAddressPage'));
-const GenericTemplatePage = lazy(() => import('./components/GenericTemplatePage'));
-const BenefitGrantPage = lazy(() => import('./components/BenefitGrantPage'));
-const AnalyticsPage = lazy(() => import('./components/AnalyticsPage'));
+// Static imports avoid React.lazy/dynamic import() so the bundle can run from `file://`.
+import FoodPage from './components/FoodPage';
+import ClothingPage from './components/ClothingPage';
+import EmergencyPage from './components/EmergencyPage';
+import TransitionToWorkPage from './components/TransitionToWorkPage';
+import RentArrearsPage from './components/RentArrearsPage';
+import CarRepairsPage from './components/CarRepairsPage';
+import FuneralAssistancePage from './components/FuneralAssistancePage';
+import StrandedTravelPage from './components/StrandedTravelPage';
+import ElectricityPage from './components/ElectricityPage';
+import DentalPage from './components/DentalPage';
+import BedsPage from './components/BedsPage';
+import BeddingPage from './components/BeddingPage';
+import FurniturePage from './components/FurniturePage';
+import GlassesPage from './components/GlassesPage';
+import WhitewarePage from './components/WhitewarePage';
+import BondRentPage from './components/BondRentPage';
+import TASGrantPage from './components/TASGrantPage';
+import DeclareIncomePage from './components/DeclareIncomePage';
+import ADSDPage from './components/ADSDPage';
+import PetrolCalculator from './components/PetrolCalculator';
+import AbsenceFromNZPage from './components/AbsenceFromNZPage';
+import MultiNeedPage from './components/MultiNeedPage';
+import ChangeOfAddressPage from './components/ChangeOfAddressPage';
+import GenericTemplatePage from './components/GenericTemplatePage';
+import BenefitGrantPage from './components/BenefitGrantPage';
 
 export interface Service {
   id: string;
@@ -57,6 +54,7 @@ export interface FoodFormData {
   directCredit: string;
   paymentReference: string;
   paymentCardNumber: string;
+  additionalPayments?: AdditionalPayment[];
   incomeLabels?: IncomeLabels;
   income: {
     benefit: number;
@@ -86,6 +84,7 @@ export interface ClothingFormData {
   directCredit: string;
   paymentReference: string;
   paymentCardNumber: string;
+  additionalPayments?: AdditionalPayment[];
   incomeLabels?: IncomeLabels;
   income: {
     benefit: number;
@@ -121,6 +120,7 @@ export interface EmergencyFormData {
   directCredit: string;
   paymentReference: string;
   paymentCardNumber: string;
+  additionalPayments?: AdditionalPayment[];
   incomeLabels?: IncomeLabels;
   income: {
     benefit: number;
@@ -160,6 +160,7 @@ export interface TransitionToWorkFormData {
   directCredit: string;
   paymentReference: string;
   paymentCardNumber: string;
+  additionalPayments?: AdditionalPayment[];
   incomeLabels?: IncomeLabels;
   income: {
     benefit: number;
@@ -188,6 +189,7 @@ export interface ADSDFormData {
   directCredit: string;
   paymentReference: string;
   paymentCardNumber: string;
+  additionalPayments?: AdditionalPayment[];
   incomeLabels?: IncomeLabels;
   income: {
     benefit: number;
@@ -218,6 +220,7 @@ export interface RentArrearsFormData {
   directCredit: string;
   paymentReference: string;
   paymentCardNumber: string;
+  additionalPayments?: AdditionalPayment[];
   incomeLabels?: IncomeLabels;
   income: {
     benefit: number;
@@ -252,6 +255,7 @@ export interface CarRepairsFormData {
   directCredit: string;
   paymentReference: string;
   paymentCardNumber: string;
+  additionalPayments?: AdditionalPayment[];
   incomeLabels?: IncomeLabels;
   income: {
     benefit: number;
@@ -288,6 +292,7 @@ export interface FuneralAssistanceFormData {
   directCredit: string;
   paymentReference: string;
   paymentCardNumber: string;
+  additionalPayments?: AdditionalPayment[];
   incomeLabels?: IncomeLabels;
   income: {
     benefit: number;
@@ -324,6 +329,7 @@ export interface StrandedTravelFormData {
   directCredit: string;
   paymentReference: string;
   paymentCardNumber: string;
+  additionalPayments?: AdditionalPayment[];
   incomeLabels?: IncomeLabels;
   income: {
     benefit: number;
@@ -364,6 +370,7 @@ export interface BondRentFormData {
   directCredit: string;
   paymentReference: string;
   paymentCardNumber: string;
+  additionalPayments?: AdditionalPayment[];
   incomeLabels?: IncomeLabels;
   income: {
     benefit: number;
@@ -393,6 +400,7 @@ export interface GlassesFormData {
   directCredit: string;
   paymentReference: string;
   paymentCardNumber: string;
+  additionalPayments?: AdditionalPayment[];
   incomeLabels?: IncomeLabels;
   income: {
     benefit: number;
@@ -422,6 +430,7 @@ export interface WhitewareFormData {
   directCredit: string;
   paymentReference: string;
   paymentCardNumber: string;
+  additionalPayments?: AdditionalPayment[];
   incomeLabels?: IncomeLabels;
   // Whiteware Info section
   householdSize: string;
@@ -459,6 +468,7 @@ export interface BedsFormData {
   directCredit: string;
   paymentReference: string;
   paymentCardNumber: string;
+  additionalPayments?: AdditionalPayment[];
   incomeLabels?: IncomeLabels;
   income: {
     benefit: number;
@@ -488,6 +498,7 @@ export interface BeddingFormData {
   directCredit: string;
   paymentReference: string;
   paymentCardNumber: string;
+  additionalPayments?: AdditionalPayment[];
   incomeLabels?: IncomeLabels;
   income: {
     benefit: number;
@@ -518,6 +529,7 @@ export interface FurnitureFormData {
   directCredit: string;
   paymentReference: string;
   paymentCardNumber: string;
+  additionalPayments?: AdditionalPayment[];
   incomeLabels?: IncomeLabels;
   income: {
     benefit: number;
@@ -549,6 +561,7 @@ export interface DentalFormData {
   directCredit: string;
   paymentReference: string;
   paymentCardNumber: string;
+  additionalPayments?: AdditionalPayment[];
   incomeLabels?: IncomeLabels;
   income: {
     benefit: number;
@@ -578,6 +591,7 @@ export interface ElectricityFormData {
   directCredit: string;
   paymentReference: string;
   paymentCardNumber: string;
+  additionalPayments?: AdditionalPayment[];
   powerAccountNumber: string;
   incomeLabels?: IncomeLabels;
   income: {
@@ -714,7 +728,14 @@ export interface BenefitGrantFormData {
   entitlementDate: string;
   standDown: string;
   commencementDate: string;
-  // Section 3: Payment
+  // Section 3: Employment
+  jsProfileUpdated: string;
+  cvStatus: string;
+  driversLicense: string;
+  employmentDiscussion: string;
+  barriersToEmployment: string;
+  roiCompleted: string;
+  // Section 4: Payment
   benefitRate: number;
   asRate: number;
   tasRate: number;
@@ -724,13 +745,6 @@ export interface BenefitGrantFormData {
   accommodationCost: number;
   hirePurchaseCosts: number;
   daCosts: number;
-  // Section 4: Employment
-  jsProfileUpdated: string;
-  cvStatus: string;
-  driversLicense: string;
-  employmentDiscussion: string;
-  barriersToEmployment: string;
-  roiCompleted: string;
   arrears: number;
   arrearsPeriodFrom: string;
   arrearsPeriodTo: string;
@@ -755,27 +769,7 @@ export const createBenefitGrantDocuments = (): BenefitGrantDocument[] =>
 
 function AppContent() {
   const { currentTheme, setCurrentTheme, customHeadingFormat, setCustomHeadingFormat } = useSettings();
-  const location = useLocation();
   useInputActivityListener();
-
-  // Initialize keep-alive service
-  useEffect(() => {
-    // Start the keep-alive service when the app mounts
-    keepAliveService.start();
-    
-    // Initialize analytics tracking
-    initAnalytics();
-    
-    // Cleanup: stop the service when the app unmounts
-    return () => {
-      keepAliveService.stop();
-    };
-  }, []);
-
-  // Track page views on route changes
-  useEffect(() => {
-    trackPageView(location.pathname);
-  }, [location.pathname]);
 
   return (
     <>
@@ -785,8 +779,7 @@ function AppContent() {
         customHeadingFormat={customHeadingFormat}
         onCustomHeadingFormatChange={setCustomHeadingFormat}
       />
-      <Suspense fallback={<div className="loading">Loading...</div>}>
-        <Routes>
+      <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/food" element={<FoodPage />} />
         <Route path="/clothing" element={<ClothingPage />} />
@@ -813,10 +806,8 @@ function AppContent() {
         <Route path="/generic-template" element={<GenericTemplatePage />} />
         <Route path="/benefit-grant" element={<BenefitGrantPage />} />
         <Route path="/change-of-address" element={<ChangeOfAddressPage />} />
-        <Route path="/analytics" element={<AnalyticsPage />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
-      </Suspense>
       
       {/* Footer */}
       <footer className="page-footer">
